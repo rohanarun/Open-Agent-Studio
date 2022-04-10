@@ -38,111 +38,112 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 def redrawHistory():
+    global verified
+    if verified:
+        global history
+        global frame
+        global btn
+        for widget in frame.winfo_children():
+            widget.destroy()
+        global canvas
+        imagek = Image.open(resource_path('keypress.png'))
+        imagek = imagek.resize((50,50), Image.ANTIALIAS)
+        imgk= ImageTk.PhotoImage(imagek)
+        imageC = Image.open(resource_path('click.png'))
+        imageC = imageC.resize((50,50), Image.ANTIALIAS)
+        imgC= ImageTk.PhotoImage(imageC)
+        imageM = Image.open(resource_path('mouse.png'))
+        imageM = imageM.resize((50,50), Image.ANTIALIAS)
+        imgM = ImageTk.PhotoImage(imageM)
+        #print(history)
+        btn = []
+        images = []
+        images_large = []
+        counter = 0
+        for x in history:
+            y = x
+            
+            if isinstance(y, str):
+                y = json.loads(x)
     
-    global history
-    global frame
-    global btn
-    for widget in frame.winfo_children():
-        widget.destroy()
-    global canvas
-    imagek = Image.open('keypress.png')
-    imagek = imagek.resize((50,50), Image.ANTIALIAS)
-    imgk= ImageTk.PhotoImage(imagek)
-    imageC = Image.open('click.png')
-    imageC = imageC.resize((50,50), Image.ANTIALIAS)
-    imgC= ImageTk.PhotoImage(imageC)
-    imageM = Image.open('mouse.png')
-    imageM = imageM.resize((50,50), Image.ANTIALIAS)
-    imgM = ImageTk.PhotoImage(imageM)
-    #print(history)
-    btn = []
-    images = []
-    images_large = []
-    counter = 0
-    for x in history:
-        y = x
+            #l = tk.Label(frame, text="Event: " + y["type"], font="-size 24")
+            #l.pack()
+    
+            #l.grid(column=0, row=len(history))   # grid dynamically divides the space in a grid
+    
+            #l.grid(column=0, row=counter)   # grid dynamically divides the space in a grid
+            #l22 = tk.Label(frame, text="Postion: " + " (" + str(y["x"]) +"," + str(y["y"])  + ")", font="-size 24")
+            #l22.pack()
+            #l22.grid(column=0, row=counter + 1)   # grid dynamically divides the space in a grid
+    
+            if "key" in y:
+                #l5 = tk.Label(frame, text="Key: " + y["key"])
+                #l5.pack()
+                #l5.grid(column=0, row=counter + 2)   # grid dynamically divides the space in a grid
+                
+                imagek = Image.open(resource_path('keypress.png'))
+                imagek = imagek.resize((50,50), Image.ANTIALIAS)
+                imgk= ImageTk.PhotoImage(imagek)
+                btn.append(tk.Button(frame, text=y["type"] + " " + str(len(btn)), image=imgC, width=200,command=lambda c=len(btn): edit(btn[c].cget("text")), compound="left"))
+            #btn[len(btn)-1].pack() #this packs the buttons
+                btn[len(btn)-1].grid(column=0, row=counter+3)   # grid dynamically divides the space in a grid
+    
+                separator = ttk.Separator(frame, orient='horizontal')
+                separator.grid(column=0, row=counter + 4, sticky="ew")   # grid dynamically divides the space in a grid
+    
+                counter += 5
+            elif "image" in y and "large" in y:
+                l6 = tk.Label(frame, text="Target Images: ")
+                #l6.pack()
+                #l6.grid(column=0, row=1)   # grid dynamically divides the space in a grid
+                #l6.grid(column=0, row=counter + 2)   # grid dynamically divides the space in a grid
+    
+                img = y["image"]
+                arry = np.array(img, dtype=np.uint8)
+    
+                im = Image.fromarray(arry)
+                images.append(ImageTk.PhotoImage(image=im))
+    
+    
+                panel = tk.Label(frame, image = images[len(images)-1], borderwidth=2, relief="solid")
+                #panel.pack()
+                #panel.grid(column=0, row=counter+ 3)   # grid dynamically divides the space in a grid
+    
+                #print("ADD IMAGE")
+                img2 = y["large"]
+                arry2 = np.array(img2, dtype=np.uint8)
+    
+                im2 = Image.fromarray(arry2)
+                images_large.append(ImageTk.PhotoImage(image=im2))
+    
+    
+                panel2 = tk.Label(frame, image = images_large[len(images_large)-1], borderwidth=2, relief="solid")
+               # panel2.pack()
+                #panel2.grid(column=0, row=counter + 4)   # grid dynamically divides the space in a grid
+                
+                #print("ADD IMAGE")
+                btn.append(tk.Button(frame, text=y["type"] + " " + str(len(btn)), image=imgC , width=200, command=lambda c=len(btn): edit(btn[c].cget("text")), compound="left"))
+            #btn[len(btn)-1].pack() #this packs the buttons
+                btn[len(btn)-1].grid(column=0, row=counter+5)   # grid dynamically divides the space in a grid
+    
+                separator = ttk.Separator(frame, orient='horizontal')
+                separator.grid(column=0, row=counter + 6, sticky="ew")   # grid dynamically divides the space in a grid
+                counter += 7
+                #separator.pack(fill='x')
+            else: 
+                btn.append(tk.Button(frame, text=y["type"] + " " + str(len(btn)),image=imgM, width=200, command=lambda c=len(btn): edit(btn[c].cget("text")), compound="left"))
+                btn[len(btn)-1].grid(column=0, row=counter+2)   # grid dynamically divides the space in a grid
+    
+                separator = ttk.Separator(frame, orient='horizontal')
+                separator.grid(column=0, row=counter + 3, sticky="ew")   # grid dynamically divides the space in a grid
+               
+                counter += 4
+                
+        size = (200, len(history)*200)
+        canvas.configure(scrollregion='0 0 %s %s' % size)
         
-        if isinstance(y, str):
-            y = json.loads(x)
-
-        #l = tk.Label(frame, text="Event: " + y["type"], font="-size 24")
-        #l.pack()
-
-        #l.grid(column=0, row=len(history))   # grid dynamically divides the space in a grid
-
-        #l.grid(column=0, row=counter)   # grid dynamically divides the space in a grid
-        #l22 = tk.Label(frame, text="Postion: " + " (" + str(y["x"]) +"," + str(y["y"])  + ")", font="-size 24")
-        #l22.pack()
-        #l22.grid(column=0, row=counter + 1)   # grid dynamically divides the space in a grid
-
-        if "key" in y:
-            #l5 = tk.Label(frame, text="Key: " + y["key"])
-            #l5.pack()
-            #l5.grid(column=0, row=counter + 2)   # grid dynamically divides the space in a grid
-            
-            imagek = Image.open('keypress.png')
-            imagek = imagek.resize((50,50), Image.ANTIALIAS)
-            imgk= ImageTk.PhotoImage(imagek)
-            btn.append(tk.Button(frame, text=y["type"] + " " + str(len(btn)), image=imgC, width=200,command=lambda c=len(btn): edit(btn[c].cget("text")), compound="left"))
-        #btn[len(btn)-1].pack() #this packs the buttons
-            btn[len(btn)-1].grid(column=0, row=counter+3)   # grid dynamically divides the space in a grid
-
-            separator = ttk.Separator(frame, orient='horizontal')
-            separator.grid(column=0, row=counter + 4, sticky="ew")   # grid dynamically divides the space in a grid
-
-            counter += 5
-        elif "image" in y and "large" in y:
-            l6 = tk.Label(frame, text="Target Images: ")
-            #l6.pack()
-            #l6.grid(column=0, row=1)   # grid dynamically divides the space in a grid
-            #l6.grid(column=0, row=counter + 2)   # grid dynamically divides the space in a grid
-
-            img = y["image"]
-            arry = np.array(img, dtype=np.uint8)
-
-            im = Image.fromarray(arry)
-            images.append(ImageTk.PhotoImage(image=im))
-
-
-            panel = tk.Label(frame, image = images[len(images)-1], borderwidth=2, relief="solid")
-            #panel.pack()
-            #panel.grid(column=0, row=counter+ 3)   # grid dynamically divides the space in a grid
-
-            #print("ADD IMAGE")
-            img2 = y["large"]
-            arry2 = np.array(img2, dtype=np.uint8)
-
-            im2 = Image.fromarray(arry2)
-            images_large.append(ImageTk.PhotoImage(image=im2))
-
-
-            panel2 = tk.Label(frame, image = images_large[len(images_large)-1], borderwidth=2, relief="solid")
-           # panel2.pack()
-            #panel2.grid(column=0, row=counter + 4)   # grid dynamically divides the space in a grid
-            
-            #print("ADD IMAGE")
-            btn.append(tk.Button(frame, text=y["type"] + " " + str(len(btn)), image=imgC , width=200, command=lambda c=len(btn): edit(btn[c].cget("text")), compound="left"))
-        #btn[len(btn)-1].pack() #this packs the buttons
-            btn[len(btn)-1].grid(column=0, row=counter+5)   # grid dynamically divides the space in a grid
-
-            separator = ttk.Separator(frame, orient='horizontal')
-            separator.grid(column=0, row=counter + 6, sticky="ew")   # grid dynamically divides the space in a grid
-            counter += 7
-            #separator.pack(fill='x')
-        else: 
-            btn.append(tk.Button(frame, text=y["type"] + " " + str(len(btn)),image=imgM, width=200, command=lambda c=len(btn): edit(btn[c].cget("text")), compound="left"))
-            btn[len(btn)-1].grid(column=0, row=counter+2)   # grid dynamically divides the space in a grid
-
-            separator = ttk.Separator(frame, orient='horizontal')
-            separator.grid(column=0, row=counter + 3, sticky="ew")   # grid dynamically divides the space in a grid
-           
-            counter += 4
-            
-    size = (200, len(history)*200)
-    canvas.configure(scrollregion='0 0 %s %s' % size)
+        window.mainloop()
     
-    window.mainloop()
-
 def deleteEvent(n):
     
     global history
@@ -312,123 +313,126 @@ def match(img1, img2):
     return len(matches)
 
 def runRecording():
-    global offsetX
-    global offsetY
-    #print(offsetX)
-    #print(offsetY)
-    global canvas
-    global window
-    global btn
-    global history
-  #  print history
-    for index,y in enumerate(history):
-        
-        x = y
-        if isinstance(x, str):
-            x = json.loads(y)
-        #print(y)
-        if index > 0:
-            btn[index].config(bg="black")
-            btn[index -1].config(bg="white") 
-            #btn[index].grid(column=0, row=index*6+3)
-            frame.update()
-            canvas.yview_moveto(index*.0020)
-
-            window.update()
-
-        for key, value in x.items()  :
-            if key == "image":
-                x["image"] = np.asarray(x["image"],dtype = "uint8")
-        if x["type"] == "Move Mouse":
-            pyautogui.moveTo(x["x"], x["y"]) 
-        if x["type"] == "Left Mouse Lift": 
-            pyautogui.mouseUp() 
-        if x["type"] == "Left Mouse Click": 
-            img = pyautogui.screenshot(region=(x["x"]-half_small,x["y"]-half_small, size_small, size_small))
-            image = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
-           # test = match(image, x["image"])
-
-
-
-            match_res = cv2.matchTemplate(x["image"], image, cv2.TM_SQDIFF_NORMED)
-            _, max_val, _, max_loc = cv2.minMaxLoc(match_res)
-            print(max_val)
-            print(max_loc)
-            if max_val > .9:
-                print("Success")
-                print(str(x["x"]) + "," + str(x["y"]))
-                pyautogui.mouseDown(x["x"], x["y"]) 
-            else:
-                print("FAILED")
-                img = pyautogui.screenshot()
+    global verified
+    if verified:
+        global offsetX
+        global offsetY
+        #print(offsetX)
+        #print(offsetY)
+        global canvas
+        global window
+        global btn
+        global history
+      #  print history
+        for index,y in enumerate(history):
+            
+            x = y
+            if isinstance(x, str):
+                x = json.loads(y)
+            #print(y)
+            if index > 0:
+                btn[index].config(bg="black")
+                btn[index -1].config(bg="white") 
+                #btn[index].grid(column=0, row=index*6+3)
+                frame.update()
+                canvas.yview_moveto(index*.0020)
+    
+                window.update()
+    
+            for key, value in x.items()  :
+                if key == "image":
+                    x["image"] = np.asarray(x["image"],dtype = "uint8")
+            if x["type"] == "Move Mouse":
+                pyautogui.moveTo(x["x"], x["y"]) 
+            if x["type"] == "Left Mouse Lift": 
+                pyautogui.mouseUp() 
+            if x["type"] == "Left Mouse Click": 
+                img = pyautogui.screenshot(region=(x["x"]-half_small,x["y"]-half_small, size_small, size_small))
                 image = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
-                print(max_loc)
-                
-                match_res = cv2.matchTemplate(x["image"], image, cv2.TM_CCOEFF_NORMED)
+               # test = match(image, x["image"])
+    
+    
+    
+                match_res = cv2.matchTemplate(x["image"], image, cv2.TM_SQDIFF_NORMED)
                 _, max_val, _, max_loc = cv2.minMaxLoc(match_res)
+                print(max_val)
+                print(max_loc)
                 if max_val > .9:
-                    pyautogui.mouseDown(int(max_loc[0] + 25), int(max_loc[1] + 25))
-                    print("Click")
-                    print("match:" +str(max_val))
+                    print("Success")
+                    print(str(x["x"]) + "," + str(x["y"]))
+                    pyautogui.mouseDown(x["x"], x["y"]) 
+                else:
+                    print("FAILED")
+                    img = pyautogui.screenshot()
+                    image = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
                     print(max_loc)
-                    print(str(x["x"]) + " " + str(x["y"]))
-                    print(str(max_loc[0] + 25) + "," + str(max_loc[1] + 25) )
-                    print(str(x["x"])+ "," + str(x["y"]) )
-                    print("CLICKED AFTER FAIL")
-                else:
-                    best_loc = None
-                    best_val = 0
-                    best_scale = 1.0
-                    	# loop over the scales of the image
-                    for scale in np.linspace(0.3, 1.0, 20)[::-1]:
-                        resized = cv2.resize(x["image"], (int(x["image"].shape[1] * scale), int(x["image"].shape[0] * scale)), interpolation = cv2.INTER_AREA)
-                        #cv2.imshow("img",resized)
-                        #cv2.waitKey(1)
-                        match_res = cv2.matchTemplate(cv2.cvtColor(np.array(resized), cv2.COLOR_BGR2RGB), image, cv2.TM_CCOEFF_NORMED)
-                        _, max_val, _, max_loc = cv2.minMaxLoc(match_res)
-                        #print(max_val)
-                        #print(max_loc)
-                        #print(scale)
-                        if max_val > best_val:
-                            best_val = max_val
-                            best_loc = max_loc
-                            best_scale = scale
-                    print("BESTS :")
-                    print("match:" + str(best_val))
-                    print(best_loc)
-                    print("scale:" + str(best_scale))
-
-                    #print("SUPER MATCH")
-                    if best_val > .8:
-                        pyautogui.mouseDown(best_loc[0] + 25*best_scale, best_loc[1] + 25*best_scale)
-                         #  offsetX = x["x"] - max_loc[0] + 25
-                         #  offsetY = x["y"] - max_loc[1] + 25
-                        
-        if x["type"] == "keypress":
-            if key_mode == "low":
-                if "space" in str(x["key"]).split("KEY_")[1].lower():
-                    pyautogui.write(" ", interval=0.05) 
-                elif "period" in str(x["key"]).split("KEY_")[1].lower():
-                    pyautogui.write(".", interval=0.05) 
-                elif "slash" in str(x["key"]).split("KEY_")[1].lower():
-                    pyautogui.write("/", interval=0.05) 
-                else:
-                    pyautogui.write(str(x["key"]).split("KEY_")[1].lower(), interval=0.05) 
-
-#button7location = pyautogui.locateOnScreen('tweet.png')asdfas asdfasdf    asdfasdf   
-#print(button7location)asdfassddss
-#button7point = pyautogui.center(button7location)asdfasdf
-
-#button7x, button7y = button7point
-#pyautogui.click(button7x, button7y)  # clicks the center of where the 7 button was found
-#pyautogui.click('tweet.png') # a shortcut version to click on the center of where the 7 button was found
-
-# Some blocking code in your main thread...
+                    
+                    match_res = cv2.matchTemplate(x["image"], image, cv2.TM_CCOEFF_NORMED)
+                    _, max_val, _, max_loc = cv2.minMaxLoc(match_res)
+                    if max_val > .9:
+                        pyautogui.mouseDown(int(max_loc[0] + 25), int(max_loc[1] + 25))
+                        print("Click")
+                        print("match:" +str(max_val))
+                        print(max_loc)
+                        print(str(x["x"]) + " " + str(x["y"]))
+                        print(str(max_loc[0] + 25) + "," + str(max_loc[1] + 25) )
+                        print(str(x["x"])+ "," + str(x["y"]) )
+                        print("CLICKED AFTER FAIL")
+                    else:
+                        best_loc = None
+                        best_val = 0
+                        best_scale = 1.0
+                        	# loop over the scales of the image
+                        for scale in np.linspace(0.3, 1.0, 20)[::-1]:
+                            resized = cv2.resize(x["image"], (int(x["image"].shape[1] * scale), int(x["image"].shape[0] * scale)), interpolation = cv2.INTER_AREA)
+                            #cv2.imshow("img",resized)
+                            #cv2.waitKey(1)
+                            match_res = cv2.matchTemplate(cv2.cvtColor(np.array(resized), cv2.COLOR_BGR2RGB), image, cv2.TM_CCOEFF_NORMED)
+                            _, max_val, _, max_loc = cv2.minMaxLoc(match_res)
+                            #print(max_val)
+                            #print(max_loc)
+                            #print(scale)
+                            if max_val > best_val:
+                                best_val = max_val
+                                best_loc = max_loc
+                                best_scale = scale
+                        print("BESTS :")
+                        print("match:" + str(best_val))
+                        print(best_loc)
+                        print("scale:" + str(best_scale))
+    
+                        #print("SUPER MATCH")
+                        if best_val > .8:
+                            pyautogui.mouseDown(best_loc[0] + 25*best_scale, best_loc[1] + 25*best_scale)
+                             #  offsetX = x["x"] - max_loc[0] + 25
+                             #  offsetY = x["y"] - max_loc[1] + 25
+                            
+            if x["type"] == "keypress":
+                if key_mode == "low":
+                    if "space" in str(x["key"]).split("KEY_")[1].lower():
+                        pyautogui.write(" ", interval=0.05) 
+                    elif "period" in str(x["key"]).split("KEY_")[1].lower():
+                        pyautogui.write(".", interval=0.05) 
+                    elif "slash" in str(x["key"]).split("KEY_")[1].lower():
+                        pyautogui.write("/", interval=0.05) 
+                    else:
+                        pyautogui.write(str(x["key"]).split("KEY_")[1].lower(), interval=0.05) 
+    
+    #button7location = pyautogui.locateOnScreen('tweet.png')asdfas asdfasdf    asdfasdf   
+    #print(button7location)asdfassddss
+    #button7point = pyautogui.center(button7location)asdfasdf
+    
+    #button7x, button7y = button7point
+    #pyautogui.click(button7x, button7y)  # clicks the center of where the 7 button was found
+    #pyautogui.click('tweet.png') # a shortcut version to click on the center of where the 7 button was found
+    
+    # Some blocking code in your main thread...
 window = tk.Tk()
 window.geometry('200x1080')
- 
+     
 def printInput():
     global recorder
+    global verified
     inp = inputtxt.get(1.0, "end-1c")
    # lbl.config(text = "Cheat Layer Key: "+inp)
     r = requests.post("https://cheatlayer.com/user/checkDesktopKey", data={'id': inp.replace('\r', '').replace('\n', '')})
@@ -443,10 +447,12 @@ def printInput():
         with open('config_cheatlayer.txt', 'w') as f:
             f.write(inp)
 def startRecording():
-    global recorder
-    counter = 0
-    bnt = 0
-    recorder = Recorder.record(eventRecord)
+    global verified
+    if verified:
+        global recorder
+        counter = 0
+        bnt = 0
+        recorder = Recorder.record(eventRecord)
 def edit(button):
     print(button)
     print(button.split(" ")[1])
@@ -474,32 +480,34 @@ def saveRecording():
         f.write("%s\n" % (item))
     f.close()
 def openRecording():
-    global history
-    global canvas
-    global frame
-    imagek = Image.open('keypress.png')
-#Resize the Image
-    imagek = imagek.resize((50,50), Image.ANTIALIAS)
-#Convert the image to PhotoImage
-    imgk= ImageTk.PhotoImage(imagek)
-    imageC = Image.open('click.png')
-#Resize the Image
-    imageC = imageC.resize((50,50), Image.ANTIALIAS)
-#Convert the image to PhotoImage
-    imgC= ImageTk.PhotoImage(imageC)
-    imageM = Image.open('mouse.png')
-#Resize the Image
-    imageM = imageM.resize((50,50), Image.ANTIALIAS)
-#Convert the image to PhotoImage
-    imgM = ImageTk.PhotoImage(imageM)
-    f = fd.askopenfilename(filetypes=(("Template files", "*.*"),
-                                           ("All files", "*.*") ))
-    with open(f) as file:
-        history = file.readlines()
-    #print(history)
-    redrawHistory()
-
-
+    global verified
+    if verified:
+        global history
+        global canvas
+        global frame
+        imagek = Image.open(resource_path('keypress.png'))
+    #Resize the Image
+        imagek = imagek.resize((50,50), Image.ANTIALIAS)
+    #Convert the image to PhotoImage
+        imgk= ImageTk.PhotoImage(imagek)
+        imageC = Image.open(resource_path('click.png'))
+    #Resize the Image
+        imageC = imageC.resize((50,50), Image.ANTIALIAS)
+    #Convert the image to PhotoImage
+        imgC= ImageTk.PhotoImage(imageC)
+        imageM = Image.open(resource_path('mouse.png'))
+    #Resize the Image
+        imageM = imageM.resize((50,50), Image.ANTIALIAS)
+    #Convert the image to PhotoImage
+        imgM = ImageTk.PhotoImage(imageM)
+        f = fd.askopenfilename(filetypes=(("Template files", "*.*"),
+                                               ("All files", "*.*") ))
+        with open(f) as file:
+            history = file.readlines()
+        #print(history)
+        redrawHistory()
+    
+    
 menubar = tk.Menu(window)
 filemenu = tk.Menu(menubar, tearoff=0)
 filemenu.add_command(label="New", command=newRecording)
@@ -521,31 +529,6 @@ if os.path.isfile('config_cheatlayer.txt'):
     with open('config_cheatlayer.txt', 'r') as file:
         default = file.read().replace('\n', '')
 # TextBox Creation
-if len(default) > 1:
-    r = requests.post("https://cheatlayer.com/user/checkDesktopKey", data={'id': default.replace('\r', '').replace('\n', '')})
-    #print(r.status_code, r.reason)
-    #print(r.json())
-    data = r.json()
-    if len(data["user"]) > 0: 
-          # Replace print with any callback that accepts an 'event' arg
-        verified = True
-       # tk.messagebox.showinfo("Cheat Layer",  "Logged in!")
-        print("Logged in!")
-        
-else:
-    inputtxt = tk.Text(window,
-                       height = 1,
-                       width = 30)
-    inputtxt.grid(column=0, row=0)   # grid dynamically divides the space in a grid
-
-    #inputtxt.pack()
-
-# Button Creation
-    printButton = tk.Button(window,
-                        text = "Submit Key", 
-                        command = printInput)
-    printButton.grid(column=1, row=0)   # grid dynamically divides the space in a grid
-
 window.title("Cheat Layer Desktop RPA Beta")
 def on_configure(event):
     global canvas
@@ -577,6 +560,33 @@ canvas.configure(yscrollcommand = scrollbar.set)
 # --- put frame in canvas ---
 
 frame = tk.Frame(canvas)
+
+
+if len(default) > 1:
+    r = requests.post("https://cheatlayer.com/user/checkDesktopKey", data={'id': default.replace('\r', '').replace('\n', '')})
+    #print(r.status_code, r.reason)
+    #print(r.json())
+    data = r.json()
+    if len(data["user"]) > 0: 
+          # Replace print with any callback that accepts an 'event' arg
+        verified = True
+        tk.messagebox.showinfo("Cheat Layer",  "Logged in!")
+        print("Logged in!")
+        
+else:
+    inputtxt = tk.Text(frame,
+                       height = 1,
+                       width = 30)
+    inputtxt.grid(column=0, row=0)   # grid dynamically divides the space in a grid
+
+    #inputtxt.pack()
+
+# Button Creation
+    printButton = tk.Button(frame,
+                        text = "Submit Key", 
+                        command = printInput)
+    printButton.grid(column=0, row=1)   # grid dynamically divides the space in a grid
+
 canvas.create_window((0,0), window=frame, anchor='nw')
 window.call('wm', 'attributes', '.', '-topmost', '1')
 window.iconbitmap(resource_path('favicon.ico'))
