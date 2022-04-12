@@ -20,6 +20,7 @@ images = []
 images_large = []
 offsetX = 0
 offsetY = 0
+shift_down = False
 recorder = None
 verified = False
 size = 500
@@ -251,7 +252,7 @@ def cap(x, y, half, size):
    # cv2.imwrite("in_memory_to_disk.png", image)
 
      # Write it to the output file
-    return image
+    return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -273,11 +274,12 @@ def eventRecord(event):
     global mouse_counter
     global history
     global half_small
+    global window
     global half
     global size
     global counter
     global size_small
-   # print(event)
+    print(event)
    # print(len(history))
     if "MOVE" in str(event.event):
         mouse_counter += 1
@@ -289,11 +291,10 @@ def eventRecord(event):
         history.append(json.dumps({"type":"Left Mouse Lift", "x": int(event.x), "y": int(event.y), "image": cap(event.x, event.y, half_small, size_small), "large": cap(event.x, event.y, half, size)}, cls=NumpyEncoder))  
     if "DOWN" in str(event.event):
         if "KEY_ESCAPE" in str(event.keyboard_key):
-            recorder.stop()
-            runRecording()   
+            stopRecording()   
         else:  
             history.append(json.dumps({"type":"keypress", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
-    
+           
 def match(img1, img2):
 #sift
     sift = cv2.xfeatures2d.SIFT_create()
@@ -317,8 +318,10 @@ def runRecording():
     if verified:
         global offsetX
         global offsetY
+        
         #print(offsetX)
         #print(offsetY)
+        global shift_down
         global canvas
         global window
         global btn
@@ -348,76 +351,77 @@ def runRecording():
                 pyautogui.mouseUp() 
             if x["type"] == "Left Mouse Click": 
                 img = pyautogui.screenshot(region=(x["x"]-half_small,x["y"]-half_small, size_small, size_small))
-                image = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+                image =  cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+
                # test = match(image, x["image"])
     
-    
-    
+                print(half_small)
+                print(size_small)
                 match_res = cv2.matchTemplate(x["image"], image, cv2.TM_SQDIFF_NORMED)
-                _, max_val, _, max_loc = cv2.minMaxLoc(match_res)
-                print(max_val)
-                print(max_loc)
-                if max_val > .9:
+                print(match_res)
+                min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match_res)
+                print(min_val)
+                print(min_loc)
+                
+                            
+                if min_val < 0.01:
                     print("Success")
                     print(str(x["x"]) + "," + str(x["y"]))
                     pyautogui.mouseDown(x["x"], x["y"]) 
                 else:
-                    print("FAILED")
                     img = pyautogui.screenshot()
                     image = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
-                    print(max_loc)
-                    
-                    match_res = cv2.matchTemplate(x["image"], image, cv2.TM_CCOEFF_NORMED)
-                    _, max_val, _, max_loc = cv2.minMaxLoc(match_res)
-                    if max_val > .9:
-                        pyautogui.mouseDown(int(max_loc[0] + 25), int(max_loc[1] + 25))
-                        print("Click")
-                        print("match:" +str(max_val))
-                        print(max_loc)
-                        print(str(x["x"]) + " " + str(x["y"]))
-                        print(str(max_loc[0] + 25) + "," + str(max_loc[1] + 25) )
-                        print(str(x["x"])+ "," + str(x["y"]) )
-                        print("CLICKED AFTER FAIL")
-                    else:
-                        best_loc = None
-                        best_val = 0
-                        best_scale = 1.0
-                        	# loop over the scales of the image
-                        for scale in np.linspace(0.3, 1.0, 20)[::-1]:
-                            resized = cv2.resize(x["image"], (int(x["image"].shape[1] * scale), int(x["image"].shape[0] * scale)), interpolation = cv2.INTER_AREA)
-                            #cv2.imshow("img",resized)
-                            #cv2.waitKey(1)
-                            match_res = cv2.matchTemplate(cv2.cvtColor(np.array(resized), cv2.COLOR_BGR2RGB), image, cv2.TM_CCOEFF_NORMED)
-                            _, max_val, _, max_loc = cv2.minMaxLoc(match_res)
-                            #print(max_val)
-                            #print(max_loc)
-                            #print(scale)
-                            if max_val > best_val:
-                                best_val = max_val
-                                best_loc = max_loc
-                                best_scale = scale
-                        print("BESTS :")
-                        print("match:" + str(best_val))
-                        print(best_loc)
-                        print("scale:" + str(best_scale))
-    
-                        #print("SUPER MATCH")
-                        if best_val > .8:
-                            pyautogui.mouseDown(best_loc[0] + 25*best_scale, best_loc[1] + 25*best_scale)
-                             #  offsetX = x["x"] - max_loc[0] + 25
-                             #  offsetY = x["y"] - max_loc[1] + 25
+                    best_loc = None
+                    best_val = 0
+                    best_scale = 1.0
+                    	# loop over the scales of the image
+                    for scale in np.linspace(0.5, 1.0, 50)[::-1]:
+                        resized = cv2.resize(x["image"], (int(x["image"].shape[1] * scale), int(x["image"].shape[0] * scale)), interpolation = cv2.INTER_AREA)
+                
+                        match_res = cv2.matchTemplate(np.array(resized), image, cv2.TM_CCOEFF_NORMED)
+                        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match_res)
+                        #print(max_val)
+                        #print(max_loc)
+                        #print(scale)
+                        if max_val > best_val:
+                            best_val = max_val
+                            best_loc = max_loc
+                            best_scale = scale
+                    print("BESTS :")
+                    print("match:" + str(best_val))
+                    print(best_loc)
+                    print("scale:" + str(best_scale))
+
+                    #print("SUPER MATCH")
+                    if best_val  > .9:
+                        pyautogui.mouseDown(best_loc[0] + 25*best_scale, best_loc[1] + 25*best_scale)
+                         #  offsetX = x["x"] - max_loc[0] + 25
+                         #  offsetY = x["y"] - max_loc[1] + 25
                             
             if x["type"] == "keypress":
                 if key_mode == "low":
-                    if "space" in str(x["key"]).split("KEY_")[1].lower():
+                    if "backspace" in str(x["key"]).split("KEY_")[1].lower():
+                         pyautogui.press('backspace')
+                    elif "space" in str(x["key"]).split("KEY_")[1].lower():
                         pyautogui.write(" ", interval=0.05) 
                     elif "period" in str(x["key"]).split("KEY_")[1].lower():
                         pyautogui.write(".", interval=0.05) 
                     elif "slash" in str(x["key"]).split("KEY_")[1].lower():
                         pyautogui.write("/", interval=0.05) 
+                    elif "return" in str(x["key"]).split("KEY_")[1].lower():
+                         pyautogui.press('enter')
+                    elif "shift" in str(x["key"]).split("KEY_")[1].lower():
+                        if shift_down:
+                            pyautogui.keyUp("shift")
+                            shift_down = False
+                        else:
+                            pyautogui.keyDown("shift")
+                            shift_down = True
                     else:
-                        pyautogui.write(str(x["key"]).split("KEY_")[1].lower(), interval=0.05) 
-    
+                        if shift_down:
+                            pyautogui.write(str(x["key"]).split("KEY_")[1].upper(), interval=0.05) 
+                        else:
+                            pyautogui.write(str(x["key"]).split("KEY_")[1].lower(), interval=0.05)
     #button7location = pyautogui.locateOnScreen('tweet.png')asdfas asdfasdf    asdfasdf   
     #print(button7location)asdfassddss
     #button7point = pyautogui.center(button7location)asdfasdf
@@ -462,6 +466,13 @@ def stopRecording():
     global recorder
     recorder.stop()
     redrawHistory()
+
+
+def loopRecording():
+    global recorder
+    print("play")
+    while True:
+        runRecording()   
 def playRecording():
     global recorder
     print("play")
@@ -514,8 +525,10 @@ filemenu.add_command(label="New", command=newRecording)
 filemenu.add_command(label="Open", command=openRecording)
 filemenu.add_command(label="Save", command=saveRecording)
 filemenu.add_command(label="Play", command=playRecording)
+filemenu.add_command(label="Loop", command=loopRecording)
+
 filemenu.add_command(label="Start Recording", command=startRecording)
-filemenu.add_command(label="Stop Recording (ESC)", command=stopRecording)
+filemenu.add_command(label="Stop Recording", command=stopRecording)
 
 filemenu.add_separator()
 filemenu.add_command(label="Exit", command=window.quit)
