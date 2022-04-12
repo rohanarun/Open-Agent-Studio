@@ -377,8 +377,8 @@ def runRecording():
                     	# loop over the scales of the image
                     for scale in np.linspace(0.5, 1.0, 50)[::-1]:
                         resized = cv2.resize(x["image"], (int(x["image"].shape[1] * scale), int(x["image"].shape[0] * scale)), interpolation = cv2.INTER_AREA)
-                
-                        match_res = cv2.matchTemplate(np.array(resized), image, cv2.TM_CCOEFF_NORMED)
+                      
+                        match_res = cv2.matchTemplate(image, np.array(resized),  cv2.TM_CCOEFF_NORMED)
                         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match_res)
                         #print(max_val)
                         #print(max_loc)
@@ -394,7 +394,7 @@ def runRecording():
 
                     #print("SUPER MATCH")
                     if best_val  > .9:
-                        pyautogui.mouseDown(best_loc[0] + 25*best_scale, best_loc[1] + 25*best_scale)
+                        pyautogui.mouseDown(best_loc[0] + half_small*best_scale, best_loc[1] + half_small*best_scale)
                          #  offsetX = x["x"] - max_loc[0] + 25
                          #  offsetY = x["y"] - max_loc[1] + 25
                             
