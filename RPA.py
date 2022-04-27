@@ -11,6 +11,10 @@ from tkinter import filedialog as fd
 import json
 from PIL import ImageTk, Image
 from tkinter import ttk
+from threading import Thread
+
+from queue import Queue
+record_tasks = Queue()
 
 import numpy as np
 import cv2
@@ -29,6 +33,8 @@ size_small = 50
 half_small = 25 
 btn = [] #creates list to store the buttons ins
 
+
+import os.path
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
@@ -38,24 +44,22 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
+
+
+
 def redrawHistory():
     global verified
     if verified:
         global history
+        global imgM
+        global imgC
+        global imgk
         global frame
         global btn
+        global window
         for widget in frame.winfo_children():
             widget.destroy()
         global canvas
-        imagek = Image.open(resource_path('keypress.png'))
-        imagek = imagek.resize((50,50), Image.ANTIALIAS)
-        imgk= ImageTk.PhotoImage(imagek)
-        imageC = Image.open(resource_path('click.png'))
-        imageC = imageC.resize((50,50), Image.ANTIALIAS)
-        imgC= ImageTk.PhotoImage(imageC)
-        imageM = Image.open(resource_path('mouse.png'))
-        imageM = imageM.resize((50,50), Image.ANTIALIAS)
-        imgM = ImageTk.PhotoImage(imageM)
         #print(history)
         btn = []
         images = []
@@ -85,7 +89,7 @@ def redrawHistory():
                 imagek = Image.open(resource_path('keypress.png'))
                 imagek = imagek.resize((50,50), Image.ANTIALIAS)
                 imgk= ImageTk.PhotoImage(imagek)
-                btn.append(tk.Button(frame, text=y["type"] + " " + str(len(btn)), image=imgC, width=200,command=lambda c=len(btn): edit(btn[c].cget("text")), compound="left"))
+                btn.append(tk.Button(frame, text=y["type"] + " " + str(len(btn)), image=imgC, width=300,command=lambda c=len(btn): edit(btn[c].cget("text")), compound="left"))
             #btn[len(btn)-1].pack() #this packs the buttons
                 btn[len(btn)-1].grid(column=0, row=counter+3)   # grid dynamically divides the space in a grid
     
@@ -123,7 +127,7 @@ def redrawHistory():
                 #panel2.grid(column=0, row=counter + 4)   # grid dynamically divides the space in a grid
                 
                 #print("ADD IMAGE")
-                btn.append(tk.Button(frame, text=y["type"] + " " + str(len(btn)), image=imgC , width=200, command=lambda c=len(btn): edit(btn[c].cget("text")), compound="left"))
+                btn.append(tk.Button(frame, text=y["type"] + " " + str(len(btn)), image=imgC , width=300, command=lambda c=len(btn): edit(btn[c].cget("text")), compound="left"))
             #btn[len(btn)-1].pack() #this packs the buttons
                 btn[len(btn)-1].grid(column=0, row=counter+5)   # grid dynamically divides the space in a grid
     
@@ -132,7 +136,7 @@ def redrawHistory():
                 counter += 7
                 #separator.pack(fill='x')
             else: 
-                btn.append(tk.Button(frame, text=y["type"] + " " + str(len(btn)),image=imgM, width=200, command=lambda c=len(btn): edit(btn[c].cget("text")), compound="left"))
+                btn.append(tk.Button(frame, text=y["type"] + " " + str(len(btn)),image=imgM, width=300, command=lambda c=len(btn): edit(btn[c].cget("text")), compound="left"))
                 btn[len(btn)-1].grid(column=0, row=counter+2)   # grid dynamically divides the space in a grid
     
                 separator = ttk.Separator(frame, orient='horizontal')
@@ -140,10 +144,11 @@ def redrawHistory():
                
                 counter += 4
                 
-        size = (200, len(history)*200)
-        canvas.configure(scrollregion='0 0 %s %s' % size)
-        
-        window.mainloop()
+       
+        window.event_generate("<<update>>", when="tail", state=123)
+      #  record_tasks.put("update")
+#        window.update()
+
     
 def deleteEvent(n):
     
@@ -291,7 +296,26 @@ def eventRecord(event):
         history.append(json.dumps({"type":"Left Mouse Lift", "x": int(event.x), "y": int(event.y), "image": cap(event.x, event.y, half_small, size_small), "large": cap(event.x, event.y, half, size)}, cls=NumpyEncoder))  
     if "DOWN" in str(event.event):
         if "KEY_ESCAPE" in str(event.keyboard_key):
-            stopRecording()   
+            #stopRecording()
+            #reco
+            window.event_generate("<<stop>>", when="tail", state=123)
+            #record_tasks.put("stop")
+            #redrawHistory() 
+        if "PRINT" in str(event.keyboard_key):
+            #stopRecording()
+            #reco
+            print("PRINT")
+            newWindow = tk.Toplevel(window)
+    
+            newWindow.title("Edit Event" + n)
+            step = json.loads(history[int(n)])   
+            newWindow.geometry("1000x800")
+            img = pyautogui.screenshot()
+            image = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+            
+            #window.event_generate("<<stop>>", when="tail", state=123)
+            #record_tasks.put("stop")
+            #redrawHistory() 
         else:  
             history.append(json.dumps({"type":"keypress", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
            
@@ -432,8 +456,23 @@ def runRecording():
     
     # Some blocking code in your main thread...
 window = tk.Tk()
-window.geometry('200x1080')
+#window.geometry('300x1080')
      
+w = 300 # width for the Tk root
+h = 1080 # height for the Tk root
+
+# get screen width and height
+ws = window.winfo_screenwidth() # width of the screen
+hs = window.winfo_screenheight() # height of the screen
+
+# calculate x and y coordinates for the Tk root window
+x = ws-300
+y = 0
+
+# set the dimensions of the screen 
+# and where it is placed
+window.geometry('%dx%d+%d+%d' % (w, h, x, y))
+
 def printInput():
     global recorder
     global verified
@@ -549,12 +588,12 @@ def on_configure(event):
     # update scrollregion after starting 'mainloop'
     # when all widgets are in canvas
     
-    size = (200, frame.winfo_reqheight())
+    size = (300, frame.winfo_reqheight())
     print(size)
     canvas.configure(scrollregion='0 0 %s %s' % size)
     #canvas.configure(scrollregion=canvas.bbox('all'))
 
-canvas = tk.Canvas(window,height = 1080 , width = 200)
+canvas = tk.Canvas(window,height = 1080 , width = 300)
 canvas.bind_all("<MouseWheel>", _on_mousewheel)
 
 #canvas.pack(side=tk.LEFT)
@@ -583,7 +622,7 @@ if len(default) > 1:
     if len(data["user"]) > 0: 
           # Replace print with any callback that accepts an 'event' arg
         verified = True
-        tk.messagebox.showinfo("Cheat Layer",  "Logged in!")
+       # tk.messagebox.showinfo("Cheat Layer",  "Logged in!")
         print("Logged in!")
         
 else:
@@ -603,6 +642,28 @@ else:
 canvas.create_window((0,0), window=frame, anchor='nw')
 window.call('wm', 'attributes', '.', '-topmost', '1')
 window.iconbitmap(resource_path('favicon.ico'))
+def stopMain(data):
+    stopRecording()
+def updateMain(data):
+    global window
+    global canvas
+    size = (300, len(history)*300)
+    canvas.configure(scrollregion='0 0 %s %s' % size)
+    print("update")
+    window.mainloop()
+
+imagek = Image.open(resource_path('keypress.png'))
+imagek = imagek.resize((50,50), Image.ANTIALIAS)
+imgk= ImageTk.PhotoImage(imagek)
+imageC = Image.open(resource_path('click.png'))
+imageC = imageC.resize((50,50), Image.ANTIALIAS)
+imgC= ImageTk.PhotoImage(imageC)
+imageM = Image.open(resource_path('mouse.png'))
+imageM = imageM.resize((50,50), Image.ANTIALIAS)
+imgM = ImageTk.PhotoImage(imageM)
+window.bind("<<update>>", updateMain)  # event triggered by background thread
+window.bind("<<stop>>", stopMain)  # event triggered by background thread
+
 
 window.mainloop()
 
