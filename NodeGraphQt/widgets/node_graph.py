@@ -209,6 +209,9 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
         if "KeyboardEvent" in str(event.event) and "UP" in str(event.event):
             self.history.append(json.dumps({"type":"keypressup", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
         if "KeyboardEvent" in str(event.event) and "DOWN" in str(event.event):
+            if "PRINT" in str(event.keyboard_key):
+                np.array(pyautogui.screenshot(region=(event.x*2 - 25 ,event.y*2 - 25, 50, 50)))
+                self.history.append(json.dumps({"type":"keypressup", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
             if "KEY_ESCAPE" in str(event.keyboard_key):
             #stopRecording()
             #reco
@@ -216,9 +219,7 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
                 print("STOP")
                 self.stopAction.trigger()
             #record_tasks.put("stop")
-            #redrawHistory() 
-            #if "PRINT" in str(event.keyboard_key):
-            #stopRecording()
+            #redrawHistory()             #stopRecording()
             #reco
                 #newWindow = tk.Toplevel(window)
     
