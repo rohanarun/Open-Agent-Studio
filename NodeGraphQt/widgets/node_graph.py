@@ -34,16 +34,10 @@ import cv2
 import mss
 import sys
 
-from Quartz.CoreGraphics import CGEventCreateMouseEvent
-from Quartz.CoreGraphics import CGEventPost
-from Quartz.CoreGraphics import kCGEventMouseMoved
-from Quartz.CoreGraphics import kCGEventLeftMouseDown
-from Quartz.CoreGraphics import kCGEventLeftMouseUp
-from Quartz.CoreGraphics import kCGMouseButtonLeft
-from Quartz.CoreGraphics import kCGHIDEventTap
 
 
 import os.path
+import platform
 
 
 
@@ -324,6 +318,8 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
         self.started = False
         self.size_small = 50
         self.half = 25
+        self.platform = platform.platform()
+        
         self.size = 50
         text_color = self.palette().text().color().toTuple()
         bg_color = QtGui.QColor(*VIEWER_BG_COLOR).darker(120).toTuple()
