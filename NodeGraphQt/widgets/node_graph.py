@@ -101,12 +101,22 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
                 if x["type"] == "Left Mouse Lift": 
                     pyautogui.mouseUp() 
                 if x["type"] == "Left Mouse Click": 
-                    img = pyautogui.screenshot(region=(x["x"]*2-self.half_small,x["y"]*2-self.half_small, self.size_small, self.size_small))
-                    image =  cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+                    img = []
+                    image = []
+                    if "Windows" in self.platform:
+                        img = pyautogui.screenshot(region=(x["x"]-self.half_small,x["y"]-self.half_small, self.size_small, self.size_small))
+                        image =  cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+                    else:
+                        img = pyautogui.screenshot(region=(x["x"]*2-self.half_small,x["y"]*2-self.half_small, self.size_small, self.size_small))
+                        image =  cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+
                     print(x)
                # test = match(image, x["image"])
-                    #cv2.imshow('test2',cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB))
-                    #cv2.waitKey(1)
+                    cv2.imshow('test2',cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB))
+                    cv2.imshow('test1',cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+                    cv2.waitKey(1)
+
                     match_res = cv2.matchTemplate(cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB), image, cv2.TM_SQDIFF_NORMED)
                     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match_res)
                     print(min_loc)
@@ -149,8 +159,10 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
                             print("SUPER MATCH" + str(best_val))
                             print(str(best_loc[0]) )
                             print(str(best_loc[1]) )
-
-                            pyautogui.mouseDown(math.floor(best_loc[0]/2 + 25*best_scale/2), math.floor(best_loc[1]/2 + 25*best_scale/2))
+                            if "Windows" in self.platform:
+                                pyautogui.mouseDown(math.floor(best_loc[0] + 25*best_scale), math.floor(best_loc[1] + 25*best_scale))
+                            else:
+                                pyautogui.mouseDown(math.floor(best_loc[0]/2 + 25*best_scale/2), math.floor(best_loc[1]/2 + 25*best_scale/2))
                          #  offsetX = x["x"] - max_loc[0] + 25
                          #  offsetY = x["y"] - max_loc[1] + 25
                 if x["type"] == "keypressup":
@@ -196,7 +208,11 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
             if self.mouse_counter%6 == 0:
                 self.history.append(json.dumps({"type":"Move Mouse", "x": int(event.x), "y": int(event.y)}, cls=NumpyEncoder))      
         if "CLICK" in str(event.event) and "DOWN" in str(event.direction):
-            self.history.append(json.dumps({"type":"Left Mouse Click", "x": int(event.x), "y": int(event.y), "image": np.array(pyautogui.screenshot(region=(event.x*2 - 25 ,event.y*2 - 25, 50, 50)))}, cls=NumpyEncoder))  
+            if "Window" in self.platform :
+                self.history.append(json.dumps({"type":"Left Mouse Click", "x": int(event.x), "y": int(event.y), "image": np.array(pyautogui.screenshot(region=(event.x - 25,event.y - 25, 50, 50)))}, cls=NumpyEncoder))  
+            else:
+                self.history.append(json.dumps({"type":"Left Mouse Click", "x": int(event.x), "y": int(event.y), "image": np.array(pyautogui.screenshot(region=(event.x*2 - 25 ,event.y*2 - 25, 50, 50)))}, cls=NumpyEncoder))  
+
         if "CLICK" in str(event.event) and "UP" in str(event.direction):
             self.history.append(json.dumps({"type":"Left Mouse Lift", "x": int(event.x), "y": int(event.y)}, cls=NumpyEncoder))  
     #    if stop == False:
