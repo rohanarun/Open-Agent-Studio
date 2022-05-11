@@ -385,7 +385,7 @@ class NodeGraph(QtCore.QObject):
 
         label = 'connect node(s)' if connected else 'disconnect node(s)'
         ptypes = {IN_PORT: 'inputs', OUT_PORT: 'outputs'}
-
+        print("CHANGE")
         self._undo_stack.beginMacro(label)
         for p1_view, p2_view in disconnected:
             node1 = self._model.nodes[p1_view.node.id]
@@ -715,7 +715,8 @@ class NodeGraph(QtCore.QObject):
         Returns:
             bool: true if acyclic (default: ``True``).
         """
-        return self._model.acyclic
+        print("CHECK ACYCLE")
+        return False
 
     def set_acyclic(self, mode=False):
         """
@@ -727,8 +728,8 @@ class NodeGraph(QtCore.QObject):
         Args:
             mode (bool): true to enable acyclic.
         """
-        self._model.acyclic = mode
-        self._viewer.acyclic = mode
+        self._model.acyclic = False
+        self._viewer.acyclic = False
 
     def pipe_collision(self):
         """
@@ -1232,7 +1233,7 @@ class NodeGraph(QtCore.QObject):
         nodes_data = {}
 
         # serialize graph session.
-        serial_data['graph']['acyclic'] = self.acyclic()
+        serial_data['graph']['acyclic'] = False
         serial_data['graph']['pipe_collision'] = self.pipe_collision()
 
         # serialize nodes.
@@ -1287,7 +1288,7 @@ class NodeGraph(QtCore.QObject):
         # update node graph properties.
         for attr_name, attr_value in data.get('graph', {}).items():
             if attr_name == 'acyclic':
-                self.set_acyclic(attr_value)
+                self.set_acyclic(False)
             elif attr_name == 'pipe_collision':
                 self.set_pipe_collision(attr_value)
 
@@ -2001,7 +2002,7 @@ class SubGraph(NodeGraph):
         # update node graph properties.
         for attr_name, attr_value in data.get('graph', {}).items():
             if attr_name == 'acyclic':
-                self.set_acyclic(attr_value)
+                self.set_acyclic(False)
             elif attr_name == 'pipe_collision':
                 self.set_pipe_collision(attr_value)
 

@@ -84,8 +84,130 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
     def loopRecording(self):
         while True:
             self.runRecording() 
+    def runNode(self, graph, node_id):
+        x = graph["nodes"][node_id]["custom"]["Data"]
+        if isinstance(x, str):
+             x = json.loads(graph["nodes"][node_id]["custom"]["Data"])
+            #pnt(y)s
+        print(node_id)
+        print(x)
+        for key, value in x.items()  :
+            if key == "image":
+                x["image"] = np.asarray(x["image"],dtype = "uint8")
+        if x["type"] == "Move Mouse":
+            pyautogui.moveTo(x["x"], x["y"]) 
+        if x["type"] == "Left Mouse Lift": 
+            pyautogui.mouseUp() 
+        if x["type"] == "Left Mouse Click": 
+            img = []
+            image = []
+            if "Windows" in self.platform:
+                img = pyautogui.screenshot(region=(x["x"]-self.half_small,x["y"]-self.half_small, self.size_small, self.size_small))
+                image =  cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+            else:
+                img = pyautogui.screenshot(region=(x["x"]*2-self.half_small,x["y"]*2-self.half_small, self.size_small, self.size_small))
+                image =  cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+            print(x)
+            #test = match(image, x["image"])
+         #   cv2.imshow('test2',cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB))
+         #   cv2.imshow('test1',cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+          #  cv2.waitKey(1
+            match_res = cv2.matchTemplate(cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB), image, cv2.TM_SQDIFF_NORMED)
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match_res)
+            print(min_loc)
+            print(min_val)
+            if min_val < 0.01:
+                print("Success")
+                print(str(x["x"]) + "," + str(x["y"]))
+                #self.mouseclick(x["x"], x["y"])
+                pyautogui.mouseDown(x["x"], x["y"]) 
+                print("Finish click")
+            else:
+                img = pyautogui.screenshot()
+                image = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+                best_loc = None
+                best_val = 1000
+                best_scale = 1.0
+                print("FAILED")
+            	# loop over the scales of the image
+                for scale in np.linspace(0.5, 1.3, 25)[::-1]:
+                    resized = cv2.resize(cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB), (int(x["image"].shape[1] * scale), int(x["image"].shape[0] * scale)), interpolation = cv2.INTER_AREA)
+                    ##cv2.imshow('image',image)
+                    #cv2.waitKey(1)
+                    match_res = cv2.matchTemplate(image, resized,  cv2.TM_SQDIFF_NORMED)
+                    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match_res)
+                    if min_val < best_val:
+                        best_val = min_val
+                        best_loc = min_loc
+                        best_scale = scale
+                    print(str(best_val) + ":" +str(best_scale))
+                    print(best_loc)
+                    
+                #cv2.rectangle(image, (best_loc[0], best_loc[1]), (best_loc[0] + 50, best_loc[1] + 50), (255,0,0), 2)
+                #cv2.imshow('resized',image
+                #cv2.waitKey(1)
+            #print("SUPER MATCH")
+                if best_val  < .05:
+                    #self.mouseclick(best_loc[0] + self.half_small*best_scale, best_loc[1] + self.half_small*best_scale)
+                    print("SUPER MATCH" + str(best_val))
+                    print(str(best_loc[0]) )
+                    print(str(best_loc[1]) )
+                    if "Windows" in self.platform:
+                        pyautogui.mouseDown(math.floor(best_loc[0] + 25*best_scale), math.floor(best_loc[1] + 25*best_scale))
+                    else:
+                        pyautogui.mouseDown(math.floor(best_loc[0]/2 + 25*best_scale/2), math.floor(best_loc[1]/2 + 25*best_scale/2))
+                 #  offsetX = x["x"] - max_loc[0] + 25
+                 #  offsetY = x["y"] - max_loc[1] + 25
+        if x["type"] == "keypressup":
+            if "shift" in str(x["key"]).split("KEY_")[1].lower():
+                pyautogui.keyUp("shfift")
+                self.shift_down = False
+        if x["type"] == "keypress":
+            if True:
+                if "backspace" in str(x["key"]).split("KEY_")[1].lower():
+                    pyautogui.press('backspace')
+                elif "space" in str(x["key"]).split("KEY_")[1].lower():
+                    pyautogui.write(" ", interval=0.05) 
+                elif "period" in str(x["key"]).split("KEY_")[1].lower():
+                    pyautogui.write(".", interval=0.05) 
+                elif "slash" in str(x["key"]).split("KEY_")[1].lower():
+                    pyautogui.write("/", interval=0.05) 
+                elif "return" in str(x["key"]).split("KEY_")[1].lower():
+                    pyautogui.press('enter')
+                elif "shift" in str(x["key"]).split("KEY_")[1].lower():
+                    pyautogui.keyDown("shift")
+                    self.shift_down = True
+                else:
+                    if self.shift_down:
+                        pyautogui.write(str(x["key"]).split("KEY_")[1].upper(), interval=0.05) 
+                    else:
+                        pyautogui.write(str(x["key"]).split("KEY_")[1].lower(), interval=0.05)
+
+        for key, node in graph["nodes"].items():
+            print(node["name"])
+            if node_id == key:
+                print("Found Next")
+                print(key)
+                for connections in graph["connections"]:
+                    print(connections["out"])
+                    if key == connections["out"][0]:
+                        print("Found End")
+                        self.runNode(graph, connections["in"][0])
+     
     def runRecording(self):
-        if True:
+        graph_nodes = self.graph.serialize_session()
+        print(graph_nodes["nodes"])
+
+        for key, node in graph_nodes["nodes"].items():
+            if "Start" in node["name"]:
+                print("Found Start")
+                print(key)
+                for connections in graph_nodes["connections"]:
+                    if key == connections["out"][0]:
+                        print("Found End")
+                        self.runNode(graph_nodes, connections["in"][0])
+
+        if False:
       #  print history
             for index,y in enumerate(self.history):
                 x = y
@@ -112,10 +234,10 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
 
                     print(x)
                # test = match(image, x["image"])
-                    cv2.imshow('test2',cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB))
-                    cv2.imshow('test1',cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+                 #   cv2.imshow('test2',cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB))
+                 #   cv2.imshow('test1',cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
-                    cv2.waitKey(1)
+                  #  cv2.waitKey(1)
 
                     match_res = cv2.matchTemplate(cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB), image, cv2.TM_SQDIFF_NORMED)
                     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match_res)
@@ -167,7 +289,7 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
                          #  offsetY = x["y"] - max_loc[1] + 25
                 if x["type"] == "keypressup":
                     if "shift" in str(x["key"]).split("KEY_")[1].lower():
-                        pyautogui.keyUp("shift")
+                        pyautogui.keyUp("shfift")
                         self.shift_down = False
                 if x["type"] == "keypress":
                     if True:
@@ -303,7 +425,8 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
 
         openAction = QAction('Open', self)  
         openAction.triggered.connect(self.openCheat)
-
+     # File toolbar
+        # Edit toolbar
 
 
         exitMenu.addAction(openAction)
@@ -313,6 +436,32 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
         exitMenu.addAction(startAction)
 
         exitMenu.addAction(self.stopAction)
+        exitMenu.setStyleSheet("""
+        QMenuBar {
+            background-color: rgb(49,49,49);
+            color: rgb(255,255,255);
+            border: 1px solid #000;
+        }
+
+        QMenuBar::item {
+            background-color: rgb(49,49,49);
+            color: rgb(255,255,255);
+        }
+
+        QMenuBar::item::selected {
+            background-color: rgb(30,30,30);
+        }
+
+        QMenu {
+            background-color: rgb(49,49,49);
+            color: rgb(255,255,255);
+            border: 1px solid #000;           
+        }
+
+        QMenu::item::selected {
+            background-color: rgb(30,30,30);
+        }
+    """)
 
         exitAction = QAction('Exit', self)  
         exitAction.triggered.connect(self.defExit)
@@ -320,7 +469,7 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
         exitMenu.addAction(exitAction)
         self.myQMenuBar.show()
     
-    def __init__(self,drawHistory, verified, parent=None):
+    def __init__(self,drawHistory, verified, graph=None, parent=None):
         super(NodeGraphWidget, self).__init__(parent)
         self.setTabsClosable(True)
         self.setTabBarAutoHide(True)
@@ -330,11 +479,13 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
         self.mouse_counter = 0
         self.history = []
         self.half_small = 25
+        self.graph = graph
         self.shift_down = False
         self.started = False
         self.size_small = 50
         self.half = 25
         self.platform = platform.platform()
+        self.history.append(json.dumps({"type":"Start Node", "x": 0, "y": 0, "Application":"chrome"}, cls=NumpyEncoder))  
         
         self.size = 50
         text_color = self.palette().text().color().toTuple()

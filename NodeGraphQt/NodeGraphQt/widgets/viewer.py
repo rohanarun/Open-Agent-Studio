@@ -54,7 +54,7 @@ class NodeViewer(QtWidgets.QGraphicsView):
                                                graph controller.
         """
         super(NodeViewer, self).__init__(parent)
-
+        print("START VIEWERS?")
         self.setScene(NodeScene(self))
         self.setRenderHint(QtGui.QPainter.Antialiasing, True)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -118,7 +118,7 @@ class NodeViewer(QtWidgets.QGraphicsView):
 
         self._build_context_menus()
 
-        self.acyclic = True
+        self.acyclic = False
         self.pipe_collision = False
 
         self.LMB_state = False
@@ -733,9 +733,10 @@ class NodeViewer(QtWidgets.QGraphicsView):
             event (QtWidgets.QGraphicsSceneMouseEvent):
                 The event handler from the QtWidgets.QGraphicsScene
         """
-        if not self._LIVE_PIPE.isVisible():
-            return
+        print("TRY CONNECT3")
 
+        if not self._LIVE_PIPE.isVisible():
+            return 
         self._start_port.hovered = False
 
         # find the end port.
@@ -747,7 +748,7 @@ class NodeViewer(QtWidgets.QGraphicsView):
 
         connected = []
         disconnected = []
-
+        print(end_port)
         # if port disconnected from existing pipe.
         if end_port is None:
             if self._detached_port and not self._LIVE_PIPE.shift_selected:
@@ -791,31 +792,9 @@ class NodeViewer(QtWidgets.QGraphicsView):
             return
 
         # end connection if starting port is already connected.
-        if self._start_port.multi_connection and \
-                self._start_port in end_port.connected_ports:
-            self._detached_port = None
-            self.end_live_connection()
-            return
 
         # register as disconnected if not acyclic.
-        if self.acyclic and not self.acyclic_check(self._start_port, end_port):
-            if self._detached_port:
-                disconnected.append((self._start_port, self._detached_port))
-
-            self.connection_changed.emit(disconnected, connected)
-
-            self._detached_port = None
-            self.end_live_connection()
-            return
-
         # make connection.
-        if not end_port.multi_connection and end_port.connected_ports:
-            dettached_end = end_port.connected_ports[0]
-            disconnected.append((end_port, dettached_end))
-
-        if self._detached_port:
-            disconnected.append((self._start_port, self._detached_port))
-
         connected.append((self._start_port, end_port))
 
         self.connection_changed.emit(disconnected, connected)
@@ -828,6 +807,8 @@ class NodeViewer(QtWidgets.QGraphicsView):
         create new pipe for the connection.
         (show the live pipe visibility from the port following the cursor position)
         """
+        print("TRY CONNECT3")
+
         if not selected_port:
             return
         self._start_port = selected_port
@@ -852,6 +833,8 @@ class NodeViewer(QtWidgets.QGraphicsView):
         establish a new pipe connection.
         (adds a new pipe item to draw between 2 ports)
         """
+        print("TRY CONNECT3")
+
         pipe = PipeItem()
         self.scene().addItem(pipe)
         pipe.set_connections(start_port, end_port)
@@ -873,18 +856,7 @@ class NodeViewer(QtWidgets.QGraphicsView):
         Returns:
             bool: True if port connection is valid.
         """
-        start_node = start_port.node
-        check_nodes = [end_port.node]
-        io_types = {IN_PORT: 'outputs', OUT_PORT: 'inputs'}
-        while check_nodes:
-            check_node = check_nodes.pop(0)
-            for check_port in getattr(check_node, io_types[end_port.port_type]):
-                if check_port.connected_ports:
-                    for port in check_port.connected_ports:
-                        if port.node != start_node:
-                            check_nodes.append(port.node)
-                        else:
-                            return False
+        print("checking? ")
         return True
 
     # --- viewer ---

@@ -373,7 +373,8 @@ def eventRecord(event):
             
             #window.event_generate("<<stop>>", when="tail", state=123)
             #record_tasks.put("stop")
-            #redrawHistory() 
+            #redrawHistory()
+            #  
         else:  
             history.append(json.dumps({"type":"keypress", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
            
@@ -414,7 +415,9 @@ def runRecording():
             x = y
             if isinstance(x, str):
                 x = json.loads(y)
+                
             #print(y)
+            
             if index > 0:
                 btn[index].config(bg="black")
                 btn[index -1].config(bg="white") 
@@ -725,17 +728,21 @@ if __name__ == '__main__':
                 icon = os.path.join(this_path, 'examples', 'mouse.png')
                 nodes[len(nodes)-1].create_property('X Coordinate', x["x"], widget_type=NODE_PROP_QLINEEDIT)
                 nodes[len(nodes)-1].create_property('Y Coordinate', x["y"], widget_type=NODE_PROP_QLINEEDIT)
+                nodes[len(nodes)-1].create_property('Type', "Move", widget_type=NODE_PROP_QLINEEDIT)
 
             if "Click" in x["type"]:
                 icon = os.path.join(this_path, 'examples', 'click.png')
                 nodes[len(nodes)-1].create_property('X Coordinate', x["x"], widget_type=NODE_PROP_QLINEEDIT)
                 nodes[len(nodes)-1].create_property('Y Coordinate', x["y"], widget_type=NODE_PROP_QLINEEDIT)
+                nodes[len(nodes)-1].create_property('Type', "Click", widget_type=NODE_PROP_QLINEEDIT)
 
             if "keypress" in x["type"]:
                 icon = os.path.join(this_path, 'examples', 'keypress.png')
                 nodes[len(nodes)-1].create_property('Key', x["key"], widget_type=NODE_PROP_QLINEEDIT)
+                nodes[len(nodes)-1].create_property('Type', "Keypress", widget_type=NODE_PROP_QLINEEDIT)
 
-            
+            nodes[len(nodes)-1].create_property('Data', json.dumps(x), widget_type=NODE_PROP_QLINEEDIT)
+
             nodes[len(nodes)-1].set_icon(icon)
             if len(nodes) > 1:
                 nodes[len(nodes)-1].input(0).connect_to(nodes[len(nodes)-2].output(0))
@@ -752,6 +759,7 @@ if __name__ == '__main__':
 
     
     graph = NodeGraph(drawHistory, verified)
+    graph.set_acyclic(False)
     QApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
     # registered example nodes.
     graph.register_nodes([

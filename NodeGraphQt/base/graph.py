@@ -454,7 +454,7 @@ class NodeGraph(QtCore.QObject):
             NodeGraphWidget: node graph widget.
         """
         if self._widget is None:
-            self._widget = NodeGraphWidget(self.drawHistory, self.verified)
+            self._widget = NodeGraphWidget(self.drawHistory, self.verified, self)
             self._widget.addTab(self._viewer, 'Node Graph')
             # hide the close button on the first tab.
             tab_bar = self._widget.tabBar()
@@ -908,6 +908,7 @@ class NodeGraph(QtCore.QObject):
                 self.model.set_node_common_properties(node_attrs)
 
             node.NODE_NAME = self.get_unique_name(name or node.NODE_NAME)
+            node.data = data
             node.model.name = node.NODE_NAME
             node.model.selected = selected
 
