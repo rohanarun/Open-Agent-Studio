@@ -1,0 +1,11 @@
+PySide2
+imutils
+requests
+pyautogui
+sneakysnek
+pillow
+numpy
+opencv-python
+mss
+apscheduler
+sqlalchemy
