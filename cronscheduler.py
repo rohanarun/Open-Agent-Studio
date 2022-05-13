@@ -19,8 +19,6 @@ class CronSchedule():
       'max_instances' : 3
     }
     self.scheduler = QtScheduler()
-    # self.scheduler = BackgroundScheduler()
-    # self.scheduler.configure( executors=self.executors, job_defaults=self.job_defaults)
     self.scheduler.configure(jobstores=self.jobstores, executors=self.executors, job_defaults=self.job_defaults)
 
   def start(self):

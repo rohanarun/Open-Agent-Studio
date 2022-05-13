@@ -718,18 +718,6 @@ if __name__ == '__main__':
 
     app = QtWidgets.QApplication([])
 
-
-    # Cron Scheduler Test Functions
-    def runSchedule():
-        f = r"C:\Users\demia\projects\cheatlayer\testcheat.cheat"
-        with open(f) as file:
-            history = file.readlines()
-            # print(self.history)
-            drawHistory(history)
-        print("play")
-        showMinimized()
-        runRecording() 
-        print("I'm testing")
     def hello():
         print("hello")
     def schedule_test():
@@ -738,7 +726,6 @@ if __name__ == '__main__':
             'day':'*','weekday':'*','month':'*',
             'startDate':datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'endDate':None,'id':'testCheat'}
-        # self.sch.addJob("self.runSchedule",job,[])
         sch.addJob(drawHistory  ,job,[history])
         sch.start()
 
