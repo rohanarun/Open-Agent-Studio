@@ -45,7 +45,9 @@ import cv2
 import mss
 import sys
 
-
+from cronscheduler import CronSchedule
+from datetime import datetime, timedelta
+import time
 import os.path
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -716,6 +718,17 @@ if __name__ == '__main__':
 
     app = QtWidgets.QApplication([])
 
+    def hello():
+        print("hello")
+    def schedule_test():
+        sch = CronSchedule() 
+        job = {'seconds':'*/1','minute':'*', 'hour':'*','week':'*',
+            'day':'*','weekday':'*','month':'*',
+            'startDate':datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'endDate':None,'id':'testCheat'}
+        sch.addJob(drawHistory  ,job,[history])
+        sch.start()
+
     def drawHistory(history):
         #print(history)
         global nodes
@@ -847,4 +860,5 @@ if __name__ == '__main__':
     nodes_palette.set_category_label('nodes.group', 'Group Nodes')
     # nodes_palette.show()
     
+    schedule_test()
     app.exec_()
