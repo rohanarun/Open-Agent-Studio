@@ -3,6 +3,36 @@
 import copy
 import json
 import os
+import pathlib
+import urllib
+import time
+from tkinter import filedialog as fd
+from sneakysnek.recorder import Recorder
+import math
+import pytesseract
+#pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+import tkinter as tk
+
+import imutils
+import requests
+import pyautogui
+import json
+from PIL import ImageTk, Image
+from tkinter import ttk
+from threading import Thread
+
+from queue import Queue
+record_tasks = Queue()
+
+import numpy as np
+import cv2
+import mss
+import sys
+
+
+
+import os.path
+import platform
 import re
 import math
 from Qt import QtCore, QtWidgets, QtGui
@@ -31,6 +61,22 @@ from NodeGraphQt.widgets.node_graph import NodeGraphWidget, SubGraphWidget
 from NodeGraphQt.widgets.viewer import NodeViewer
 from NodeGraphQt.widgets.viewer_nav import NodeNavigationWidget
 
+from PySide2.QtWidgets import (QWidget, QApplication, QGraphicsView,
+QGridLayout, QMainWindow, QAction, QMenu, QVBoxLayout, QMenuBar, QFileDialog, QInputDialog)
+from PySide2 import QtCore, QtWidgets, QtGui
+
+
+
+class NumpyEncoder(json.JSONEncoder):
+    """ Special json encoder for numpy types """
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
 
 class NodeGraph(QtCore.QObject):
     """
@@ -115,7 +161,438 @@ class NodeGraph(QtCore.QObject):
     :emits: new session path
     """
 
-    def __init__(self, drawHistory, verified, parent=None, **kwargs):
+    def loopRecording(self):
+        while True:
+            self.runRecording() 
+
+
+    def runNode(self, graph, node_id):
+        x = graph["nodes"][node_id]["custom"]["Data"]
+        if isinstance(x, str):
+             x = json.loads(graph["nodes"][node_id]["custom"]["Data"])
+            #pnt(y)s
+        print(node_id)
+        print(x)
+        for key, value in x.items()  :
+            if key == "image":
+                x["image"] = np.asarray(x["image"],dtype = "uint8")
+        if x["type"] == "OCR":
+            print("OCR")
+            cv2.namedWindow("OCR")
+            img = pyautogui.screenshot()
+            screenshot = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+            
+        # draw a rectangle around the region of interest
+            cv2.rectangle(screenshot, x["bounding_box"][0], x["bounding_box"][1], (0, 255, 0), 2)
+
+            cv2.imshow("OCR", screenshot)
+            cv2.setWindowProperty("OCR", cv2.WND_PROP_TOPMOST, 1)
+            
+            thresh = 255 - cv2.threshold(cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+            
+            xp,yp,w,h = x["bounding_box"][0][0], x["bounding_box"][0][1], x["bounding_box"][1][0]-x["bounding_box"][0][0], x["bounding_box"][1][1]-x["bounding_box"][0][1]  
+            ROI = thresh[x["bounding_box"][0][1]:x["bounding_box"][1][1],x["bounding_box"][0][0]:x["bounding_box"][1][0]]
+            data = pytesseract.image_to_string(ROI, lang='eng',config='--psm 6')
+            print(data)
+            self.variables.append(data)
+            cv2.waitKey(1)
+            time.sleep(5)
+            cv2.destroyAllWindows()
+
+        if x["type"] == "Move Mouse":
+            pyautogui.moveTo(x["x"], x["y"]) 
+        if x["type"] == "Left Mouse Lift": 
+            pyautogui.mouseUp() 
+        if x["type"] == "Left Mouse Click": 
+            img = []
+            image = []
+            if "Windows" in self.platform:
+                img = pyautogui.screenshot(region=(x["x"]-self.half_small,x["y"]-self.half_small, self.size_small, self.size_small))
+                image =  cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+            else:
+                img = pyautogui.screenshot(region=(x["x"]*2-self.half_small,x["y"]*2-self.half_small, self.size_small, self.size_small))
+                image =  cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+            print(x)
+            #test = match(image, x["image"])
+         #   cv2.imshow('test2',cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB))
+         #   cv2.imshow('test1',cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+          #  cv2.waitKey(1
+            match_res = cv2.matchTemplate(cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB), image, cv2.TM_SQDIFF_NORMED)
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match_res)
+            print(min_loc)
+            print(min_val)
+            if min_val < 0.01:
+                print("Success")
+                print(str(x["x"]) + "," + str(x["y"]))
+                #self.mouseclick(x["x"], x["y"])
+                pyautogui.mouseDown(x["x"], x["y"]) 
+                print("Finish click")
+            else:
+                img = pyautogui.screenshot()
+                image = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+                best_loc = None
+                best_val = 1000
+                best_scale = 1.0
+                print("FAILED")
+            	# loop over the scales of the image
+                for scale in np.linspace(0.5, 1.3, 25)[::-1]:
+                    resized = cv2.resize(cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB), (int(x["image"].shape[1] * scale), int(x["image"].shape[0] * scale)), interpolation = cv2.INTER_AREA)
+                    ##cv2.imshow('image',image)
+                    #cv2.waitKey(1)
+                    match_res = cv2.matchTemplate(image, resized,  cv2.TM_SQDIFF_NORMED)
+                    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match_res)
+                    if min_val < best_val:
+                        best_val = min_val
+                        best_loc = min_loc
+                        best_scale = scale
+                    print(str(best_val) + ":" +str(best_scale))
+                    print(best_loc)
+                    
+                #cv2.rectangle(image, (best_loc[0], best_loc[1]), (best_loc[0] + 50, best_loc[1] + 50), (255,0,0), 2)
+                #cv2.imshow('resized',image
+                #cv2.waitKey(1)
+            #print("SUPER MATCH")
+                if best_val  < .05:
+                    #self.mouseclick(best_loc[0] + self.half_small*best_scale, best_loc[1] + self.half_small*best_scale)
+                    print("SUPER MATCH" + str(best_val))
+                    print(str(best_loc[0]) )
+                    print(str(best_loc[1]) )
+                    if "Windows" in self.platform:
+                        pyautogui.mouseDown(math.floor(best_loc[0] + 25*best_scale), math.floor(best_loc[1] + 25*best_scale))
+                    else:
+                        pyautogui.mouseDown(math.floor(best_loc[0]/2 + 25*best_scale/2), math.floor(best_loc[1]/2 + 25*best_scale/2))
+                 #  offsetX = x["x"] - max_loc[0] + 25
+                 #  offsetY = x["y"] - max_loc[1] + 25
+        if x["type"] == "keypressup":
+            if "shift" in str(x["key"]).split("KEY_")[1].lower():
+                pyautogui.keyUp("shfift")
+                self.shift_down = False
+        if x["type"] == "keypress":
+            if True:
+                if "backspace" in str(x["key"]).split("KEY_")[1].lower():
+                    pyautogui.press('backspace')
+                elif "space" in str(x["key"]).split("KEY_")[1].lower():
+                    pyautogui.write(" ", interval=0.05) 
+                elif "period" in str(x["key"]).split("KEY_")[1].lower():
+                    pyautogui.write(".", interval=0.05) 
+                elif "slash" in str(x["key"]).split("KEY_")[1].lower():
+                    pyautogui.write("/", interval=0.05) 
+                elif "return" in str(x["key"]).split("KEY_")[1].lower():
+                    pyautogui.press('enter')
+                elif "shift" in str(x["key"]).split("KEY_")[1].lower():
+                    pyautogui.keyDown("shift")
+                    self.shift_down = True
+                else:
+                    if self.shift_down:
+                        pyautogui.write(str(x["key"]).split("KEY_")[1].upper(), interval=0.05) 
+                    else:
+                        pyautogui.write(str(x["key"]).split("KEY_")[1].lower(), interval=0.05)
+
+        for key, node in graph["nodes"].items():
+            if node_id == key:
+                for connections in graph["connections"]:
+                    print(connections["out"])
+                    if key == connections["out"][0]:
+                        self.runNode(graph, connections["in"][0])
+     
+    def runRecording(self):
+        graph_nodes = self.serialize_session()
+        for key, node in graph_nodes["nodes"].items():
+            if "Start" in node["name"]:
+                print("Found Start")
+                print(key)
+                for connections in graph_nodes["connections"]:
+                    if key == connections["out"][0]:
+                        print("Found End")
+                        self.runNode(graph_nodes, connections["in"][0])
+
+        if False:
+      #  print history
+            for index,y in enumerate(self.history):
+                x = y
+                if isinstance(x, str):
+                     x = json.loads(y)
+            #print(y)s
+                
+                for key, value in x.items()  :
+                    if key == "image":
+                        x["image"] = np.asarray(x["image"],dtype = "uint8")
+                if x["type"] == "Move Mouse":
+                    pyautogui.moveTo(x["x"], x["y"]) 
+                if x["type"] == "Left Mouse Lift": 
+                    pyautogui.mouseUp() 
+                if x["type"] == "Left Mouse Click": 
+                    img = []
+                    image = []
+                    if "Windows" in self.platform:
+                        img = pyautogui.screenshot(region=(x["x"]-self.half_small,x["y"]-self.half_small, self.size_small, self.size_small))
+                        image =  cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+                    else:
+                        img = pyautogui.screenshot(region=(x["x"]*2-self.half_small,x["y"]*2-self.half_small, self.size_small, self.size_small))
+                        image =  cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+
+                    print(x)
+               # test = match(image, x["image"])
+                 #   cv2.imshow('test2',cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB))
+                 #   cv2.imshow('test1',cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+                  #  cv2.waitKey(1)
+
+                    match_res = cv2.matchTemplate(cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB), image, cv2.TM_SQDIFF_NORMED)
+                    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match_res)
+                    print(min_loc)
+                    print(min_val)
+                    if min_val < 0.01:
+                        print("Success")
+                        print(str(x["x"]) + "," + str(x["y"]))
+                        #self.mouseclick(x["x"], x["y"])
+                        pyautogui.mouseDown(x["x"], x["y"]) 
+                        print("Finish click")
+                    else:
+                        img = pyautogui.screenshot()
+                        image = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+                        best_loc = None
+                        best_val = 1000
+                        best_scale = 1.0
+                        print("FAILED")
+                    	# loop over the scales of the image
+                        for scale in np.linspace(0.5, 1.3, 25)[::-1]:
+                            resized = cv2.resize(cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB), (int(x["image"].shape[1] * scale), int(x["image"].shape[0] * scale)), interpolation = cv2.INTER_AREA)
+
+                            ##cv2.imshow('image',image)
+                            #cv2.waitKey(1)
+                            match_res = cv2.matchTemplate(image, resized,  cv2.TM_SQDIFF_NORMED)
+                            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match_res)
+                            if min_val < best_val:
+                                best_val = min_val
+                                best_loc = min_loc
+                                best_scale = scale
+                            print(str(best_val) + ":" +str(best_scale))
+                            print(best_loc)
+                            
+                        #cv2.rectangle(image, (best_loc[0], best_loc[1]), (best_loc[0] + 50, best_loc[1] + 50), (255,0,0), 2)
+                        #cv2.imshow('resized',image)
+
+                        #cv2.waitKey(1)
+                    #print("SUPER MATCH")
+                        if best_val  < .05:
+                            #self.mouseclick(best_loc[0] + self.half_small*best_scale, best_loc[1] + self.half_small*best_scale)
+                            print("SUPER MATCH" + str(best_val))
+                            print(str(best_loc[0]) )
+                            print(str(best_loc[1]) )
+                            if "Windows" in self.platform:
+                                pyautogui.mouseDown(math.floor(best_loc[0] + 25*best_scale), math.floor(best_loc[1] + 25*best_scale))
+                            else:
+                                pyautogui.mouseDown(math.floor(best_loc[0]/2 + 25*best_scale/2), math.floor(best_loc[1]/2 + 25*best_scale/2))
+                         #  offsetX = x["x"] - max_loc[0] + 25
+                         #  offsetY = x["y"] - max_loc[1] + 25
+                if x["type"] == "keypressup":
+                    if "shift" in str(x["key"]).split("KEY_")[1].lower():
+                        pyautogui.keyUp("shfift")
+                        self.shift_down = False
+                if x["type"] == "keypress":
+                    if True:
+                        if "backspace" in str(x["key"]).split("KEY_")[1].lower():
+                            pyautogui.press('backspace')
+                        elif "space" in str(x["key"]).split("KEY_")[1].lower():
+                            pyautogui.write(" ", interval=0.05) 
+                        elif "period" in str(x["key"]).split("KEY_")[1].lower():
+                            pyautogui.write(".", interval=0.05) 
+                        elif "slash" in str(x["key"]).split("KEY_")[1].lower():
+                            pyautogui.write("/", interval=0.05) 
+                        elif "return" in str(x["key"]).split("KEY_")[1].lower():
+                            pyautogui.press('enter')
+                        elif "shift" in str(x["key"]).split("KEY_")[1].lower():
+                            pyautogui.keyDown("shift")
+                            self.shift_down = True
+                        else:
+                            if self.shift_down:
+                                pyautogui.write(str(x["key"]).split("KEY_")[1].upper(), interval=0.05) 
+                            else:
+                                pyautogui.write(str(x["key"]).split("KEY_")[1].lower(), interval=0.05)
+
+    def eventRecord(self, event):        
+   # print(len(history))
+        print(event)
+        if "MOVE" in str(event.event):
+            self.mouse_counter += 1
+            if self.mouse_counter%6 == 0:
+                self.history.append(json.dumps({"type":"Move Mouse", "x": int(event.x), "y": int(event.y)}, cls=NumpyEncoder))      
+        if "CLICK" in str(event.event) and "DOWN" in str(event.direction):
+            if "Window" in self.platform :
+                self.history.append(json.dumps({"type":"Left Mouse Click", "x": int(event.x), "y": int(event.y), "image": np.array(pyautogui.screenshot(region=(event.x - 25,event.y - 25, 50, 50)))}, cls=NumpyEncoder))  
+            else:
+                self.history.append(json.dumps({"type":"Left Mouse Click", "x": int(event.x), "y": int(event.y), "image": np.array(pyautogui.screenshot(region=(event.x*2 - 25 ,event.y*2 - 25, 50, 50)))}, cls=NumpyEncoder))  
+
+        if "CLICK" in str(event.event) and "UP" in str(event.direction):
+            self.history.append(json.dumps({"type":"Left Mouse Lift", "x": int(event.x), "y": int(event.y)}, cls=NumpyEncoder))  
+    #    if stop == False:
+        if "KeyboardEvent" in str(event.event) and "UP" in str(event.event):
+            self.history.append(json.dumps({"type":"keypressup", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
+        if "KeyboardEvent" in str(event.event) and "DOWN" in str(event.event):
+            if "PRINT" in str(event.keyboard_key):
+                np.array(pyautogui.screenshot(region=(event.x*2 - 25 ,event.y*2 - 25, 50, 50)))
+                self.history.append(json.dumps({"type":"keypressup", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
+            if "KEY_ESCAPE" in str(event.keyboard_key):
+            #stopRecording()
+            #reco
+                
+                print("STOP")
+                self.stopAction.trigger()
+            #record_tasks.put("stop")
+            #redrawHistory()             #stopRecording()
+            #reco
+                #newWindow = tk.Toplevel(window)
+    
+                #newWindow.title("Edit Event" + n)
+                #step = json.loads(history[int(n)])   
+                #newWindow.geometry("1000x800")
+                #img = pyautogui.screenshot()
+                #image = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+            
+            #window.event_generate("<<stop>>", when="tail", state=123)
+            #record_tasks.put("stop")
+            #redrawHistory() 
+            else:  
+                self.history.append(json.dumps({"type":"keypress", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
+      
+    def openCheat(self):
+        f,_ = QFileDialog.getOpenFileName(self, 'Open file', 'c:\\',"Cheat Files (*.cheat)")
+        with open(f) as file:
+            self.history = file.readlines()
+            self.drawHistory(self.history)
+    def stopRecording(self):
+        if self.started:
+            self.recorder.stop()
+            self.drawHistory(self.history)
+            self.QMainWindow.showMaximized()
+        self.started = False
+
+    def playRecording(self):
+        print("play")
+        self.QMainWindow.showMinimized()
+
+        self.runRecording()   
+    def newCheat(self):
+        self.history = []
+        self.drawHistory(self.history)
+    
+    def startRecording(self):
+        if self.started == False:
+            self.started = True
+            self.QMainWindow.showMinimized()
+            self.counter = 0
+            self.bnt = 0
+            self.recorder = Recorder.record(self.eventRecord)
+    def defExit(self):
+        sys.exit()
+    def saveCheat(self):
+        name, save = QFileDialog.getSaveFileName(self, 'Save Cheat')
+        file = open(name,'w')
+        for item in self.history:
+             file.write("%s\n" % (item))
+        file.close()
+    def defineMenu(self):
+        self.myQMenuBar = self.QMainWindow.menuBar()
+        exitMenu = self.myQMenuBar.addMenu('File')
+        
+          
+        self.stopAction = QAction('Stop Recording (ESC)', self)  
+        self.stopAction.triggered.connect(self.stopRecording)
+        
+        startAction = QAction('Schedule Recording', self)  
+        startAction.triggered.connect(self.startRecording)
+        
+        
+        saveAction = QAction('Save', self)  
+        saveAction.triggered.connect(self.saveCheat)
+
+        
+        loopAction = QAction('Loop', self)  
+        loopAction.triggered.connect(self.loopRecording)
+
+        startAction = QAction('Start Recording', self)  
+        startAction.triggered.connect(self.startRecording)
+
+        
+
+        
+        playAction = QAction('Play', self)  
+        playAction.triggered.connect(self.playRecording)
+
+        openAction = QAction('Open', self)  
+        openAction.triggered.connect(self.openCheat)
+     # File toolbar
+        # Edit toolbar
+
+
+        exitMenu.addAction(openAction)
+        exitMenu.addAction(playAction)
+        exitMenu.addAction(loopAction)
+        exitMenu.addAction(saveAction)
+        exitMenu.addAction(startAction)
+
+        exitMenu.addAction(self.stopAction)
+        exitMenu.setStyleSheet("""
+        QMenuBar {
+            background-color: rgb(49,49,49);
+            color: rgb(255,255,255);
+            border: 1px solid #000;
+        }
+
+        QMenuBar::item {
+            background-color: rgb(49,49,49);
+            color: rgb(255,255,255);
+        }
+
+        QMenuBar::item::selected {
+            background-color: rgb(30,30,30);
+        }
+
+        QMenu {
+            background-color: rgb(49,49,49);
+            color: rgb(255,255,255);
+            border: 1px solid #000;           
+        }
+
+        QMenu::item::selected {
+            background-color: rgb(30,30,30);
+        }
+    """)
+
+        exitAction = QAction('Exit', self)  
+        exitAction.triggered.connect(self.defExit)
+ 
+        exitMenu.addAction(exitAction)
+        self.myQMenuBar.show()
+    
+    def _createToolBars(self):
+        # File toolbar
+        print("CREATING TOOLBAR44")
+        current_directory = str(pathlib.Path(__file__).parent.absolute())
+        path = current_directory + '/OCR.png'
+        url = 'https://cheatlayer.com/ocr.png'    
+        data = urllib.request.urlopen(url).read()
+        pixmap = QtGui.QPixmap()
+        pixmap.loadFromData(data)
+        this_path = os.path.dirname(os.path.abspath(__file__))
+        icon = os.path.join(this_path, 'examples', 'OCR.png')
+        self.OCRAction = QAction(QtGui.QIcon(pixmap), "&Copy", self)
+        self.printAction = QAction(QtGui.QIcon(pixmap), "&Paste", self)
+        self.requestAction = QAction(QtGui.QIcon(pixmap), "C&ut", self)
+        #self.addTab(self.QMainWindow, "Add Actions")
+        fileToolBar = self.QMainWindow.addToolBar("File")
+        fileToolBar.addAction(self.OCRAction)
+        
+        self.OCRAction.triggered.connect(self.addOCR)
+
+        fileToolBar.addAction(self.printAction)
+        self.printAction.triggered.connect(self.addPrint)
+
+        fileToolBar.addAction(self.requestAction)
+        self.requestAction.triggered.connect(self.playRecording)
+
+    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll, parent=None, **kwargs):
         """
         Args:
             parent (object): object parent.
@@ -124,6 +601,23 @@ class NodeGraph(QtCore.QObject):
         super(NodeGraph, self).__init__(parent)
         self.setObjectName('NodeGraph')
         self.verified = verified
+        self.verified = verified
+        self.drawHistory = drawHistory
+        self.addOCR = addOCR
+        self.addPrint = addPrint
+
+        self.mouse_counter = 0
+        self.variables = []
+        self.history = []
+        self.half_small = 25
+        self.shift_down = False
+        self.started = False
+        self.size_small = 50
+        self.half = 25
+        self.platform = platform.platform()
+        self.history.append(json.dumps({"type":"Start Node", "x": 0, "y": 0, "Application":"chrome"}, cls=NumpyEncoder))  
+        
+        self.size = 50
         self.drawHistory = drawHistory
         self._model = (
             kwargs.get('model') or NodeGraphModel())
@@ -133,6 +627,7 @@ class NodeGraph(QtCore.QObject):
         self._undo_view = None
         self._undo_stack = (
             kwargs.get('undo_stack') or QtWidgets.QUndoStack(self))
+        self.QMainWindow = QMainWindow()
 
         self._widget = None
 
@@ -403,7 +898,9 @@ class NodeGraph(QtCore.QObject):
             port1.connect_to(port2)
         self._undo_stack.endMacro()
     def startMenu(self):
-        self._widget.defineMenu()
+        self.defineMenu()
+        self._createToolBars()
+
 
     def _on_connection_sliced(self, ports):
         """
@@ -455,6 +952,8 @@ class NodeGraph(QtCore.QObject):
         """
         if self._widget is None:
             self._widget = NodeGraphWidget(self.drawHistory, self.verified, self)
+            self.QMainWindow.setCentralWidget(self._widget)
+            self.startMenu()
             self._widget.addTab(self._viewer, 'Node Graph')
             # hide the close button on the first tab.
             tab_bar = self._widget.tabBar()

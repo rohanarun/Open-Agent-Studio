@@ -4,7 +4,6 @@ import os
 import signal
 
 from Qt import QtCore, QtWidgets, QtGui
-
 from NodeGraphQt import (
     NodeGraph,
     PropertiesBinWidget,
@@ -685,33 +684,11 @@ class Window(QWidget):
         self.setWindowTitle("Image viewer")
         self.setGeometry(200, 200, 1000, 800)
 
-class Main_window(QMainWindow):
-
-    def __init__(self, parent=None):
-
-        super(Main_window, self).__init__(parent)
-        self.window = Window()
-        self.setCentralWidget(self.window)
-        self.initUI()
-
-    def initUI(self):
-
-        menubar = self.menuBar()
-        fileMenu = menubar.addMenu('File')
-
-        impMenu = QMenu('Import', self)
-        impAct = QAction('Import mail', self)
-        impMenu.addAction(impAct)
-
-        newAct = QAction('New', self)
-
-        fileMenu.addAction(newAct)
-        fileMenu.addMenu(impMenu)
-
-
-
 if __name__ == '__main__':
     # handle SIGINT to make the app terminate on CTRL+C
+    
+    ref_point = []
+    cropping = False
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     nodes = []
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
@@ -726,11 +703,87 @@ if __name__ == '__main__':
             'day':'*','weekday':'*','month':'*',
             'startDate':datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'endDate':None,'id':'testCheat'}
-        sch.addJob(drawHistory  ,job,[history])
-        sch.start()
+        #sch.addJob(drawHistory  ,job,[history])
+        #sch.start()
+
+    def shape_selection(event, x, y, flags, param):
+      # grab references to the global variables
+      global ref_point, cropping, screenshot
+    
+      # if the left mouse button was clicked, record the starting
+      # (x, y) coordinates and indicate that cropping is being
+      # performed
+      if event == cv2.EVENT_LBUTTONDOWN:
+        ref_point = [(x, y)]
+        cropping = True
+    
+      # check to see if the left mouse button was released
+      elif event == cv2.EVENT_LBUTTONUP:
+        # record the ending (x, y) coordinates and indicate that
+        # the cropping operation is finished
+        ref_point.append((x, y))
+        cropping = False
+    
+        # draw a rectangle around the region of interest
+        cv2.rectangle(screenshot, ref_point[0], ref_point[1], (0, 255, 0), 2)
+        cv2.imshow("OCR", screenshot)
+        x = {"type":"OCR", "bounding_box":ref_point}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="OCR " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+        nodes[len(nodes)-1].create_property('Bounding Box X1', ref_point[0][0], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Bounding Box Y1', ref_point[0][1], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Bounding Box X2', ref_point[1][0], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Bounding Box Y2', ref_point[1][1], widget_type=NODE_PROP_QLINEEDIT)
+
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        this_path = os.path.dirname(os.path.abspath(__file__))
+        icon = os.path.join(this_path, 'examples', 'OCR.png')
+        nodes[len(nodes)-1].set_icon(icon)
+
+
+        graph.auto_layout_nodes()
+            
+        cv2.waitKey(1)
+
+    # crate a backdrop node and wrap it around
+    # "custom port node" and "group node".
+    # fit node selection to the viewer.
+        graph.fit_to_selection()
+        time.sleep(1)
+        cv2.destroyAllWindows()
+        graph.QMainWindow.showMaximized()
+    def addScroll():
+        global nodes
+        x = {"type":"scroll", "data":"variables"}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Scroll " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+        nodes[len(nodes)-1].create_property('Distance',100, widget_type=NODE_PROP_QLINEEDIT)
+
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        graph.auto_layout_nodes()
+        graph.fit_to_selection()
+    def addPrint():
+        global nodes
+        x = {"type":"print", "data":"variables"}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Print " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        graph.auto_layout_nodes()
+        graph.fit_to_selection()
+
+    def addOCR():
+        global nodes, screenshot, graph
+        graph.QMainWindow.showMinimized()
+        cv2.namedWindow("OCR")
+        cv2.setMouseCallback("OCR", shape_selection)
+        img = pyautogui.screenshot()
+        screenshot = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+        cv2.imshow("OCR", screenshot)
+        cv2.setWindowProperty("OCR", cv2.WND_PROP_TOPMOST, 1)
+
+        cv2.waitKey(1)
+
+        #nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="OCR", data={}))#, color= "#FFFFFF"
 
     def drawHistory(history):
-        #print(history)
         global nodes
         for x in history:
             x = json.loads(x)
@@ -771,7 +824,7 @@ if __name__ == '__main__':
     verified = False
 
     
-    graph = NodeGraph(drawHistory, verified)
+    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll)
     graph.set_acyclic(False)
     QApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
     # registered example nodes.
@@ -786,12 +839,20 @@ if __name__ == '__main__':
     ])
 
     # show the node graph widget.
-    graph_widget = graph.widget
+    graph_widget = graph.QMainWindow
     graph_widget.resize(1100, 800)
     graph_widget.show()
 
+    graph_widget2 = graph.widget
+    graph_widget2.resize(1100, 800)
+    graph_widget2.show()
 
     # auto layout nodes.
+    nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Start Node " + str(len(nodes)), data={"type":"Start Node", "x": 0, "y": 0, "Application":"chrome"}))#, color= "#FFFFFF"
+    nodes[len(nodes)-1].create_property('Initial Program', "none", widget_type=NODE_PROP_QLINEEDIT)
+    this_path = os.path.dirname(os.path.abspath(__file__))
+    icon = os.path.join(this_path, 'examples', 'mouse.png')
+    nodes[len(nodes)-1].set_icon(icon)
     graph.auto_layout_nodes()
 
     # crate a backdrop node and wrap it around
@@ -820,7 +881,7 @@ if __name__ == '__main__':
     print(key)
     def Login():
         global graph
-        graph.startMenu()
+        
 
     if key == 'None':
         widget = MyWidget(Login)
