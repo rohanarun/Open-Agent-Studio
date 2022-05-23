@@ -15,7 +15,7 @@ from NodeGraphQt.widgets.viewer_nav import NodeNavigationWidget
 from tkinter import filedialog as fd
 from sneakysnek.recorder import Recorder
 import math
-
+import time
 import tkinter as tk
 
 import imutils
@@ -38,6 +38,7 @@ import sys
 
 import os.path
 import platform
+
 
 
 
@@ -77,7 +78,7 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
 
     def mouseclick(self,posx,posy):
         # uncomment this line if you want to force the mouse 
-        # to MOVE to the click location first (I found it was not necessary).
+        # to MOVE to the clicnodesk location first (I found it was not necessary).
         #mouseEvent(kCGEventMouseMoved, posx,posy);
         self.mouseEvent(kCGEventLeftMouseDown, posx,posy)
         self.mouseEvent(kCGEventLeftMouseUp, posx,posy)
@@ -312,15 +313,38 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
                             else:
                                 pyautogui.write(str(x["key"]).split("KEY_")[1].lower(), interval=0.05)
 
-    #button7location = pyautogui.locateOnScreen('tweet.png')asdfas asdfasdf    asdfasdf   
-    #print(button7location)asdfassddss
-    #button7point = pyautogui.center(button7location)asdfasdf
+    def shape_selection(self, event, x, y, flags, param):
+      # grab references to the global variables
+      global ref_point, cropping, screenshot, nodes
     
-    #button7x, button7y = button7point
-    #pyautogui.click(button7x, button7y)  # clicks the center of where the 7 button was found
-    #pyautogui.click('tweet.png') # a shortcut version to click on the center of where the 7 button was found
+      # if the left mouse button was clicked, record the starting
+      # (x, y) coordinates and indicate that cropping is being
+      # performed
+      if event == cv2.EVENT_LBUTTONDOWN:
+        ref_point = [(x, y)]
+        cropping = True
     
-    # Some blocking code in your main thread...
+      # check to see if the left mouse button was released
+      elif event == cv2.EVENT_LBUTTONUP:
+        # record the ending (x, y) coordinates and indicate that
+        # the cropping operation is finished
+        ref_point.append((x, y))
+        
+        cropping = False
+    
+        # draw a rectangle around the region of interest
+        cv2.rectangle(screenshot, ref_point[0], ref_point[1], (0, 255, 0), 2)
+        cv2.imshow("OCR", screenshot)
+        x = {"type":"OCR", "bounding_box":ref_point}
+             
+        cv2.waitKey(1)
+    # crate a backdrop node and wrap it around
+    # "custom port node" and "group node".
+    # fit node selection to the viewer.
+        time.sleep(1)
+        self.history.append(json.dumps(x, cls=NumpyEncoder)) 
+        self.recorder.start()
+        cv2.destroyAllWindows()
 
     def eventRecord(self, event):        
    # print(len(history))
@@ -342,6 +366,16 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
             self.history.append(json.dumps({"type":"keypressup", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
         if "KeyboardEvent" in str(event.event) and "DOWN" in str(event.event):
             if "PRINT" in str(event.keyboard_key):
+                self.recorder.stop()
+                self.graph.QMainWindow.showMinimized()
+                cv2.namedWindow("OCR")
+                cv2.setMouseCallback("OCR", shape_selection)
+                img = pyautogui.screenshot()
+                screenshot = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+                cv2.imshow("OCR", screenshot)
+                cv2.setWindowProperty("OCR", cv2.WND_PROP_TOPMOST, 1)
+        
+                cv2.waitKey(1)
                 np.array(pyautogui.screenshot(region=(event.x*2 - 25 ,event.y*2 - 25, 50, 50)))
                 self.history.append(json.dumps({"type":"keypressup", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
             if "KEY_ESCAPE" in str(event.keyboard_key):
@@ -485,7 +519,7 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
         self.size_small = 50
         self.half = 25
         self.platform = platform.platform()
-        self.history.append(json.dumps({"type":"Start Node", "x": 0, "y": 0, "Application":"chrome"}, cls=NumpyEncoder))  
+       # self.history.append(json.dumps({"type":"Start Node", "x": 0, "y": 0, "Application":"chrome"}, cls=NumpyEncoder))  
         
         self.size = 50
         text_color = self.palette().text().color().toTuple()
