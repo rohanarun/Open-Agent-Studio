@@ -364,6 +364,28 @@ def match(img1, img2):
     #v2.waitKey()
     return len(matches)
 
+def getData(url, payload={}, headers={}, cookies={}):
+    '''
+    sends GET request. 
+    payload, headers and cookies should a key value pair of strings.
+    For payload it is permissible to send a list of strings as a value.
+    response can be read as response.text  or if json response.json(),
+    binary would be response.content
+    '''
+    response = requests.get(url=url, params=payload,cookies=cookies, headers=headers)
+    return response
+
+def postData(url, payload={},headers={}, cookies={}):
+    '''
+    sends POST request. 
+    payload, headers and cookies should a key value pair of strings.
+    For payload it is permissible to send a list of strings as a value.
+    response can be read as response.text  or if json response.json(),
+    binary would be response.content
+    '''
+    response = requests.post(url=url,data=payload, headers=headers,cookies=cookies)
+    return response
+
 def runRecording():
     global verified
     if verified:
