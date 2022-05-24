@@ -761,6 +761,16 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
         graph.auto_layout_nodes()
         graph.fit_to_selection()
+    def addSendData():
+        global nodes
+        x = {"type":"sendData", "url":"https://cheatlayer.com/triggers/extension", "data":'{"start":"https://www.google.com", "name": "test inputs", "data":"' + global_variables[0] + '","key":"' + key + '"}'}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Send Data " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Request', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('URL', "https://cheatlayer.com/triggers/extension", widget_type=NODE_PROP_QLINEEDIT)
+
+        graph.auto_layout_nodes()
+        graph.fit_to_selection()
     def addPrint():
         global nodes
         x = {"type":"print", "index":0, "selected":global_variables[0]}
@@ -825,7 +835,7 @@ if __name__ == '__main__':
     verified = False
 
     
-    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll)
+    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll, addSendData)
     graph.set_acyclic(False)
     QApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
     # registered example nodes.
