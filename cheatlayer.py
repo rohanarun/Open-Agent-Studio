@@ -708,7 +708,7 @@ if __name__ == '__main__':
 
     def shape_selection(event, x, y, flags, param):
       # grab references to the global variables
-      global ref_point, cropping, screenshot
+      global ref_point, cropping, screenshot, global_variables
     
       # if the left mouse button was clicked, record the starting
       # (x, y) coordinates and indicate that cropping is being
@@ -737,8 +737,9 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
         this_path = os.path.dirname(os.path.abspath(__file__))
         icon = os.path.join(this_path, 'examples', 'OCR.png')
-        nodes[len(nodes)-1].set_icon(icon)
+        global_variables.append("OCR_" + str(len(global_variables)))
 
+        nodes[len(nodes)-1].set_icon(icon)
 
         graph.auto_layout_nodes()
             
@@ -762,9 +763,9 @@ if __name__ == '__main__':
         graph.fit_to_selection()
     def addPrint():
         global nodes
-        x = {"type":"print", "data":"variables"}
+        x = {"type":"print", "index":0, "selected":global_variables[0]}
         nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Print " + str(len(nodes)), data=x))#, color= "#FFFFFF"
-
+        nodes[len(nodes)-1].create_property('Variables',global_variables[0],items=global_variables,  widget_type=NODE_PROP_QCOMBO)
         nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
         graph.auto_layout_nodes()
         graph.fit_to_selection()
@@ -842,7 +843,7 @@ if __name__ == '__main__':
     graph_widget = graph.QMainWindow
     graph_widget.resize(1100, 800)
     graph_widget.show()
-
+    global_variables = []
     graph_widget2 = graph.widget
     graph_widget2.resize(1100, 800)
     graph_widget2.show()
