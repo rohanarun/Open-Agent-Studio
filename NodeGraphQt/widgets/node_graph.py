@@ -15,7 +15,7 @@ from sneakysnek.recorder import Recorder
 import math
 import time
 import tkinter as tk
-
+import pytesseract
 import imutils
 import requests
 import pyautogui
@@ -93,6 +93,12 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
         for key, value in x.items()  :
             if key == "image":
                 x["image"] = np.asarray(x["image"],dtype = "uint8")
+        if x["type"] == "OCR":
+            img = pyautogui.screenshot(region=(x["bounding_box"][0][0],x["bounding_box"][0][1],x["bounding_box"][1][0] -x["bounding_box"][0][0] , x["bounding_box"][1][1] - x["bounding_box"][0][1]))
+            text = pytesseract.image_to_string(img, lang='eng')
+            print(text)
+            print("OCR OUTPUT")
+            self.global_variables.append(text)
         if x["type"] == "Move Mouse":
             pyautogui.moveTo(x["x"], x["y"]) 
         if x["type"] == "Left Mouse Lift": 
@@ -205,7 +211,7 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
                     if key == connections["out"][0]:
                         print("Found End")
                         self.runNode(graph_nodes, connections["in"][0])
-
+                break
         if False:
       #  print history
             for index,y in enumerate(self.history):
@@ -367,15 +373,15 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
                 self.recorder.stop()
                 self.graph.QMainWindow.showMinimized()
                 cv2.namedWindow("OCR")
-                cv2.setMouseCallback("OCR", shape_selection)
+                cv2.setMouseCallback("OCR", self.shape_selection)
                 img = pyautogui.screenshot()
                 screenshot = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
                 cv2.imshow("OCR", screenshot)
                 cv2.setWindowProperty("OCR", cv2.WND_PROP_TOPMOST, 1)
         
                 cv2.waitKey(1)
-                np.array(pyautogui.screenshot(region=(event.x*2 - 25 ,event.y*2 - 25, 50, 50)))
-                self.history.append(json.dumps({"type":"keypressup", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
+               # np.array(pyautogui.screenshot(region=(event.x*2 - 25 ,event.y*2 - 25, 50, 50)))
+               # self.history.append(json.dumps({"type":"keypressup", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
             if "KEY_ESCAPE" in str(event.keyboard_key):
             #stopRecording()
             #reco
@@ -510,6 +516,7 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
         self.drawHistory = drawHistory
         self.mouse_counter = 0
         self.history = []
+        self.global_variables = []
         self.half_small = 25
         self.graph = graph
         self.shift_down = False
