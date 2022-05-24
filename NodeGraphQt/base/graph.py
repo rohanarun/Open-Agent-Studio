@@ -176,6 +176,11 @@ class NodeGraph(QtCore.QObject):
         for key, value in x.items()  :
             if key == "image":
                 x["image"] = np.asarray(x["image"],dtype = "uint8")
+        if x["type"] == "print":
+            vars = graph["nodes"][node_id]["custom"]["Variables"]
+            print(vars.split("_")[1])
+            print("PRINT")
+            print(self.global_variables[int(vars.split("_")[1])])
         if x["type"] == "OCR":
             print("OCR")
             cv2.namedWindow("OCR")
@@ -183,21 +188,15 @@ class NodeGraph(QtCore.QObject):
             screenshot = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
             
         # draw a rectangle around the region of interest
-            cv2.rectangle(screenshot, x["bounding_box"][0], x["bounding_box"][1], (0, 255, 0), 2)
-
-            cv2.imshow("OCR", screenshot)
-            cv2.setWindowProperty("OCR", cv2.WND_PROP_TOPMOST, 1)
-            
+           
             thresh = 255 - cv2.threshold(cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
             
             xp,yp,w,h = x["bounding_box"][0][0], x["bounding_box"][0][1], x["bounding_box"][1][0]-x["bounding_box"][0][0], x["bounding_box"][1][1]-x["bounding_box"][0][1]  
             ROI = thresh[x["bounding_box"][0][1]:x["bounding_box"][1][1],x["bounding_box"][0][0]:x["bounding_box"][1][0]]
             data = pytesseract.image_to_string(ROI, lang='eng',config='--psm 6')
             print(data)
-            self.variables.append(data)
-            cv2.waitKey(1)
-            time.sleep(5)
-            cv2.destroyAllWindows()
+            self.global_variables.append(data)
+
 
         if x["type"] == "Move Mouse":
             pyautogui.moveTo(x["x"], x["y"]) 
@@ -578,7 +577,10 @@ class NodeGraph(QtCore.QObject):
         this_path = os.path.dirname(os.path.abspath(__file__))
         icon = os.path.join(this_path, 'examples', 'OCR.png')
         self.OCRAction = QAction(QtGui.QIcon(pixmap), "&Copy", self)
+        self.OCRAction.setText("OCR Scraping")
         self.printAction = QAction(QtGui.QIcon(pixmap), "&Paste", self)
+        self.printAction.setText("Print Data")
+
         self.requestAction = QAction(QtGui.QIcon(pixmap), "C&ut", self)
         #self.addTab(self.QMainWindow, "Add Actions")
         fileToolBar = self.QMainWindow.addToolBar("File")
@@ -605,7 +607,7 @@ class NodeGraph(QtCore.QObject):
         self.drawHistory = drawHistory
         self.addOCR = addOCR
         self.addPrint = addPrint
-
+        self.global_variables = []
         self.mouse_counter = 0
         self.variables = []
         self.history = []
@@ -615,7 +617,7 @@ class NodeGraph(QtCore.QObject):
         self.size_small = 50
         self.half = 25
         self.platform = platform.platform()
-        self.history.append(json.dumps({"type":"Start Node", "x": 0, "y": 0, "Application":"chrome"}, cls=NumpyEncoder))  
+        #self.history.append(json.dumps({"type":"Start Node", "x": 0, "y": 0, "Application":"chrome"}, cls=NumpyEncoder))  
         
         self.size = 50
         self.drawHistory = drawHistory
