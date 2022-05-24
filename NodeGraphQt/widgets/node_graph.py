@@ -1,6 +1,4 @@
-from Qt import QtWidgets, QtGui
-    
-    
+from Qt import QtWidgets, QtGui    
 
 from PySide2.QtWidgets import (QWidget, QApplication, QGraphicsView,
 QGridLayout, QMainWindow, QAction, QMenu, QVBoxLayout, QMenuBar, QFileDialog, QInputDialog)

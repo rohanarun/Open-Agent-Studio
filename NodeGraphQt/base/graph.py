@@ -577,14 +577,22 @@ class NodeGraph(QtCore.QObject):
         pixmap.loadFromData(data)
         this_path = os.path.dirname(os.path.abspath(__file__))
         icon = os.path.join(this_path, 'examples', 'OCR.png')
-        self.OCRAction = QAction(QtGui.QIcon(pixmap), "&Copy", self)
-        self.printAction = QAction(QtGui.QIcon(pixmap), "&Paste", self)
-        self.requestAction = QAction(QtGui.QIcon(pixmap), "C&ut", self)
+        self.OCRAction = QAction(QtGui.QIcon(pixmap), "&OCR", self)
+        self.printAction = QAction(QtGui.QIcon(pixmap), "&Print", self)
+        self.requestAction = QAction(QtGui.QIcon(pixmap), "&Request", self)
+        self.moveAction = QAction(QtGui.QIcon(pixmap), "&Move", self)
+        self.scrollAction = QAction(QtGui.QIcon(pixmap), "Scroll",self)
+
         #self.addTab(self.QMainWindow, "Add Actions")
         fileToolBar = self.QMainWindow.addToolBar("File")
         fileToolBar.addAction(self.OCRAction)
-        
         self.OCRAction.triggered.connect(self.addOCR)
+
+        fileToolBar.addAction(self.scrollAction)
+        self.scrollAction.triggered.connect(self.addScroll)
+
+        fileToolBar.addAction(self.moveAction)
+        self.moveAction.triggered.connect(self.addMove)
 
         fileToolBar.addAction(self.printAction)
         self.printAction.triggered.connect(self.addPrint)
@@ -592,7 +600,7 @@ class NodeGraph(QtCore.QObject):
         fileToolBar.addAction(self.requestAction)
         self.requestAction.triggered.connect(self.playRecording)
 
-    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll, parent=None, **kwargs):
+    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll,addMove, parent=None, **kwargs):
         """
         Args:
             parent (object): object parent.
@@ -605,6 +613,8 @@ class NodeGraph(QtCore.QObject):
         self.drawHistory = drawHistory
         self.addOCR = addOCR
         self.addPrint = addPrint
+        self.addMove = addMove
+        self.addScroll = addScroll
 
         self.mouse_counter = 0
         self.variables = []

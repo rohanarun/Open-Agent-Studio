@@ -760,11 +760,27 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
         graph.auto_layout_nodes()
         graph.fit_to_selection()
+
+
+        
     def addPrint():
         global nodes
         x = {"type":"print", "data":"variables"}
         nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Print " + str(len(nodes)), data=x))#, color= "#FFFFFF"
 
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        graph.auto_layout_nodes()
+        graph.fit_to_selection()
+
+    def addMove():
+        global nodes
+        # x = {"type":"Move Mouse", "data":"variables","x":500,"y":500}
+        x = {"type":"Move Mouse", "data":"variables","x":500,"y":500}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Move " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+
+        nodes[len(nodes)-1].create_property('X Coordinate', x["x"], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Y Coordinate', x["y"], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Type', "Move Mouse", widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
         graph.auto_layout_nodes()
         graph.fit_to_selection()
@@ -824,7 +840,7 @@ if __name__ == '__main__':
     verified = False
 
     
-    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll)
+    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll,addMove)
     graph.set_acyclic(False)
     QApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
     # registered example nodes.
