@@ -172,7 +172,7 @@ class NodeGraph(QtCore.QObject):
              x = json.loads(graph["nodes"][node_id]["custom"]["Data"])
             #pnt(y)s
         print(node_id)
-        print(x)
+        # print(x)
         for key, value in x.items()  :
             if key == "image":
                 x["image"] = np.asarray(x["image"],dtype = "uint8")
@@ -181,14 +181,16 @@ class NodeGraph(QtCore.QObject):
             print(vars.split("_")[1])
             print("PRINT")
             print(self.global_variables[int(vars.split("_")[1])])
+        if x["type"] == "scroll":
+            vars = graph["nodes"][node_id]["custom"]["Distance"]
+            print()
+            # pyautogui.scroll()
         if x["type"] == "OCR":
             print("OCR")
             cv2.namedWindow("OCR")
             img = pyautogui.screenshot()
-            screenshot = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
-            
-        # draw a rectangle around the region of interest
-           
+            screenshot = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)            
+        # draw a rectangle around the region of interest           
             thresh = 255 - cv2.threshold(cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
             
             xp,yp,w,h = x["bounding_box"][0][0], x["bounding_box"][0][1], x["bounding_box"][1][0]-x["bounding_box"][0][0], x["bounding_box"][1][1]-x["bounding_box"][0][1]  
@@ -197,7 +199,7 @@ class NodeGraph(QtCore.QObject):
             print(data)
             self.global_variables.append(data)
 
-
+        
         if x["type"] == "Move Mouse":
             pyautogui.moveTo(x["x"], x["y"]) 
         if x["type"] == "Left Mouse Lift": 
@@ -211,12 +213,10 @@ class NodeGraph(QtCore.QObject):
             else:
                 img = pyautogui.screenshot(region=(x["x"]*2-self.half_small,x["y"]*2-self.half_small, self.size_small, self.size_small))
                 image =  cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
-            print(x)
-            #test = match(image, x["image"])
-         #   cv2.imshow('test2',cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB))
-         #   cv2.imshow('test1',cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-          #  cv2.waitKey(1
+
+            print("Im running")
             match_res = cv2.matchTemplate(cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB), image, cv2.TM_SQDIFF_NORMED)
+            # match_res = cv2.matchTemplate(cv2.cvtColor(x["image"], cv2.COLOR_RGB2BGR), image, cv2.TM_SQDIFF_NORMED)
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match_res)
             print(min_loc)
             print(min_val)
@@ -234,6 +234,7 @@ class NodeGraph(QtCore.QObject):
                 best_scale = 1.0
                 print("FAILED")
             	# loop over the scales of the image
+
                 for scale in np.linspace(0.5, 1.3, 25)[::-1]:
                     resized = cv2.resize(cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB), (int(x["image"].shape[1] * scale), int(x["image"].shape[0] * scale)), interpolation = cv2.INTER_AREA)
                     ##cv2.imshow('image',image)
@@ -258,10 +259,13 @@ class NodeGraph(QtCore.QObject):
                     print(str(best_loc[1]) )
                     if "Windows" in self.platform:
                         pyautogui.mouseDown(math.floor(best_loc[0] + 25*best_scale), math.floor(best_loc[1] + 25*best_scale))
+                        print("clicked")
                     else:
                         pyautogui.mouseDown(math.floor(best_loc[0]/2 + 25*best_scale/2), math.floor(best_loc[1]/2 + 25*best_scale/2))
+                        print("clicked")
                  #  offsetX = x["x"] - max_loc[0] + 25
                  #  offsetY = x["y"] - max_loc[1] + 25
+
         if x["type"] == "keypressup":
             if "shift" in str(x["key"]).split("KEY_")[1].lower():
                 pyautogui.keyUp("shfift")
@@ -286,7 +290,7 @@ class NodeGraph(QtCore.QObject):
                         pyautogui.write(str(x["key"]).split("KEY_")[1].upper(), interval=0.05) 
                     else:
                         pyautogui.write(str(x["key"]).split("KEY_")[1].lower(), interval=0.05)
-
+        start_for_loop = time.time()
         for key, node in graph["nodes"].items():
             if node_id == key:
                 for connections in graph["connections"]:
@@ -330,7 +334,7 @@ class NodeGraph(QtCore.QObject):
                         img = pyautogui.screenshot(region=(x["x"]*2-self.half_small,x["y"]*2-self.half_small, self.size_small, self.size_small))
                         image =  cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
 
-                    print(x)
+                    # print(x)
                # test = match(image, x["image"])
                  #   cv2.imshow('test2',cv2.cvtColor(x["image"], cv2.COLOR_BGR2RGB))
                  #   cv2.imshow('test1',cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
@@ -576,12 +580,15 @@ class NodeGraph(QtCore.QObject):
         pixmap.loadFromData(data)
         this_path = os.path.dirname(os.path.abspath(__file__))
         icon = os.path.join(this_path, 'examples', 'OCR.png')
-        self.OCRAction = QAction(QtGui.QIcon(pixmap), "&Copy", self)
+        self.OCRAction = QAction(QtGui.QIcon(pixmap), "&OCR", self)
         self.OCRAction.setText("OCR Scraping")
-        self.printAction = QAction(QtGui.QIcon(pixmap), "&Paste", self)
+        self.printAction = QAction(QtGui.QIcon(pixmap), "&Print", self)
         self.printAction.setText("Print Data")
 
-        self.requestAction = QAction(QtGui.QIcon(pixmap), "C&ut", self)
+        self.requestAction = QAction(QtGui.QIcon(pixmap), "Request", self)
+        self.moveAction = QAction(QtGui.QIcon(pixmap), "&Move", self)
+        self.scrollAction = QAction(QtGui.QIcon(pixmap), "Scroll",self)
+        self.clickAction = QAction(QtGui.QIcon(pixmap), "Click", self)
         #self.addTab(self.QMainWindow, "Add Actions")
         fileToolBar = self.QMainWindow.addToolBar("File")
         fileToolBar.addAction(self.OCRAction)
@@ -599,7 +606,11 @@ class NodeGraph(QtCore.QObject):
         fileToolBar.addAction(self.requestAction)
         self.requestAction.triggered.connect(self.playRecording)
 
-    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll,addMove, parent=None, **kwargs):
+        fileToolBar.addAction(self.clickAction)
+        self.clickAction.triggered.connect(self.addClick)
+
+
+    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll,addMove,addClick, parent=None, **kwargs):
         """
         Args:
             parent (object): object parent.
@@ -614,6 +625,7 @@ class NodeGraph(QtCore.QObject):
         self.addPrint = addPrint
         self.addMove = addMove
         self.addScroll = addScroll
+        self.addClick = addClick
 
         self.global_variables = []
         self.mouse_counter = 0

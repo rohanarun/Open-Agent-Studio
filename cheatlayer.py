@@ -48,6 +48,7 @@ from cronscheduler import CronSchedule
 from datetime import datetime, timedelta
 import time
 import os.path
+
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
@@ -752,6 +753,52 @@ if __name__ == '__main__':
         time.sleep(1)
         cv2.destroyAllWindows()
         graph.QMainWindow.showMaximized()
+
+    def click_coordinates(event,x,y,flags,params):
+      # grab references to the global variables
+      global ref_point, screenshot, global_variables    
+      
+      if event == cv2.EVENT_LBUTTONDOWN:
+        ref_point = [(x-25, y-25),(x+25,y+25)]
+       
+        # draw a rectangle around the region of interest
+        cut_image=screenshot[y-25:y+25,x-25:x+25]
+        x = {"type":"Left Mouse Click",  "x": x, "y": y,"image":np.array(cut_image)}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="CLICK " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+        nodes[len(nodes)-1].create_property('Bounding Box X1', ref_point[0][0], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Bounding Box Y1', ref_point[0][1], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Bounding Box X2', ref_point[1][0], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Bounding Box Y2', ref_point[1][1], widget_type=NODE_PROP_QLINEEDIT)
+
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        this_path = os.path.dirname(os.path.abspath(__file__))
+        icon = os.path.join(this_path, 'examples', 'OCR.png')
+        global_variables.append("CLICK_" + str(len(global_variables)))
+        nodes[len(nodes)-1].set_icon(icon)
+        graph.auto_layout_nodes()            
+        cv2.waitKey(1)
+
+    # crate a backdrop node and wrap it around
+    # "custom port node" and "group node".
+    # fit node selection to the viewer.
+        graph.fit_to_selection()
+        time.sleep(1)
+        cv2.destroyAllWindows()
+        graph.QMainWindow.showMaximized()
+
+    def addClick():
+        global nodes, screenshot, graph
+        graph.QMainWindow.showMinimized() # minimize main window to select an element
+        time.sleep(.25) # to get rid of shadow
+        cv2.namedWindow("CLICK")    # create new window
+        cv2.setMouseCallback("CLICK", click_coordinates) # get click coordinaates
+        img = pyautogui.screenshot()
+        screenshot = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+        cv2.imshow("CLICK", screenshot)
+        cv2.setWindowProperty("CLICK", cv2.WND_PROP_TOPMOST, 1)
+        cv2.waitKey(1)
+
+        
     def addScroll():
         global nodes
         x = {"type":"scroll", "data":"variables"}
@@ -785,6 +832,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
         graph.auto_layout_nodes()
         graph.fit_to_selection()
+
 
     def addOCR():
         global nodes, screenshot, graph
@@ -841,7 +889,7 @@ if __name__ == '__main__':
     verified = False
 
     
-    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll,addMove)
+    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll,addMove,addClick)
     graph.set_acyclic(False)
     QApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
     # registered example nodes.
