@@ -938,5 +938,5 @@ if __name__ == '__main__':
     nodes_palette.set_category_label('nodes.group', 'Group Nodes')
     # nodes_palette.show()
     
-    #schedule_test()
+    schedule_test()
     app.exec_()

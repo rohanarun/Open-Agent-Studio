@@ -4,7 +4,6 @@ from PySide2.QtWidgets import (QWidget, QApplication, QGraphicsView,
 QGridLayout, QMainWindow, QAction, QMenu, QVBoxLayout, QMenuBar, QFileDialog, QInputDialog)
 from PySide2 import QtCore, QtWidgets, QtGui
 import sys
-from PySide2.QtGui import QKeySequence
 from NodeGraphQt.constants import (
     NODE_SEL_BORDER_COLOR,
     VIEWER_BG_COLOR,
@@ -442,34 +441,28 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
         self.stopAction = QAction('Stop Recording (ESC)', self)  
         self.stopAction.triggered.connect(self.stopRecording)
         
-        # scheduleAction = QAction('Schedule Recording', self)  
-        # scheduleAction.triggered.connect(self.startRecording)
+        startAction = QAction('Schedule Recording', self)  
+        startAction.triggered.connect(self.startRecording)
         
         
         saveAction = QAction('Save', self)  
         saveAction.triggered.connect(self.saveCheat)
-        saveAction.setShortcut(QKeySequence("Shift+s"))
 
         
         loopAction = QAction('Loop', self)  
         loopAction.triggered.connect(self.loopRecording)
-        loopAction.setShortcut(QKeySequence("Shift+l"))
 
         startAction = QAction('Start Recording', self)  
         startAction.triggered.connect(self.startRecording)
-        startAction.setShortcut(QKeySequence("Shift+r"))
 
         
 
         
         playAction = QAction('Play', self)  
         playAction.triggered.connect(self.playRecording)
-        playAction.setShortcut(QKeySequence("Shift+p"))
-
 
         openAction = QAction('Open', self)  
         openAction.triggered.connect(self.openCheat)
-        openAction.setShortcut(QKeySequence("Shift+o"))
      # File toolbar
         # Edit toolbar
 
@@ -510,7 +503,6 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
 
         exitAction = QAction('Exit', self)  
         exitAction.triggered.connect(self.defExit)
-        exitAction.setShortcut(QKeySequence("Shift+x"))
  
         exitMenu.addAction(exitAction)
         self.myQMenuBar.show()
