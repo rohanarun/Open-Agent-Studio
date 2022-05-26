@@ -204,7 +204,7 @@ class NodeGraph(QtCore.QObject):
 
 
         if x["type"] == "Move Mouse":
-            pyautogui.moveTo(x["x"], x["y"]) 
+            pyautogui.moveTo((graph["nodes"][node_id]["custom"]["X Coordinate"]), (graph["nodes"][node_id]["custom"]["Y Coordinate"])) 
         if x["type"] == "Left Mouse Lift": 
             pyautogui.mouseUp() 
         if x["type"] == "Left Mouse Click": 
