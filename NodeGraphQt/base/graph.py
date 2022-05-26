@@ -585,13 +585,8 @@ class NodeGraph(QtCore.QObject):
         #self.addTab(self.QMainWindow, "Add Actions")
         fileToolBar = self.QMainWindow.addToolBar("File")
         fileToolBar.addAction(self.OCRAction)
+        
         self.OCRAction.triggered.connect(self.addOCR)
-
-        fileToolBar.addAction(self.scrollAction)
-        self.scrollAction.triggered.connect(self.addScroll)
-
-        fileToolBar.addAction(self.moveAction)
-        self.moveAction.triggered.connect(self.addMove)
 
         fileToolBar.addAction(self.printAction)
         self.printAction.triggered.connect(self.addPrint)
@@ -599,7 +594,7 @@ class NodeGraph(QtCore.QObject):
         fileToolBar.addAction(self.requestAction)
         self.requestAction.triggered.connect(self.playRecording)
 
-    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll,addMove, parent=None, **kwargs):
+    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll, parent=None, **kwargs):
         """
         Args:
             parent (object): object parent.
@@ -612,9 +607,6 @@ class NodeGraph(QtCore.QObject):
         self.drawHistory = drawHistory
         self.addOCR = addOCR
         self.addPrint = addPrint
-        self.addMove = addMove
-        self.addScroll = addScroll
-
         self.global_variables = []
         self.mouse_counter = 0
         self.variables = []
