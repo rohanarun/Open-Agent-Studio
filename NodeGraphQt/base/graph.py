@@ -183,8 +183,9 @@ class NodeGraph(QtCore.QObject):
             print(self.global_variables[int(vars.split("_")[1])])
         if x["type"] == "scroll":
             vars = graph["nodes"][node_id]["custom"]["Distance"]
-            print()
-            # pyautogui.scroll()
+            print("before scroll")
+            pyautogui.scroll(x["y"])
+            print("after scroll")
         if x["type"] == "OCR":
             print("OCR")
             cv2.namedWindow("OCR")

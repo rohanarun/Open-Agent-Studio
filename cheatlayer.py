@@ -801,9 +801,9 @@ if __name__ == '__main__':
         
     def addScroll():
         global nodes
-        x = {"type":"scroll", "data":"variables"}
+        x = {"type":"scroll", "data":"variables","y":-900}
         nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Scroll " + str(len(nodes)), data=x))#, color= "#FFFFFF"
-        nodes[len(nodes)-1].create_property('Distance',100, widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Distance',x["y"], widget_type=NODE_PROP_QLINEEDIT)
 
         nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
         graph.auto_layout_nodes()
