@@ -176,6 +176,11 @@ class NodeGraph(QtCore.QObject):
         for key, value in x.items()  :
             if key == "image":
                 x["image"] = np.asarray(x["image"],dtype = "uint8")
+        if x["type"] == "sendData":
+            print("SEND DATA")
+            print(graph["nodes"][node_id]["custom"]["URL"])
+            print(graph["nodes"][node_id]["custom"]["Request"])
+            r = requests.post(graph["nodes"][node_id]["custom"]["URL"], data=graph["nodes"][node_id]["custom"]["Request"])
         if x["type"] == "print":
             vars = graph["nodes"][node_id]["custom"]["Variables"]
             print(vars.split("_")[1])
@@ -199,7 +204,8 @@ class NodeGraph(QtCore.QObject):
 
 
         if x["type"] == "Move Mouse":
-            pyautogui.moveTo(x["x"], x["y"]) 
+            pyautogui.moveTo((graph["nodes"][node_id]["custom"]["X Coordinate"]), (graph["nodes"][node_id]["custom"]["Y Coordinate"]))
+            #pyautogui.moveTo(x["x"], x["y"]) 
         if x["type"] == "Left Mouse Lift": 
             pyautogui.mouseUp() 
         if x["type"] == "Left Mouse Click": 
@@ -576,15 +582,16 @@ class NodeGraph(QtCore.QObject):
         pixmap.loadFromData(data)
         this_path = os.path.dirname(os.path.abspath(__file__))
         icon = os.path.join(this_path, 'examples', 'OCR.png')
-        self.OCRAction = QAction(QtGui.QIcon(pixmap), "&Copy", self)
-        self.OCRAction.setText("OCR Scraping")
-        self.printAction = QAction(QtGui.QIcon(pixmap), "&Paste", self)
-        self.printAction.setText("Print Data")
-
-        self.requestAction = QAction(QtGui.QIcon(pixmap), "C&ut", self)
+        self.OCRAction = QAction(QtGui.QIcon(pixmap), "OCR Scraping", self)
+        self.printAction = QAction(QtGui.QIcon(pixmap), "Print Data", self)
+        self.requestAction = QAction(QtGui.QIcon(pixmap), "Send Data", self)
         #self.addTab(self.QMainWindow, "Add Actions")
-        fileToolBar = self.QMainWindow.addToolBar("File")
+        fileToolBar = self.QMainWindow.addToolBar("")
+
+        # Position the ToolBar on the left side of the Main Window
+        self.QMainWindow.addToolBar(QtCore.Qt.LeftToolBarArea, fileToolBar)
         fileToolBar.addAction(self.OCRAction)
+        self.QMainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)        
         
         self.OCRAction.triggered.connect(self.addOCR)
 
@@ -592,9 +599,9 @@ class NodeGraph(QtCore.QObject):
         self.printAction.triggered.connect(self.addPrint)
 
         fileToolBar.addAction(self.requestAction)
-        self.requestAction.triggered.connect(self.playRecording)
+        self.requestAction.triggered.connect(self.addSendData)
 
-    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll, parent=None, **kwargs):
+    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll, addSendData, parent=None, **kwargs):
         """
         Args:
             parent (object): object parent.
@@ -605,6 +612,7 @@ class NodeGraph(QtCore.QObject):
         self.verified = verified
         self.verified = verified
         self.drawHistory = drawHistory
+        self.addSendData = addSendData
         self.addOCR = addOCR
         self.addPrint = addPrint
         self.global_variables = []
