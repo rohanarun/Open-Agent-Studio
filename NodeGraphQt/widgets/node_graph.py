@@ -21,6 +21,7 @@ import pytesseract
 import imutils
 import requests
 import pyautogui
+import subprocess
 import json
 from PIL import ImageTk, Image
 from tkinter import ttk
@@ -209,6 +210,10 @@ class NodeGraphWidget(QtWidgets.QTabWidget):
             if "Start" in node["name"]:
                 print("Found Start")
                 print(key)
+                x = graph_nodes["nodes"][key]["custom"]["Initial Program"]
+                print(x)
+
+                subprocess.call([x])
                 for connections in graph_nodes["connections"]:
                     if key == connections["out"][0]:
                         print("Found End")

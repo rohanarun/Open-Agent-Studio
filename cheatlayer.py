@@ -860,7 +860,7 @@ if __name__ == '__main__':
 
     # auto layout nodes.
     nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Start Node " + str(len(nodes)), data={"type":"Start Node", "x": 0, "y": 0, "Application":"chrome"}))#, color= "#FFFFFF"
-    nodes[len(nodes)-1].create_property('Initial Program', "none", widget_type=NODE_PROP_QLINEEDIT)
+    nodes[len(nodes)-1].create_property('Initial Program', "C:\Program Files\Google\Chrome\Application\chrome.exe 'https://cheatlayer.com'", widget_type=NODE_PROP_QLINEEDIT)
     this_path = os.path.dirname(os.path.abspath(__file__))
     icon = os.path.join(this_path, 'examples', 'mouse.png')
     nodes[len(nodes)-1].set_icon(icon)
