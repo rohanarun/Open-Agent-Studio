@@ -12,6 +12,7 @@ import math
 import pytesseract
 #pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 import tkinter as tk
+import subprocess
 
 import imutils
 import requests
@@ -306,6 +307,11 @@ class NodeGraph(QtCore.QObject):
             if "Start" in node["name"]:
                 print("Found Start")
                 print(key)
+                print(key)
+                x = graph_nodes["nodes"][key]["custom"]["Initial Program"]
+                print(x)
+
+                subprocess.call(x)
                 for connections in graph_nodes["connections"]:
                     if key == connections["out"][0]:
                         print("Found End")
