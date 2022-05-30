@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import copy
 import json
+import io
 import os
 import pathlib
 import urllib
@@ -63,10 +64,36 @@ from NodeGraphQt.widgets.viewer import NodeViewer
 from NodeGraphQt.widgets.viewer_nav import NodeNavigationWidget
 
 from PySide2.QtWidgets import (QWidget, QApplication, QGraphicsView,
-QGridLayout, QMainWindow, QAction, QMenu, QVBoxLayout, QMenuBar, QFileDialog, QInputDialog)
+QGridLayout, QMainWindow, QAction, QMenu, QVBoxLayout, QMenuBar, QFileDialog, QInputDialog, QMessageBox)
 from PySide2 import QtCore, QtWidgets, QtGui
-
-
+from PySide2.QtGui import QKeySequence
+class CustomMessageBox(QMessageBox):
+    def __init__(self, *__args):
+        QMessageBox.__init__(self)
+        self.timeout = 0
+        self.autoclose = False
+        self.currentTime = 0
+    
+    def showEvent(self, QShowEvent):
+        self.currentTime = 0
+        if self.autoclose:
+            self.startTimer(1000)
+    
+    def timerEvent(self, *args, **kwargs):
+        self.currentTime += 1
+        if self.currentTime >= self.timeout:
+            self.done(0)
+    
+    @staticmethod
+    def showWithTimeout(timeoutSeconds, message, title, icon=QMessageBox.Information, buttons=QMessageBox.Ok):
+        w = CustomMessageBox()
+        w.autoclose = True
+        w.timeout = timeoutSeconds
+        w.setText(message)
+        w.setWindowTitle(title)
+        w.setIcon(icon)
+        w.setStandardButtons(buttons)
+        w.exec_()
 
 class NumpyEncoder(json.JSONEncoder):
     """ Special json encoder for numpy types """
@@ -168,6 +195,7 @@ class NodeGraph(QtCore.QObject):
 
 
     def runNode(self, graph, node_id):
+        path = "A"
         x = graph["nodes"][node_id]["custom"]["Data"]
         if isinstance(x, str):
              x = json.loads(graph["nodes"][node_id]["custom"]["Data"])
@@ -177,6 +205,19 @@ class NodeGraph(QtCore.QObject):
         for key, value in x.items()  :
             if key == "image":
                 x["image"] = np.asarray(x["image"],dtype = "uint8")
+        if x["type"] == "IfElse":
+            print(graph["nodes"][node_id]["custom"]["operator"])
+            if graph["nodes"][node_id]["custom"]["operator"] == "equals":
+                if graph["nodes"][node_id]["custom"]["Variables"] == graph["nodes"][node_id]["custom"]["condition"]:
+                    path = "A"
+                else:
+                    path = "B"
+            if graph["nodes"][node_id]["custom"]["operator"] == "includes":
+                if graph["nodes"][node_id]["custom"]["condition"] in graph["nodes"][node_id]["custom"]["Variables"]:
+                    path = "A"
+                else:
+                    path = "B"
+
         if x["type"] == "sendData":
             print("SEND DATA")
             print(graph["nodes"][node_id]["custom"]["URL"])
@@ -185,7 +226,12 @@ class NodeGraph(QtCore.QObject):
         if x["type"] == "print":
             vars = graph["nodes"][node_id]["custom"]["Variables"]
             print(vars.split("_")[1])
-            print("PRINT")
+            msg = QMessageBox()
+            msg.setWindowTitle("Print Variable")
+            msg.setText(self.global_variables[int(vars.split("_")[1])])
+            x = msg.exec_()
+            #CustomMessageBox.showWithTimeout(3, "Print Variable",self.global_variables[int(vars.split("_")[1])], icon=QMessageBox.Warning)
+
             print(self.global_variables[int(vars.split("_")[1])])
         if x["type"] == "OCR":
             print("OCR")
@@ -298,7 +344,11 @@ class NodeGraph(QtCore.QObject):
             if node_id == key:
                 for connections in graph["connections"]:
                     print(connections["out"])
-                    if key == connections["out"][0]:
+                    if key == connections["out"][0] and path in connections["out"][1]:
+                        print("Found")
+                        print(connections["out"][1])
+                        print(connections["out"][0])
+                        
                         self.runNode(graph, connections["in"][0])
      
     def runRecording(self):
@@ -308,6 +358,7 @@ class NodeGraph(QtCore.QObject):
                 print("Found Start")
                 print(key)
                 print(key)
+                self.global_variables = []
                 x = graph_nodes["nodes"][key]["custom"]["Initial Program"]
                 print(x)
 
@@ -468,25 +519,24 @@ class NodeGraph(QtCore.QObject):
                 self.history.append(json.dumps({"type":"keypress", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
       
     def openCheat(self):
-        f,_ = QFileDialog.getOpenFileName(self, 'Open file', 'c:\\',"Cheat Files (*.cheat)")
-        with open(f) as file:
-            self.history = file.readlines()
-            self.drawHistory(self.history)
+        f,_ = QFileDialog.getOpenFileName(self.QMainWindow, 'Open file', 'c:\\',"Cheat Files (*.cheat)")
+        self.load_session(f)
     def stopRecording(self):
         if self.started:
             self.recorder.stop()
             self.drawHistory(self.history)
             self.QMainWindow.showMaximized()
         self.started = False
-
+    def newCheat(self):
+        self.history = []
+        self.delete_nodes(self.all_nodes())
+        self.auto_layout_nodes()
+        self.fit_to_selection()
     def playRecording(self):
         print("play")
         self.QMainWindow.showMinimized()
 
         self.runRecording()   
-    def newCheat(self):
-        self.history = []
-        self.drawHistory(self.history)
     
     def startRecording(self):
         if self.started == False:
@@ -498,11 +548,9 @@ class NodeGraph(QtCore.QObject):
     def defExit(self):
         sys.exit()
     def saveCheat(self):
-        name, save = QFileDialog.getSaveFileName(self, 'Save Cheat')
-        file = open(name,'w')
-        for item in self.history:
-             file.write("%s\n" % (item))
-        file.close()
+        name, save = QFileDialog.getSaveFileName(self.QMainWindow, 'Save Cheat')
+        self.save_session(name)
+       
     def defineMenu(self):
         self.myQMenuBar = self.QMainWindow.menuBar()
         exitMenu = self.myQMenuBar.addMenu('File')
@@ -511,31 +559,49 @@ class NodeGraph(QtCore.QObject):
         self.stopAction = QAction('Stop Recording (ESC)', self)  
         self.stopAction.triggered.connect(self.stopRecording)
         
-        startAction = QAction('Schedule Recording', self)  
-        startAction.triggered.connect(self.startRecording)
-        
-        
+        # scheduleAction = QAction('Schedule Recording', self)  
+        # scheduleAction.triggered.connect(self.startRecording)
+
+
         saveAction = QAction('Save', self)  
         saveAction.triggered.connect(self.saveCheat)
+        saveAction.setShortcut(QKeySequence("Shift+s"))
 
-        
+
         loopAction = QAction('Loop', self)  
         loopAction.triggered.connect(self.loopRecording)
+        loopAction.setShortcut(QKeySequence("Shift+l"))
 
         startAction = QAction('Start Recording', self)  
         startAction.triggered.connect(self.startRecording)
+        startAction.setShortcut(QKeySequence("Shift+r"))
 
-        
 
-        
+        newAction = QAction('New', self)  
+        newAction.triggered.connect(self.newCheat)
+        newAction.setShortcut(QKeySequence("Shift+n"))
+
+
+
         playAction = QAction('Play', self)  
         playAction.triggered.connect(self.playRecording)
+        playAction.setShortcut(QKeySequence("Shift+p"))
+
 
         openAction = QAction('Open', self)  
         openAction.triggered.connect(self.openCheat)
+        openAction.setShortcut(QKeySequence("Shift+o"))
      # File toolbar
         # Edit toolbar
 
+
+        exitAction = QAction('Exit', self)  
+        exitAction.triggered.connect(self.defExit)
+        exitAction.setShortcut(QKeySequence("Shift+x"))
+     # File toolbar
+        # Edit toolbar
+
+        exitMenu.addAction(newAction)
 
         exitMenu.addAction(openAction)
         exitMenu.addAction(playAction)
@@ -591,23 +657,28 @@ class NodeGraph(QtCore.QObject):
         self.OCRAction = QAction(QtGui.QIcon(pixmap), "OCR Scraping", self)
         self.printAction = QAction(QtGui.QIcon(pixmap), "Print Data", self)
         self.requestAction = QAction(QtGui.QIcon(pixmap), "Send Data", self)
+        self.ifAction = QAction(QtGui.QIcon(pixmap), "If/Else", self)
+
         #self.addTab(self.QMainWindow, "Add Actions")
         fileToolBar = self.QMainWindow.addToolBar("")
 
         # Position the ToolBar on the left side of the Main Window
         self.QMainWindow.addToolBar(QtCore.Qt.LeftToolBarArea, fileToolBar)
-        fileToolBar.addAction(self.OCRAction)
         self.QMainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)        
-        
+        fileToolBar.addAction(self.OCRAction)
         self.OCRAction.triggered.connect(self.addOCR)
 
         fileToolBar.addAction(self.printAction)
         self.printAction.triggered.connect(self.addPrint)
+        
+        fileToolBar.addAction(self.ifAction)
+        self.ifAction.triggered.connect(self.addIfElse)
+
 
         fileToolBar.addAction(self.requestAction)
         self.requestAction.triggered.connect(self.addSendData)
 
-    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll, addSendData, parent=None, **kwargs):
+    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll, addSendData, addIfElse, parent=None, **kwargs):
         """
         Args:
             parent (object): object parent.
@@ -621,6 +692,7 @@ class NodeGraph(QtCore.QObject):
         self.addSendData = addSendData
         self.addOCR = addOCR
         self.addPrint = addPrint
+        self.addIfElse = addIfElse
         self.global_variables = []
         self.mouse_counter = 0
         self.variables = []

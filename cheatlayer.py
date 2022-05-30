@@ -771,6 +771,17 @@ if __name__ == '__main__':
 
         graph.auto_layout_nodes()
         graph.fit_to_selection()
+    def addIfElse():
+        global nodes
+        x = {"type":"IfElse", "boolean":"="}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeB', name="If Else " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+        nodes[len(nodes)-1].create_property('Variables',global_variables[0],items=global_variables,  widget_type=NODE_PROP_QCOMBO)
+        nodes[len(nodes)-1].create_property('operator', "includes", widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('condition', "none", widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        graph.auto_layout_nodes()
+        graph.fit_to_selection()
+
     def addPrint():
         global nodes
         x = {"type":"print", "index":0, "selected":global_variables[0]}
@@ -835,7 +846,7 @@ if __name__ == '__main__':
     verified = False
 
     
-    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll, addSendData)
+    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll, addSendData, addIfElse)
     graph.set_acyclic(False)
     QApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
     # registered example nodes.
@@ -860,7 +871,7 @@ if __name__ == '__main__':
 
     # auto layout nodes.
     nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Start Node " + str(len(nodes)), data={"type":"Start Node", "x": 0, "y": 0, "Application":"chrome"}))#, color= "#FFFFFF"
-    nodes[len(nodes)-1].create_property('Initial Program', "C:\Program Files\Google\Chrome\Application\chrome.exe 'https://cheatlayer.com'", widget_type=NODE_PROP_QLINEEDIT)
+    nodes[len(nodes)-1].create_property('Initial Program', "C:\Program Files\Google\Chrome\Application\chrome.exe cheatlayer.com", widget_type=NODE_PROP_QLINEEDIT)
     this_path = os.path.dirname(os.path.abspath(__file__))
     icon = os.path.join(this_path, 'examples', 'mouse.png')
     nodes[len(nodes)-1].set_icon(icon)
@@ -871,7 +882,7 @@ if __name__ == '__main__':
     # fit node selection to the viewer.
     graph.fit_to_selection()
     # Custom builtin widgets from NodeGraphQt
-    # ---------------------------------------
+    # ---------------------------------------sdfasdasgdasdfasdf
 
     # create a node properties bin widget.
     properties_bin = PropertiesBinWidget(node_graph=graph)
