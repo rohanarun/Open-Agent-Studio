@@ -17,11 +17,9 @@ class BasicNodeA(BaseNode):
 
         # create node inputs.
         self.add_input('in A')
-        self.add_input('in B')
 
         # create node outputs.
         self.add_output('out A')
-        self.add_output('out B')
 
 
 class BasicNodeB(BaseNode):
@@ -39,12 +37,9 @@ class BasicNodeB(BaseNode):
     def __init__(self):
         super(BasicNodeB, self).__init__()
 
-        # create node inputs
-        self.add_input('single 1')
-        self.add_input('single 2')
-        self.add_input('multi in', multi_input=True)
+        # create node inputs.
+        self.add_input('in A')
 
-        # create node outputs
-        self.add_output('single 1', multi_output=False)
-        self.add_output('single 2', multi_output=False)
-        self.add_output('multi out')
+        # create node outputs.
+        self.add_output('out A')
+        self.add_output('out B')
