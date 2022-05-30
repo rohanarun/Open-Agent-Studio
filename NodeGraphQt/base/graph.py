@@ -213,7 +213,7 @@ class NodeGraph(QtCore.QObject):
                 else:
                     path = "B"
             if graph["nodes"][node_id]["custom"]["operator"] == "includes":
-                if graph["nodes"][node_id]["custom"]["condition"] in graph["nodes"][node_id]["custom"]["Variables"]:
+                if graph["nodes"][node_id]["custom"]["condition"] in self.global_variables[int(graph["nodes"][node_id]["custom"]["Variables"].split("_")[1])]:
                     path = "A"
                 else:
                     path = "B"
@@ -229,7 +229,7 @@ class NodeGraph(QtCore.QObject):
             msg = QMessageBox()
             msg.setWindowTitle("Print Variable")
             msg.setText(self.global_variables[int(vars.split("_")[1])])
-            x = msg.exec_()
+            _ = msg.exec_()
             #CustomMessageBox.showWithTimeout(3, "Print Variable",self.global_variables[int(vars.split("_")[1])], icon=QMessageBox.Warning)
 
             print(self.global_variables[int(vars.split("_")[1])])

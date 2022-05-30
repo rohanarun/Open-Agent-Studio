@@ -703,7 +703,7 @@ if __name__ == '__main__':
             'day':'*','weekday':'*','month':'*',
             'startDate':datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'endDate':None,'id':'testCheat'}
-        #sch.addJob(drawHistory  ,job,[history])
+        sch.addJob(drawHistory  ,job,[history])
         #sch.start()
 
     def shape_selection(event, x, y, flags, param):
