@@ -752,6 +752,99 @@ if __name__ == '__main__':
         time.sleep(1)
         cv2.destroyAllWindows()
         graph.QMainWindow.showMaximized()
+
+    def click_coordinates(event,x,y,flags,params):
+      # grab references to the global variables
+      global ref_point, screenshot, global_variables    
+      
+      if event == cv2.EVENT_LBUTTONDOWN:
+        ref_point = [(x-25, y-25),(x+25,y+25)]
+       
+        # draw a rectangle around the region of interest
+        cut_image=screenshot[y-25:y+25,x-25:x+25]
+        x = {"type":"Left Mouse Click",  "x": x, "y": y,"image":np.array(cut_image)}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="CLICK " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+        nodes[len(nodes)-1].create_property('Bounding Box X1', ref_point[0][0], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Bounding Box Y1', ref_point[0][1], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Bounding Box X2', ref_point[1][0], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Bounding Box Y2', ref_point[1][1], widget_type=NODE_PROP_QLINEEDIT)
+
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        this_path = os.path.dirname(os.path.abspath(__file__))
+        icon = os.path.join(this_path, 'examples', 'OCR.png')
+        global_variables.append("CLICK_" + str(len(global_variables)))
+        nodes[len(nodes)-1].set_icon(icon)
+        graph.auto_layout_nodes()            
+        cv2.waitKey(1)
+        graph.fit_to_selection()
+        time.sleep(1)
+        cv2.destroyAllWindows()
+        graph.QMainWindow.showMaximized()
+
+    def addMove():
+        global nodes
+        # x = {"type":"Move Mouse", "data":"variables""x":500,"y":500}
+        x = {"type":"Move Mouse", "data":"variables","x":0,"y":0}
+        nodes.append(graph.create_node('nodes.basicBasicNodeA',     name="Move " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+        nodes[len(nodes)-1].create_property('X Coordinate',x["x"],  widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Y Coordinate',x["y"],  widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Type', "MoveMouse",    widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x,   cls=NumpyEncoder),widget_type=NODE_PROP_QLINEEDIT)
+        graph.auto_layout_nodes()
+        graph.fit_to_selection()
+        
+    def addClick():
+        global nodes, screenshot, graph
+        graph.QMainWindow.showMinimized() # minimize main window to select an element
+        time.sleep(.25) # to get rid of shadow
+        cv2.namedWindow("CLICK")    # create new window
+        cv2.setMouseCallback("CLICK", click_coordinates) # get click coordinaates
+        img = pyautogui.screenshot()
+        screenshot = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+        cv2.imshow("CLICK", screenshot)
+        cv2.setWindowProperty("CLICK", cv2.WND_PROP_TOPMOST, 1)
+        cv2.waitKey(1)
+
+    def getData():
+        global nodes
+        x = {"type":"getData", "data":"variables",
+            "url":"URL_HERE","payload":"","cookies":"","headers":""}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="GetData " + str(len(nodes)), data=x))
+        nodes[len(nodes)-1].create_property('URL', x["url"], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Payload', x["payload"], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Cookies', x["cookies"], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Headers', x["headers"], widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Type', "getData", widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        graph.auto_layout_nodes()
+        graph.fit_to_selection()
+
+    def download_file():
+        global nodes
+        default_download = "FILE_NAME_HERE"
+        x={"type":"download","data":"variables","download_location":default_download, "url":"URL_HERE"}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Download " + str(len(nodes)), data=x))
+        nodes[len(nodes)-1].create_property('Download Location', x["download_location"],
+            widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('URL', x["download_location"],
+            widget_type=NODE_PROP_QLINEEDIT)
+
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        graph.auto_layout_nodes()
+        graph.fit_to_selection()
+        
+    def getScreenshot():
+        global nodes, screenshot
+        default_download = "screenshot.png"
+        x={"type":"screenshot","data":"variables","download_location":default_download}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Screenshot " + str(len(nodes)), data=x))
+        nodes[len(nodes)-1].create_property('Download Location', x["download_location"],
+            widget_type=NODE_PROP_QLINEEDIT)
+
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        graph.auto_layout_nodes()
+        graph.fit_to_selection()
+
     def addScroll():
         global nodes
         x = {"type":"scroll", "data":"variables"}
@@ -761,6 +854,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
         graph.auto_layout_nodes()
         graph.fit_to_selection()
+
     def addSendData():
         global nodes
         x = {"type":"sendData", "url":"https://cheatlayer.com/triggers/extension", "data":'{"start":"https://www.google.com", "name": "test inputs", "data":"' + global_variables[0] + '","key":"' + key + '"}'}
@@ -855,7 +949,7 @@ if __name__ == '__main__':
     verified = False
 
     
-    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll, addSendData, addIfElse, addKeypress)
+    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll, addSendData, addIfElse, addKeypress, addMove, addClick,getData,getScreenshot,download_file)
     graph.set_acyclic(False)
     QApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
     # registered example nodes.

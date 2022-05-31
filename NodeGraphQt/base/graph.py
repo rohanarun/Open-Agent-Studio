@@ -254,12 +254,27 @@ class NodeGraph(QtCore.QObject):
             print(data)
             self.global_variables.append(data)
 
+        if x["type"] == "scroll":
+            vars = graph["nodes"][node_id]["custom"]["Distance"]
+            pyautogui.scroll(x["y"])
+    
+        if x["type"] == "getData":
+            response = requests.get(url=x["url"], params=x["payload"],cookies=x["cookies"], headers=x["headers"])
+            print(response.json())
+
+        if x["type"] == "screenshot":
+            pyautogui.screenshot(x["download_location"])
+
+        if x["type"] == "download":
+            response = requests.get(x["url"])
+            open(x["download_location"], "wb").write(response.content)
 
         if x["type"] == "Move Mouse":
             pyautogui.moveTo((graph["nodes"][node_id]["custom"]["X Coordinate"]), (graph["nodes"][node_id]["custom"]["Y Coordinate"]))
-            #pyautogui.moveTo(x["x"], x["y"]) 
+
         if x["type"] == "Left Mouse Lift": 
-            pyautogui.mouseUp() 
+            pyautogui.mouseUp()
+             
         if x["type"] == "Left Mouse Click": 
             img = []
             image = []
@@ -662,46 +677,76 @@ class NodeGraph(QtCore.QObject):
  
         exitMenu.addAction(exitAction)
         self.myQMenuBar.show()
-    
+
+    def getIcon(self,url):
+        data = urllib.request.urlopen(url).read()
+        icon = QtGui.QPixmap()
+        icon.loadFromData(data)
+        return icon
+
     def _createToolBars(self):
         # File toolbar
         print("CREATING TOOLBAR44")
         current_directory = str(pathlib.Path(__file__).parent.absolute())
         path = current_directory + '/OCR.png'
         url = 'https://cheatlayer.com/ocr.png'    
-        data = urllib.request.urlopen(url).read()
-        pixmap = QtGui.QPixmap()
-        pixmap.loadFromData(data)
+        # data = urllib.request.urlopen(url).read()
+        # pixmap = QtGui.QPixmap()
+        # pixmap.loadFromData(data)
+        pixmap = self.getIcon('https://cheatlayer.com/ocr.png' )
         
-        url = 'https://cheatlayer.com/images/textarea/text4.png'    
-        data = urllib.request.urlopen(url).read()
-        printimg = QtGui.QPixmap()
-        printimg.loadFromData(data)
+        # url = 'https://cheatlayer.com/images/textarea/text4.png'    
+        # data = urllib.request.urlopen(url).read()
+        # printimg = QtGui.QPixmap()
+        # printimg.loadFromData(data)
+        printing = self.getIcon('https://cheatlayer.com/images/textarea/text4.png')
         
-        url = 'https://cheatlayer.com/webhook.png'    
-        data = urllib.request.urlopen(url).read()
-        webhook = QtGui.QPixmap()
-        webhook.loadFromData(data)
+        # url = 'https://cheatlayer.com/webhook.png'    
+        # data = urllib.request.urlopen(url).read()
+        # webhook = QtGui.QPixmap()
+        # webhook.loadFromData(data)
+        webhook = self.getIcon('https://cheatlayer.com/webhook.png' )
         
-        url = 'https://cheatlayer.com/images/textarea/text10.png'    
-        data = urllib.request.urlopen(url).read()
-        ifelse = QtGui.QPixmap()
-        ifelse.loadFromData(data)
+        # url = 'https://cheatlayer.com/images/textarea/text10.png'    
+        # data = urllib.request.urlopen(url).read()
+        # ifelse = QtGui.QPixmap()
+        # ifelse.loadFromData(data)
+        ifelse = self.getIcon('https://cheatlayer.com/images/textarea/text10.png')
         
-        url = 'https://cheatlayer.com/images/textarea/text14.png'    
-        data = urllib.request.urlopen(url).read()
-        keypress = QtGui.QPixmap()
-        keypress.loadFromData(data)
+        # url = 'https://cheatlayer.com/images/textarea/text14.png'    
+        # data = urllib.request.urlopen(url).read()
+        # keypress = QtGui.QPixmap()
+        # keypress.loadFromData(data)
+        keypress = self.getIcon('https://cheatlayer.com/images/textarea/text14.png' )
+
+        get_icon= self.getIcon("https://cheatlayer.com/webhook.png")
         
+        screenshotIcon = self.getIcon("https://cheatlayer.com/images/textarea/text16.png")
+
+        downloadIcon = self.getIcon("https://cheatlayer.com/images/textarea/text12.png")
+
+        scrollIcon = self.getIcon("https://cheatlayer.com/images/textarea/text15.png")
+
+        clickIcon = self.getIcon("https://cheatlayer.com/images/textarea/text8.png")
+
+        moveIcon = self.getIcon("https://cheatlayer.com/ocr.png")
+
+
 
 
         this_path = os.path.dirname(os.path.abspath(__file__))
         icon = os.path.join(this_path, 'examples', 'OCR.png')
         self.OCRAction = QAction(QtGui.QIcon(pixmap), "OCR Scraping", self)
-        self.printAction = QAction(QtGui.QIcon(printimg), "Print Data", self)
+        self.printAction = QAction(QtGui.QIcon(printing), "Print Data", self)
         self.requestAction = QAction(QtGui.QIcon(webhook), "Send Data", self)
         self.ifAction = QAction(QtGui.QIcon(ifelse), "If/Else", self)
         self.keypressAction = QAction(QtGui.QIcon(keypress), "addKeypress", self)
+        self.getAction = QAction(QtGui.QIcon(get_icon), "Get Data",self)
+        self.screenshotAction = QAction(QtGui.QIcon(screenshotIcon), "Screenshot",self)
+        self.downloadAction = QAction(QtGui.QIcon(downloadIcon), "Download",self)
+        self.scrollAction =  QAction(QtGui.QIcon(scrollIcon), "Screenshot",self)
+        self.moveAction = QAction(QtGui.QIcon(moveIcon), "&Move", self)
+        self.clickAction = QAction(QtGui.QIcon(clickIcon), "Click", self)
 
         #self.addTab(self.QMainWindow, "Add Actions")
         fileToolBar = self.QMainWindow.addToolBar("")
@@ -725,7 +770,7 @@ class NodeGraph(QtCore.QObject):
         fileToolBar.addAction(self.requestAction)
         self.requestAction.triggered.connect(self.addSendData)
 
-    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll, addSendData, addIfElse, addKeypress, parent=None, **kwargs):
+    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll, addSendData, addIfElse, addKeypress, addMove, addClick,getData,getScreenshot,download_file, parent=None, **kwargs):
         """
         Args:
             parent (object): object parent.
@@ -737,6 +782,12 @@ class NodeGraph(QtCore.QObject):
         self.verified = verified
         self.drawHistory = drawHistory
         self.addSendData = addSendData
+        self.addScroll = addScroll
+        self.addClick = addClick
+        self.getData = getData
+        self.getScreenshot = getScreenshot
+        self.download_file = download_file
+        self.addMove = addMove
         self.addOCR = addOCR
         self.addPrint = addPrint
         self.addKeypress = addKeypress
