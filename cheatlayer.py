@@ -703,7 +703,7 @@ if __name__ == '__main__':
             'day':'*','weekday':'*','month':'*',
             'startDate':datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'endDate':None,'id':'testCheat'}
-        #sch.addJob(drawHistory  ,job,[history])
+        sch.addJob(drawHistory  ,job,[history])
         #sch.start()
 
     def shape_selection(event, x, y, flags, param):
@@ -782,6 +782,15 @@ if __name__ == '__main__':
         graph.auto_layout_nodes()
         graph.fit_to_selection()
 
+    def addKeypress():
+        global nodes
+        x = {"type":"keypress_manual", "String":"test"}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Print " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+        nodes[len(nodes)-1].create_property('String',"test", widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        graph.auto_layout_nodes()
+        graph.fit_to_selection()
+
     def addPrint():
         global nodes
         x = {"type":"print", "index":0, "selected":global_variables[0]}
@@ -846,7 +855,7 @@ if __name__ == '__main__':
     verified = False
 
     
-    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll, addSendData, addIfElse)
+    graph = NodeGraph(drawHistory, verified, addOCR, addPrint, addScroll, addSendData, addIfElse, addKeypress)
     graph.set_acyclic(False)
     QApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
     # registered example nodes.
@@ -933,7 +942,8 @@ if __name__ == '__main__':
     nodes_tree.set_category_label('nodes.basic', 'Basic Nodes')
     nodes_tree.set_category_label('nodes.group', 'Group Nodes')
     # nodes_tree.show()
-
+    graph.QMainWindow.setWindowTitle("Cheat Layer")
+    graph.QMainWindow.setWindowIcon(QIcon(os.path.join(this_path, 'examples', 'favicon.ico')))
     # create a node palette widget.
     nodes_palette = NodesPaletteWidget(node_graph=graph)
     nodes_palette.set_category_label('nodeGraphQt.nodes', 'Builtin Nodes')

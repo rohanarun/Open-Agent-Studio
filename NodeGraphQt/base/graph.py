@@ -14,6 +14,7 @@ import pytesseract
 #pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 import tkinter as tk
 import subprocess
+from cronscheduler import CronSchedule
 
 import imutils
 import requests
@@ -213,11 +214,15 @@ class NodeGraph(QtCore.QObject):
                 else:
                     path = "B"
             if graph["nodes"][node_id]["custom"]["operator"] == "includes":
-                if graph["nodes"][node_id]["custom"]["condition"] in graph["nodes"][node_id]["custom"]["Variables"]:
+                if graph["nodes"][node_id]["custom"]["condition"] in self.global_variables[int(graph["nodes"][node_id]["custom"]["Variables"].split("_")[1])]:
                     path = "A"
                 else:
                     path = "B"
 
+        if x["type"] == "keypress_manual":
+            print("keypress")
+            print(graph["nodes"][node_id]["custom"]["String"])
+            pyautogui.write(graph["nodes"][node_id]["custom"]["String"], interval=0.05) 
         if x["type"] == "sendData":
             print("SEND DATA")
             print(graph["nodes"][node_id]["custom"]["URL"])
@@ -229,7 +234,7 @@ class NodeGraph(QtCore.QObject):
             msg = QMessageBox()
             msg.setWindowTitle("Print Variable")
             msg.setText(self.global_variables[int(vars.split("_")[1])])
-            x = msg.exec_()
+            _ = msg.exec_()
             #CustomMessageBox.showWithTimeout(3, "Print Variable",self.global_variables[int(vars.split("_")[1])], icon=QMessageBox.Warning)
 
             print(self.global_variables[int(vars.split("_")[1])])
@@ -517,7 +522,17 @@ class NodeGraph(QtCore.QObject):
             #redrawHistory() 
             else:  
                 self.history.append(json.dumps({"type":"keypress", "key": str(event.keyboard_key)}, cls=NumpyEncoder))  
-      
+    def scheduleCheat(self):
+        print("Scehdule")
+        sch = CronSchedule() 
+        job = {'seconds':'*/1','minute':'*', 'hour':'*','week':'*',
+            'day':'*','weekday':'*','month':'*',
+            'startDate':datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'endDate':None}
+        self.jobs.append(job)
+        sch.addJob(self.openOneCheat  ,job,["history"])
+    def openOneCheat(self,f):
+        self.load_session(f)
     def openCheat(self):
         f,_ = QFileDialog.getOpenFileName(self.QMainWindow, 'Open file', 'c:\\',"Cheat Files (*.cheat)")
         self.load_session(f)
@@ -581,6 +596,11 @@ class NodeGraph(QtCore.QObject):
         newAction.triggered.connect(self.newCheat)
         newAction.setShortcut(QKeySequence("Shift+n"))
 
+
+
+        scheduleAction = QAction('Schedule', self)  
+        scheduleAction.triggered.connect(self.scheduleCheat)
+        scheduleAction.setShortcut(QKeySequence("Shift+c"))
 
 
         playAction = QAction('Play', self)  
@@ -652,12 +672,36 @@ class NodeGraph(QtCore.QObject):
         data = urllib.request.urlopen(url).read()
         pixmap = QtGui.QPixmap()
         pixmap.loadFromData(data)
+        
+        url = 'https://cheatlayer.com/images/textarea/text4.png'    
+        data = urllib.request.urlopen(url).read()
+        printimg = QtGui.QPixmap()
+        printimg.loadFromData(data)
+        
+        url = 'https://cheatlayer.com/webhook.png'    
+        data = urllib.request.urlopen(url).read()
+        webhook = QtGui.QPixmap()
+        webhook.loadFromData(data)
+        
+        url = 'https://cheatlayer.com/images/textarea/text10.png'    
+        data = urllib.request.urlopen(url).read()
+        ifelse = QtGui.QPixmap()
+        ifelse.loadFromData(data)
+        
+        url = 'https://cheatlayer.com/images/textarea/text14.png'    
+        data = urllib.request.urlopen(url).read()
+        keypress = QtGui.QPixmap()
+        keypress.loadFromData(data)
+        
+
+
         this_path = os.path.dirname(os.path.abspath(__file__))
         icon = os.path.join(this_path, 'examples', 'OCR.png')
         self.OCRAction = QAction(QtGui.QIcon(pixmap), "OCR Scraping", self)
-        self.printAction = QAction(QtGui.QIcon(pixmap), "Print Data", self)
-        self.requestAction = QAction(QtGui.QIcon(pixmap), "Send Data", self)
-        self.ifAction = QAction(QtGui.QIcon(pixmap), "If/Else", self)
+        self.printAction = QAction(QtGui.QIcon(printimg), "Print Data", self)
+        self.requestAction = QAction(QtGui.QIcon(webhook), "Send Data", self)
+        self.ifAction = QAction(QtGui.QIcon(ifelse), "If/Else", self)
+        self.keypressAction = QAction(QtGui.QIcon(keypress), "addKeypress", self)
 
         #self.addTab(self.QMainWindow, "Add Actions")
         fileToolBar = self.QMainWindow.addToolBar("")
@@ -667,6 +711,9 @@ class NodeGraph(QtCore.QObject):
         self.QMainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)        
         fileToolBar.addAction(self.OCRAction)
         self.OCRAction.triggered.connect(self.addOCR)
+
+        fileToolBar.addAction(self.keypressAction)
+        self.keypressAction.triggered.connect(self.addKeypress)
 
         fileToolBar.addAction(self.printAction)
         self.printAction.triggered.connect(self.addPrint)
@@ -678,7 +725,7 @@ class NodeGraph(QtCore.QObject):
         fileToolBar.addAction(self.requestAction)
         self.requestAction.triggered.connect(self.addSendData)
 
-    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll, addSendData, addIfElse, parent=None, **kwargs):
+    def __init__(self, drawHistory, verified, addOCR, addPrint, addScroll, addSendData, addIfElse, addKeypress, parent=None, **kwargs):
         """
         Args:
             parent (object): object parent.
@@ -692,6 +739,7 @@ class NodeGraph(QtCore.QObject):
         self.addSendData = addSendData
         self.addOCR = addOCR
         self.addPrint = addPrint
+        self.addKeypress = addKeypress
         self.addIfElse = addIfElse
         self.global_variables = []
         self.mouse_counter = 0
