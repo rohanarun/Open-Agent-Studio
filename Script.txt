@@ -1,0 +1,35 @@
+Hello and welcome to cheat layer
+
+This is a quick overview of how to schedule automation in the new cheat layer UI 
+ 
+ The new dashboard streams lens the process to be much easier 
+ 
+ All you have to do is select the automation that you want to automate and schedule from the right-hand side 
+ 
+ then click this “schedule” button 
+ 
+ you can either schedule things to the extension which has no limit
+
+you can schedule as many times as you want 
+ 
+ Or you can schedule tasks to Cheat Cloud, which allows you to scale up tasks to thousands of operations 
+
+ the new scheduling system uses our fault tolerance scheduling server for both the local extension and Cheat Cloud 
+ 
+ And it uses extension webhooks for local extension scheduling, which means if your browser is closed and you scheduled something to run at 9 am every day, it'll queue the tasks to run them again when you open them again or when you open the browser again 
+ 
+ so this allows you if you're late, to catch up on work which is very useful for productivity 
+ 
+ But you now also have the option to fall back to cheat cloud if it's very urgent work or time-sensitive
+ 
+ both of these now use our chrome scheduling format which allows you to schedule months in advance down to the minute 
+ 
+ Which allows you to create any sort of schedule you want with any sort of granularity 
+
+ I am just going to do a quick example here if you wanted to do schedule every minute task, all you need to do is to select all the stars here
+ 
+ Once done, Click this “submit” button to submit your schedule  
+
+You can click the scheduled automations in the list to see their logs after running.
+ 
+ Cheat Layer, Business Automation
