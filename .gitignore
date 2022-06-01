@@ -81,3 +81,6 @@ welllnew.cheat
 NodeGraphQt/base/__pycache__/graph.cpython-310.pyc
 NodeGraphQt/base/__pycache__/model.cpython-310.pyc
 examples/custom_nodes/__pycache__/basic_nodes.cpython-310.pyc
+/examples/custom_nodes/__pycache__
+/examples/__pycache__
+/NodeGraphQt/__pycache__
