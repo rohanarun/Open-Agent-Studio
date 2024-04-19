@@ -12,6 +12,8 @@ Businesses today are threatening to fire employees and replace them with AI. We 
 
 In a future where the AI in your pocket can generate custom, secure, and free versions of all the most expensive business software, we believe there'll be a level playing field that removes the barrier to build these businesses. More small businesses will build competitive brands through personal relationships, better quality service, and network effects through unique data. We invite you to join us in building this future together faster.
 
+This is an older public version of our internal private repo which will be updated in the coming days with the latest updates to Open Agent Studio 7.0.0 whch can be downloaded at openagent.studio now. 
+
 ## Agentic Process Automation
 ![Generalized Agents framework](https://storage.googleapis.com/cheatlayer/agent.png)
 
