@@ -27,6 +27,8 @@ Semantic targets can be dynamic or robust based on how strict the language is.
 ### Reasoning Based Targets
 ![Reasoning Based Targets](https://storage.googleapis.com/cheatlayer/reasoning.png)  
 ## Windows Instructions
+Check docs.cheatlayer.com for more details. 
+
 Install Python 3.10
 You need to install python 3.10 to enable agents to install any arbitrary python library when solving general problems. 
 
