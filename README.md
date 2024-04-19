@@ -17,6 +17,9 @@ In a future where the AI in your pocket can generate custom, secure, and free ve
 
 
 ### Semantic Targets
+Semantic targets distils the underlying intent of a target to english, so they still work even if services completely change their designs. This enables building robust, future-proof, agents. 
+
+Semantic targets can be dynamic or robust based on how strict the language is. 
 
 ### Semantic Triggers
 ![Semantic Triggers](https://storage.googleapis.com/cheatlayer/semtriggers.png)
