@@ -86,8 +86,7 @@ Cheat Layer Desktop requires users to keep the display scaling set to 100%.
 ### Single Monitors and Resolution
 We currently only support single monitor agents, but in the future we can train multi-monitor agents. Please ensure you use one monitor and the same resolution the agent creator uses for publishes agents. 
 ## Mac Instructions
-https://youtu.be/fnAvP2s_2rk
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/fnAvP2s_2rk/0.jpg)](https://www.youtube.com/watch?v=fnAvP2s_2rk)
+[![Mac Install Instructions](https://img.youtube.com/vi/fnAvP2s_2rk/0.jpg)](https://www.youtube.com/watch?v=fnAvP2s_2rk)
 
 Go to System Preferences > Security & Privacy.
 
