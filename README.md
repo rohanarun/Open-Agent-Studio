@@ -108,3 +108,6 @@ Check if terminal and cheatlayeror a related process is listed and has a checkma
 Add "terminal" to the "accessibility" and "screen recording" lists.
 
 Then click the "General" tab, and click run apps from the App Store and approved developers. 
+
+## Citations
+We forked the https://github.com/jchanvfx/NodeGraphQt framework for the UI. 
