@@ -784,7 +784,7 @@ class MyWidget(QtWidgets.QWidget):
             graph.cheat_scheduler = BackgroundScheduler()
 
             #if os.path.isfile(get_path('config_cheatlayer.txt')):
-            with open(get_path('config_cheatlayer.txt'), 'w') as f:
+            with open(get_path(resource_path('config_cheatlayer.txt')), 'w') as f:
                 f.write(key)
     
             schedule_json = data["schedule"]
@@ -3176,7 +3176,7 @@ padding: 0px;
         self.chat_display.hide()  # Hide the chat display initially
         self.animation = QPropertyAnimation(self, b"geometry")
         self.animation.finished.connect(self.on_animation_finished)
-        self.create_quick_launch_buttons()
+        #self.create_quick_launch_buttons()
 
     def hide_chat_display(self):
         self.chat_display.hide()
@@ -3224,10 +3224,10 @@ padding: 0px;
         """Filters the quick-launch buttons based on the text input."""
         search_text = self.entry_field.text().lower()
         found = False
-        for btn in self.buttons:
-            btn.setVisible(search_text in btn.objectName().lower())
-            if btn.isVisible():
-                found = True
+#        for btn in self.buttons:
+     #       btn.setVisible(search_text in btn.objectName().lower())
+     #       if btn.isVisible():
+     #           found = True
        
     def toggle_chat_display(self):
         graph.notification_manager.show()
@@ -3258,9 +3258,8 @@ padding: 0px;
         self.update()    
     def find_guidelines(self, input_text, guidelines):
         global desktop_guidelines, previous_steps, last_input
-        print(previous_steps)
-        print("previous steps")
-        total_guidelines = "You are a professional automation engineer. Current Goal: "  + last_input + ". You take the current state as an image and the goal and perform 1 action to make progress towards this goal. Each request includes an image to describe the current state. For example, you can open a browser, click something, click then type things with a keyboard, but do not perform more than 1 action. Consider clicking+typing a single action that requires putting focus on an element. If the goal is to search google, and the current state includes an empty search bar, the next step would be to click in the search bar and type the search query. You have access to functions like semanticClick and semanticScrape to accomplish these goals. Use your understanding of the next step to determine the targets to use in semanticClick, which takes an english description as input of the target. Try to be as descriptive as possible of the target based on the image. Use the following functions and general guidelines when performing actions. Consider an entire python script to generate a single output a single action. You are also provided a list of previous steps so you can determine if you accomplish the goal using the input image. Make sure to verify the goal has been accomplished using the input image. If the user asks to build a product, video, image, or website, and the input image representing the state of the screen doesn't show a functional product, video, image, or website that matches the design, the goal has not been accomplished. If the current state based on the input image indicates you accomplished the goal, simply output 'goal accomplished: explanation' and include an explanation of why you think the goal is accomplished. For example, if you are asked to post to twitter and notice that the post you generated in previous steps is now in the image of the state of the screen, you can assume you accomplished the goal. With each step you generate, briefly describe it before the code in 2 sentences. If the user indicates an error has occured, do not assume the goal has been accomplished even if the image looks correct and try to fix the code generated. Do not generate more than 1 python code block each step to verify that step has been completed by the next image. Always generate python code between [start python] and [end python] code blocks."
+        
+        total_guidelines = "You are a professional automation engineer. Current Goal: "  + last_input + ". You take the current state as an image and the goal and perform actions to make progress towards this goal. Each request includes an image to describe the current state. For example, you can open a browser, click something, click then type things with a keyboard, but do not perform more than 1 action. Consider clicking+typing a single action that requires putting focus on an element. If the goal is to search google, and the current state includes an empty search bar, the next step would be to click in the search bar and type the search query. In addition to the python code, generate a JSON block output that represents all the steps in the automate translated to these common automation json steps: click, open program, magic scraper, and keypress. Generate the json block within [start json] and [end json] text at the end of the output. For example, if the python code includes a semantic click operation and a keypress operation, generate this json block: [start json][{type:\"click\", \"target\":\"the blue post button\"},{\"type\":\"magic scraper\", \"target\":\"the text of the tweet on the page\"},{\"type\":\"keypress\",\"text\":\"generate a funny reply to the tweet\"}][end json]. You have access to functions like semanticClick and semanticScrape to accomplish these goals. Use your understanding of the next step to determine the targets to use in semanticClick, which takes an english description as input of the target. Try to be as descriptive as possible of the target based on the image. Use the following functions and general guidelines when performing actions. Never suggest clicking the \"deploy workflow\" button since this is part of the interface. Consider an entire python script to generate a single output a single action. You are also provided a list of previous steps so you can determine if you accomplish the goal using the input image. Make sure to verify the goal has been accomplished using the input image. If the user asks to build a product, video, image, or website, and the input image representing the state of the screen doesn't show a functional product, video, image, or website that matches the design, the goal has not been accomplished. If the current state based on the input image indicates you accomplished the goal, simply output 'goal accomplished: explanation' and include an explanation of why you think the goal is accomplished. If the next step involves typing into a search bar, include both the semantiClick for the search bar and the keypress operation in a single output. For example, if you are asked to post to twitter and notice that the post you generated in previous steps is now in the image of the state of the screen, you can assume you accomplished the goal. With each step you generate, briefly describe it before the code in 2 sentences. If the user indicates an error has occured, do not assume the goal has been accomplished even if the image looks correct and try to fix the code generated. Do not generate more than 1 python code block each step to verify that step has been completed by the next image. Always generate python code between [start python] and [end python] code blocks. When searching google, always use the URL search parameter to go directly to the search terms by opening https://www.google.com/search?q=. For example, if the user asks to search for dogs, go to https://www.google.com/search?q=dogs. If you see the google search page open, assume the cursor is already in the search bar so you can start typing the search term without clicking the search bar.  Include a short explanation for each step in between the [start explanation] and [end explanation] blocks."
       #  print("all guidelines")
       #  print(guidelines)
         #for guideline_obj in guidelines:
@@ -3270,8 +3269,38 @@ padding: 0px;
         #            total_guidelines += guideline_obj["guideline"]  # add newline for separation
         #            break  # if one keyword matches, no need to check the others for this guideline
 
-        
-        total_guidelines += desktop_guidelines + "If you are asked to click any button, always describe the color of the button in semanticClick, for example semanticClick('blue continue button'). If you are asked to book a flight to LA, use https://www.google.com/travel/flights and click the image that says Los Angeles. Then click through the UI of the website to book the flight and pay for it. If you are asked to purchase an amazon product, first go to amazon.com and do a semantic click on the amazon search bar using semanticClick('amazon search bar'). then type the product and press enter after 5 seconds. Then click that product. Then you can click either the yellow 'Set up now' or 'buy now' button based on which you see in the supplied image. Do not describe the product for the semanticClick target for the buy buttons, and instead simply say semanticClick('Set up Now') rather than including the product names in the semanticClick targets for buttons. If you still see the button you intended to cilck on the screen without changes, it was likely not clicked and you should try again. Use the semanticClick('yellow buy now button') or semanticClick('yellow Set up now button') depending on which is on the screen. Continue to add the product to your cart, then click checkout if the user asks to buy an amazon product. Finally click the confirm subscription or payment button on the checkout screen to complete the purchase. Only specify a target if you see it in the provided image, and never provide any semanticClick targets unless you explicitly observe it exists in the image. This is because sometimes steps may fail, so you may need to repeat them. Never assume a step has been completed, and always verify it in the latest provided image. Sometimes it may say buy now or sometimes it may say set up now. If you are provided an image with articles and asked to summarize 'this page' or 'the articles on this page' then summarize what you see directly rather than using code. If you are constantly getting the same error, try solving the problem with a different alternative python library. When saving all files or giving file names, use the folder stored in the variable 'folder' and assume it is already defined to save all files. If you are asked to search for a house, use google first to find an appropriate link rather than zillow directly, then use semanticClick to click the first search result link for houses which may be redfin, or houses,com, like semanticClick('first search result link for houses'). If you are asked to generate synthetic video, make sure to open the generated videos using os.system('start ' + resource_path(file_name)) after you are finished in the same code block. Generate the complete processing steps for a complex video project entirely in a single code block. If you are asked to generate an email, first navigate to https://mail.google.com/mail/u/0/#inbox?compose=new and do not assume the user is already on their email page. Be as descriptive as possible in the descriptions for semanticClick and semanticSearch. For example, if you want to click the first search result, describe the text in the first search result. You may include the bash code blocks necessary to install libraries. Whenever you perform an automation, store relevant analytics data in a json format. For example, if you scrape twitter posts, store {‘automation’:’twitter post scrape’, ‘text’: ‘twitter post text content’, ‘likes’: number of likes it received, ‘engagement’: ‘amount of traffic it received’}. Then pass this json to the store_analytics(json_object) function. Assume this function is already defined. If you use the moviepy library, make sure to import all the classes you use in the code like AudioFileClip. Do not install the youtube-dl github library using bash unless you actually need to use that library in python. Whenever you are faced with a list of choices to perform an action, for example a list of youtube videos to generate blog posts from, use the check_duplicates(entry_string) function first. If it returns True, go down the list and choose the next option. Continue running check_duplicates until it returns false to be sure you are choosing a new option that has not been used before. Then proceed with that choice in the automation. Never use subprocess to run ffmpeg. Only generate bash code that installs every python library used in the python code. Make sure import every python library used within the code.  Never generate filler or placeholder functions, and always implement every function and class. This ensures the code you generate won't have syntax errors. Always generateing perfectly functioning code to accomplish the task. If you are asked to generate a synthetic video, use the genSyntheticVideo(description, file_name='synthetic.mp4') function to generate it directly, then always generate code to open the final video after all the processing is done. The default file output for synthetic videos is synthetic.mp4. Do not try to import or define genSyntheticVideo, and assume it is already defined globally. If you need to generate and use multiple videos in the automation, you can give each a different file name. Never use the openAI python library and instead always use the gpt3Prompt(system_promt, user_input) function if the user asks to generate gpt3 content, voiceovers, or any text. The gpt3Prompt function only takes 2 arguments and does not have a callback. Never use a lambda function with gpt3Prompt and only give it the system prompt and user input. always use pip3 when installing python libraries in bash. Alwaysy use subprocess to run ffmpeg from python rather than using the ffmpeg python library. If the user supplies a drawing to generate a website or web app, host a local flask server on port 3000 and generate the full website as a string template within the flask code. Do not separately generate the HTML and instead generate it directly as a string within the python flask code. Do explain the code generated and only generate code directly. Never use render_template in flask servers to a .html file and instead generate the html template directly in python code as a string. If the user asks to turn an image URL into a video, use the imageToVideo(image_URL, file_name = 'synthetic.mp4') function and assume it is already defined.  Do not generate more than 1 python code block each step to verify that step has been completed by the next image. Use the contents of the provided image each step to provide relevant and detailed targets for semanticClick or semanticSearch. Never generate code outside of the appropriate highlighter boxes like [start python] and [end python] and never use quotes to generate code otherwise I can't run it. To perform these automations, generally you should choose opening a browser and performing it directly rather than using python tools so you can visually verify the process. Use the appropriate website for the job directly rather than just using google for everything, for example use zillow for houses and amazon for products. This allows you to see each step with the image as input and determine if the step was succesful. Remember to always generate python code within the [start python] and [end python] blocks. Include a short explanation for each step in between the [start explanation] and [end explanation] blocks. Be as descriptive as possible for the targets for semanticClick, with as many sentences as possible to describe the UI element and it's surroundings. Include the color, and general area of the screen for each semanticClick description. Previous Steps: " + previous_steps
+        total_guidelines += '''
+If the request relates to one of the automations below, then output exactly the same json but with the variables inside brackets replaced. In the case where an automation is supported in the json list below, do not generate python and instead just generate the json below with the parameters filled in. For example if the request is to post a tiktok video, output exactly the same tiktok json from below, and replace the prompt with user's theme
+Do not output quotes or a prefix to the json, and output a properly formatted json directly without extra text. 
+Return a json that contains the name of the .cheat file and any parameters in the json within brackets {{}} mapped to the user request. 
+For example if the user asks to upload a video to tiktok about dogs, return:
+{"name":"TikTok_Marketing_Agent_0.cheat", "prompt": "A video about dogs", "voiceover": "a voiceover about dogs", "caption": "a social caption about dogs"}
+Use the full list below to map the request to the json. 
+because the json for this tiktok agent contains {{prompt}} {{voiceover}} and {{caption}}
+Output exactly the same .cheat file name otherwise it won't open. Do not change the file names
+If the user asks to write an email, use email.cheat from the json and not a general automation.
+If the user asks to click a random element, use the click_request.cheat json and use their target as the prompt like this: 
+{"name":"open_program.cheat", "prompt": user_target}
+
+If the user asks to use gpt4 to generate something, use the gpt4_generator.cheat json
+{"name":"gpt4_generator.cheat", "prompt": user_prompt}
+Scheduling instructions:
+If the user asks to schedule the automation at a specific frequency, generate the cron format for the schedule and add it to the json output. For example, if the user asks to 'generate a video about ai automation and upload it to tiktok everyday at 10am' return this json:
+{"name":"TikTok_Marketing_Agent_0.cheat", "prompt": "A video about dogs", "voiceover": "a voiceover about dogs", "caption": "a social caption about dogs", "cron": "0 10 * * *"}
+
+Or for example if the user asks to schedule an email every 5 minutes, return this json: 
+{"name":"email.cheat", "to": "Rohan arun@gmail.com", "subject": "Lunch Alert", "body": "Don't forget to have your lunch!", "cron":"*/5 * * * *"}
+
+Do not forget to include a "cron" key in the json if the user includes any frequency at all in the request. 
+
+ Here are the json data:
+[START SUPPORTED AUTOMATIONS]
+                    '''
+        total_guidelines += json.dumps(graph.data_graph)
+        total_guidelines += '''
+[END SUPPORTED AUTOMATIONS]
+'''
+        total_guidelines += desktop_guidelines + ". If the user asks to search google, always use the URL search parameter to go directly to the search terms by opening https://www.google.com/search?q=. For example, if the user asks to search for dogs, go to https://www.google.com/search?q=dogs. When clicking search bars, always include typing the search query in the same output. Never use the search bar at the bottom of the screen in windows. Never use the 'deploy workflow' button in the Open Agent Studio editor, since this is part of the interrace. If you are asked to click any button, always describe the color of the button in semanticClick, for example semanticClick('blue continue button'). If you are asked to book a flight to LA, use https://www.google.com/travel/flights and click the image that says Los Angeles. Then click through the UI of the website to book the flight and pay for it. If you are asked to purchase an amazon product, first go to amazon.com and do a semantic click on the amazon search bar using semanticClick('amazon search bar'). then type the product and press enter after 5 seconds. Then click that product. Then you can click either the yellow 'Set up now' or 'buy now' button based on which you see in the supplied image. Do not describe the product for the semanticClick target for the buy buttons, and instead simply say semanticClick('Set up Now') rather than including the product names in the semanticClick targets for buttons. If you still see the button you intended to cilck on the screen without changes, it was likely not clicked and you should try again. Use the semanticClick('yellow buy now button') or semanticClick('yellow Set up now button') depending on which is on the screen. Continue to add the product to your cart, then click checkout if the user asks to buy an amazon product. Finally click the confirm subscription or payment button on the checkout screen to complete the purchase. Only specify a target if you see it in the provided image, and never provide any semanticClick targets unless you explicitly observe it exists in the image. This is because sometimes steps may fail, so you may need to repeat them. Never assume a step has been completed, and always verify it in the latest provided image. Sometimes it may say buy now or sometimes it may say set up now. If you are provided an image with articles and asked to summarize 'this page' or 'the articles on this page' then summarize what you see directly rather than using code. If you are constantly getting the same error, try solving the problem with a different alternative python library. When saving all files or giving file names, use the folder stored in the variable 'folder' and assume it is already defined to save all files. If you are asked to search for a house, use google first to find an appropriate link rather than zillow directly, then use semanticClick to click the first search result link for houses which may be redfin, or houses,com, like semanticClick('first search result link for houses'). If you are asked to generate synthetic video, make sure to open the generated videos using os.system('start ' + resource_path(file_name)) after you are finished in the same code block. Generate the complete processing steps for a complex video project entirely in a single code block. If you are asked to generate an email, first navigate to https://mail.google.com/mail/u/0/#inbox?compose=new and do not assume the user is already on their email page. Be as descriptive as possible in the descriptions for semanticClick and semanticSearch. For example, if you want to click the first search result, describe the text in the first search result. You may include the bash code blocks necessary to install libraries. Whenever you perform an automation, store relevant analytics data in a json format. For example, if you scrape twitter posts, store {‘automation’:’twitter post scrape’, ‘text’: ‘twitter post text content’, ‘likes’: number of likes it received, ‘engagement’: ‘amount of traffic it received’}. Then pass this json to the store_analytics(json_object) function. Assume this function is already defined. If you use the moviepy library, make sure to import all the classes you use in the code like AudioFileClip. Do not install the youtube-dl github library using bash unless you actually need to use that library in python. Whenever you are faced with a list of choices to perform an action, for example a list of youtube videos to generate blog posts from, use the check_duplicates(entry_string) function first. If it returns True, go down the list and choose the next option. Continue running check_duplicates until it returns false to be sure you are choosing a new option that has not been used before. Then proceed with that choice in the automation. Never use subprocess to run ffmpeg. Only generate bash code that installs every python library used in the python code. Make sure import every python library used within the code.  Never generate filler or placeholder functions, and always implement every function and class. This ensures the code you generate won't have syntax errors. Always generateing perfectly functioning code to accomplish the task. If you are asked to generate a synthetic video, use the genSyntheticVideo(description, file_name='synthetic.mp4') function to generate it directly, then always generate code to open the final video after all the processing is done. The default file output for synthetic videos is synthetic.mp4. Do not try to import or define genSyntheticVideo, and assume it is already defined globally. If you need to generate and use multiple videos in the automation, you can give each a different file name. Never use the openAI python library and instead always use the gpt3Prompt(system_promt, user_input) function if the user asks to generate gpt3 content, voiceovers, or any text. The gpt3Prompt function only takes 2 arguments and does not have a callback. Never use a lambda function with gpt3Prompt and only give it the system prompt and user input. always use pip3 when installing python libraries in bash. Alwaysy use subprocess to run ffmpeg from python rather than using the ffmpeg python library. If the user supplies a drawing to generate a website or web app, host a local flask server on port 3000 and generate the full website as a string template within the flask code. Do not separately generate the HTML and instead generate it directly as a string within the python flask code. Do explain the code generated and only generate code directly. Never use render_template in flask servers to a .html file and instead generate the html template directly in python code as a string. If the user asks to turn an image URL into a video, use the imageToVideo(image_URL, file_name = 'synthetic.mp4') function and assume it is already defined.  Do not generate more than 1 python code block each step to verify that step has been completed by the next image. Use the contents of the provided image each step to provide relevant and detailed targets for semanticClick or semanticSearch. Never generate code outside of the appropriate highlighter boxes like [start python] and [end python] and never use quotes to generate code otherwise I can't run it. To perform these automations, generally you should choose opening a browser and performing it directly rather than using python tools so you can visually verify the process. Use the appropriate website for the job directly rather than just using google for everything, for example use zillow for houses and amazon for products. This allows you to see each step with the image as input and determine if the step was succesful. Remember to always generate python code within the [start python] and [end python] blocks. Include a short explanation for each step in between the [start explanation] and [end explanation] blocks. Be as descriptive as possible for the targets for semanticClick, with as many sentences as possible to describe the UI element and it's surroundings. Include the color, and general area of the screen for each semanticClick description. In addition to the python code, generate a JSON block output that represents all the steps in the automate translated to these common automation json steps: click, open program, magic scraper, and keypress. Generate the json block within [start json] and [end json] text at the end of the output. For example, if the python code includes a semantic click operation and a gpt-4 operation, generate this json block: [start json][{type:\"click\", \"target\":\"the blue post button\"},{\"type\":\"magic scraper\", \"target\":\"blue post button\"},{\"type\":\"keypress\",\"text\":\"generate a funny tweet\"}][end json]. Remember to include an explanation for each step between the [start explanation] and [end explanation blocks]. Remember, if the user requests an automation in our [START SUPPORTED AUTOMATIONS] block, do not generate python and instead output the json from the list with the parameters filled in, since we already have these supported."
         print("total guidelines")
         return total_guidelines
     
@@ -3279,91 +3308,263 @@ padding: 0px;
         self.send_message(last_message + " This automation failed and this is the current state of the screen:" + last_state)
 
     def processChunkThread(self, total,item, request, thread_signals):
-        global test_iterations, last_input
-   
-
+        global test_iterations, last_input, window2, nodes, graph, graph_nodes, last_message, last_state, previous_steps
+        print(total)
+        print("processing output")
+        print(last_input)
+        print(request)
         split_blocks = total.split("[start")
         block_counter = 0
         for block in split_blocks:
             block_counter += 1
             if len(block) > 5:
                # time.sleep(3)
+                
+
 #                item[block_counter].label.setText(block)
                # thread_signals.notifications.emit("Step " + str(block_counter), total, resource_path("icon.png"))
-                if "start python" in block or "start bash" in block or "javascript" in block:
-                    thread_signals.progress.emit("Running Code: [start" + block)
-                    thread_signals.progress.emit("code output")
-                #
+                #if "start python" in block or "start bash" in block or "javascript" in block:
+             #       thread_signals.progress.emit("Running Code: [start" + block)
+              #      thread_signals.progress.emit("code output")
+                if "end json" in block:
+                    text = block.split("json]")[1].split("[end")[0].strip().rstrip()
+                    print(text)
+                    try:
+                        json_output = json.loads(text)
+                    except Exception as e:
+                        print(e)
+                    print(json_output)
+                    if "name" in json_output: 
+                            print("FOUND PREBUILT AGENT")
+                            print(graph.global_variables)
+                            for key, value in json_output.items():
+                                print(key)
+                                print(value)
+                                graph.global_variables[key] = value
+                            print(graph.global_variables)
+                            print("SAVED GLOBALS")
+                            job_folder_name = "general"
+
+                            file_name = json_output["name"]
+                            file_path = file_name
+
+                            with open(resource_path(file_path)) as file:
+                                data = json.load(file)
+                                print("loaded data")
+                                print(data)
+                                current_desktop = 0  # Assuming `current_desktop` is previously defined
+                                ##self.thread_signals.recording_start.emit()
+                                job_folder_path = os.path.join("general", job_folder_name)
+                                for key, node in data["nodes"].items():
+                                    print(node)
+                                    custom = json.loads(node["custom"]["Data"])
+                                    if custom["type"] == "Start Node":
+                                        print("start node")
+                                        # Pass job_folder_path to the runNode function:
+                                        graph.runNode(data, key, thread_signals, False, True, folder=job_folder_path)
+                                        break
+                    for node in json_output:
+                        print(node)
+
+                        if "type" in node and node["type"] == "keypress":
+                            x = {"type":"keypress_manual", "key":node["text"]}
+                            nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Keypress " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+
+                            nodes[len(nodes)-1].create_property('String',node["text"], widget_type=NODE_PROP_QLINEEDIT)
+                            nodes[len(nodes)-1].create_property('Saved Values', "None",items=list(["None", "Current Directory"]) ,  widget_type=NODE_PROP_QCOMBO)
+                            nodes[len(nodes)-1].create_property('GPT-4 Mode', "False",items=list(["False", "True"]) ,  widget_type=NODE_PROP_QCOMBO)
+                            nodes[len(nodes)-1].create_property('Automation Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
+
+                            nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
+                            connectToLastNode(nodes[-1])
+                            import pyautogui
+                            import pydirectinput
+
+                            
+                            print("lower keypress regular")
+                            print(node["text"])
+                            if node["text"] == "enter":
+                                pydirectinput.press('enter')
+                            else:
+                                pydirectinput.write(node["text"])
+                        #    thread_signals.notifications.emit("Keypress", node["text"], "icon.png", None, "No")
+                            #clipboard.copy(node["text"])
+                            #pyautogui.hotkey('ctrl', 'v')
+                          #  graph.runNode(graph_nodes,nodes[len(nodes)-1].id, thread_signals, False)
+
+                            self.mode = "chat"
+                        if "type" in node and  node["type"] == "click":
+                            print("process click")
+                            x = {"type":"Left Mouse Click", "semanticTarget":node["target"], "x":100, "y":100}
+
+                            print("process click 1")
+
+                            nodes.append(graph.create_node('nodes.basic.BasicNodeA',     name="CLICK " + str(len(nodes)), data=x))
+                            print("process click 1")
+
+                            nodes[len(nodes)-1].create_property('Automation Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
+                            print("process click 2")
+
+                            nodes[len(nodes)-1].create_property('X',x["x"],  widget_type=NODE_PROP_QLINEEDIT)
+                            nodes[len(nodes)-1].create_property('Y',x["y"],  widget_type=NODE_PROP_QLINEEDIT)
+                            nodes[len(nodes)-1].create_property('Click Type',"Single Left Click",items=["Single Left Click", "Single Right Click","Double Click", "Drag"],  widget_type=NODE_PROP_QCOMBO)
+                            print("process click 3")
+
+                            nodes[len(nodes)-1].create_property('Mode',"All",items=["First","Last", "Loop Total Runs","Loop Node Runs"],  widget_type=NODE_PROP_QCOMBO)
+
+                            nodes[len(nodes)-1].create_property('semanticTarget', node["target"], widget_type=NODE_PROP_QLINEEDIT)
+
+
+                            nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
+                         #   thread_signals.notifications.emit("Click", node["target"], "icon.png", None, "No")
+                            
+                            
+                            connectToLastNode(nodes[len(nodes)-1])
+                            print("added click")
+                            try:
+                                print("clicking")
+                                new_max = graph.semanticSearch(node["target"], 100,100)
+                                print(new_max)
+                                print("clicking")
+                                import pyautogui
+                                pyautogui.click(int(new_max['x']), int(new_max['y']))
+
+                           #     graph.QMainWindow.showMinimized()
+                                print("run node click")
+                           #     graph.runNode(graph_nodes,nodes[len(nodes)-1].id, thread_signals, False)
+
+                                self.mode = "chat"
+                            except Exception as e:
+                                print(e)
+                        if "type" in node and node["type"] == "open program":
+                            print("open program")
+                            x = {"type":"Open"}
+                            nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Open Program " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+                              #      nodes.append(graph.create_node('nodes.basic.BasicNodeA',     name="Open Program " + str(len(nodes)), data=x))
+                            program = node["target"]
+                            if "http" in program:
+                                program = "C:\Program Files\Google\Chrome\Application\chrome.exe " + node["target"]
+                            print(program)
+                            nodes[len(nodes)-1].create_property('program', program, widget_type=NODE_PROP_QLINEEDIT)
+                            nodes[len(nodes)-1].create_property('arguments', "", widget_type=NODE_PROP_QLINEEDIT)
+                            nodes[len(nodes)-1].create_property('Automated Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
+                            nodes[len(nodes)-1].create_property('Automated Lists',"",items=list(graph.global_variables.keys()) ,  widget_type=NODE_PROP_QCOMBO)
+
+                            nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
+                            connectToLastNode(nodes[len(nodes)-1])
+                            graph_nodes = graph.serialize_session()
+                            import subprocess
+                            subprocess.call(program)
+
+                #    
+                           # thread_signals.notifications.emit("Open", program, "icon.png", None, "No")
+                            #graph.runNode(graph_nodes,nodes[len(nodes)-1].id, thread_signals, False)
+                            self.mode = "chat"
+                            print(program)
+                            print("open program")
+                            print(program)
+                        if "type" in node and node["type"] == "magic scraper":
+                            print("magic scraper")
+                            print(node["target"])
+                        if "type" in node and node["type"] == "gpt-4":
+                            print("gpt-4")
+                            print(node["prompt"])
+
+            
                 #if "start explanation" in block:
                 #    explanation = block.split('[end explanation]')[0].split('[start explanation]')[1]
                 #    print(explanation)
                    # thread_signals.notifications.emit("Step " + str(block_counter), explanation, "icon.png")
                     #        graph.notification_manager.add_notification("Step " + block_counter, explanation, "icon.png", lambda: print("Notification closed"))
-                if "end javascript" in block:            
-                    code = block.replace('javascript]','').replace('[end ','')
-                    x = {"type":"cheatlayer", "code": code, "url" :'https://cheatlayer.com'}
-                    nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Cheat Layer Extension " + str(len(nodes)), data=x))#, color= "#FFFFFF"
-                    nodes[len(nodes)-1].create_property('code',code, widget_type=NODE_PROP_QTEXTEDIT)
-                    nodes[len(nodes)-1].create_property('URL','https://cheatlayer.com', widget_type=NODE_PROP_QLINEEDIT)
-                    nodes[len(nodes)-1].create_property('key',user_key, widget_type=NODE_PROP_QLINEEDIT)
-                    nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
-                    connectToLastNode(nodes[len(nodes)-1])
-                    graph_nodes = graph.serialize_session()
-                   # graph.QMainWindow.showMinimized()
-                    graph.runNode(graph_nodes,nodes[len(nodes)-1].id, thread_signals, False)
-#                    self.model.add_message(USER_THEM, "Step completed!")
-                    self.mode = "chat"
-                if "end python" in block:            
-                    code = block.replace('python]','').replace('[end ','')
-                    x = {"type":"python", "code": code}
-                    nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Python Code " + str(len(nodes)), data=x))#, color= "#FFFFFF"
-                    nodes[len(nodes)-1].create_property('code',code, widget_type=NODE_PROP_QTEXTEDIT)
-                    nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
-                    connectToLastNode(nodes[len(nodes)-1])
-                    graph_nodes = graph.serialize_session()
-                   # graph.QMainWindow.showMinimized()
-                    graph.runNode(graph_nodes,nodes[len(nodes)-1].id, thread_signals, False)
-
-                    self.mode = "chat"
-                if "end bash" in block:
-                    code = block.replace('bash]','').replace('[end ','')
-                    x = {"type":"bash", "code": code}
-                    nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Bash Commands " + str(len(nodes)), data=x))
-                    nodes[len(nodes)-1].create_property('code',code, widget_type=NODE_PROP_QTEXTEDIT)
-                    nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
-                    connectToLastNode(nodes[len(nodes)-1])
-                    graph_nodes = graph.serialize_session()
-                    #graph.QMainWindow.showMinimized()
-                    graph.runNode(graph_nodes,nodes[len(nodes)-1].id, thread_signals, False)
-
-                    self.mode = "chat"
-
+                #if "end javascript" in block:            
+                #    code = block.replace('javascript]','').replace('[end ','')
+                #    x = {"type":"cheatlayer", "code": code, "url" :'https://cheatlayer.com'}
+                #    nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Cheat Layer Extension " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+                #    nodes[len(nodes)-1].create_property('code',code, widget_type=NODE_PROP_QTEXTEDIT)
+                #    nodes[len(nodes)-1].create_property('URL','https://cheatlayer.com', widget_type=NODE_PROP_QLINEEDIT)
+                #    nodes[len(nodes)-1].create_property('key',user_key, widget_type=NODE_PROP_QLINEEDIT)
+                #    nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
+                #    connectToLastNode(nodes[len(nodes)-1])
+                #    graph_nodes = graph.serialize_session()
+                #   # graph.QMainWindow.showMinimized()
+                #    graph.runNode(graph_nodes,nodes[len(nodes)-1].id, thread_signals, False)
+#               #     self.model.add_message(USER_THEM, "Step completed!")
+                #    self.mode = "chat"
+                #if "end python" in block:            
+                #    code = block.replace('python]','').replace('[end ','')
+                #    x = {"type":"python", "code": code}
+                #    nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Python Code " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+                #    nodes[len(nodes)-1].create_property('code',code, widget_type=NODE_PROP_QTEXTEDIT)
+                #    nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
+                #    connectToLastNode(nodes[len(nodes)-1])
+                #    graph_nodes = graph.serialize_session()
+                #   # graph.QMainWindow.showMinimized()
+                #    graph.runNode(graph_nodes,nodes[len(nodes)-1].id, thread_signals, False)
+#
+                #    self.mode = "chat"
+                #if "end bash" in block:
+                #    code = block.replace('bash]','').replace('[end ','')
+                #    x = {"type":"bash", "code": code}
+                #    nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Bash Commands " + str(len(nodes)), data=x))
+                #    nodes[len(nodes)-1].create_property('code',code, widget_type=NODE_PROP_QTEXTEDIT)
+                #    nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
+                #    connectToLastNode(nodes[len(nodes)-1])
+                #    graph_nodes = graph.serialize_session()
+                #    #graph.QMainWindow.showMinimized()
+                #    graph.runNode(graph_nodes,nodes[len(nodes)-1].id, thread_signals, False)
+#
+                #    self.mode = "chat"
+#
         #ver    ify output
 
       #  thread_signals.progress.emit("Please click Share Agent below to share this agent.")
  #       thread_signals.recording.emit()
         if "accomplished" not in total and test_iterations < 20 and self.mode == "chat":
-            time.sleep(4)
+            time.sleep(10)
             #run a new request with the text that says you are an agent. this is the current state of the screen. What should we do next to accomplish the original goal?
             #graph.chatInstance.hide_chat_display()
             test_iterations += 1
+            last_input = request
         #    graph.notification_manager.add_notification("Step " + block_counter, "Analyzing the current state of the screen. Please wait..", "icon.png", lambda: print("Notification closed"))
-
-            thread_signals.chat.emit("you are an agent. this is the current state of the screen in the provided image. Only specify a target if you see it in the provided image, and never provide any semanticClick targets unless you explicitly observe it exists in the image. What should we do next to accomplish the original goal:" + request)
+            #window2.show()
+            thread_signals.chat.emit(request)
         if "accomplished" in total:   
             test_iterations = 0
-            graph.label.hide()
-            graph.label2.hide()
-            graph.label3.hide()
-        graph.chatInstance.toggle_chat_display()
-        graph.auto_layout_nodes()
-        graph.fit_to_selection()
+            #window2.show()
+           # window2.show()
+         #   thread_signals.notifications.emit("Accomplished!", total, "icon.png", None, "No")
+            print("accomplished")
+            #self.mode = "chat"
+            #graph.notification_manager.add_notification("Accomplished!", total, "icon.png", lambda: print("Notification closed"))
+            #graph.chatInstance.toggle_chat_display()
+          #  graph.label.hide()
+       #     graph.label2.hide()
+     #       graph.label3.hide()
+     #   graph.chatInstance.toggle_chat_display()
+
 #        item.label.setTextFormat(QtCore.Qt.PlainText)
     def sendRequest(self, msg, thread_signals, system_log):
         print("SENDING REQUEST")
-
-        global last_input, chat_log, previous_steps
+        system_log[0]["content"] = system_log[0]["content"].replace("Current Goal: .", "Current Goal: " + msg["data"]["lastInput"] + ".")
+        
+        screenshot = pyautogui.screenshot()
+        buffer = BytesIO()
+        # Save the screenshot to the buffer in PNG format
+        screenshot.save(buffer, format="JPEG", quality=50)  # Here is where we save as JPEG
+        # Seek to the beginning of the buffer
+        buffer.seek(0)
+        # Read the buffer content into bytes
+        image_bytes = buffer.getvalue()
+        # Encode the bytes to base64
+        base64_image = base64.b64encode(image_bytes)
+        # If you need the base64 string, decode the bytes to a string
+        base64_string = base64_image.decode('utf-8')
+        #log.append({"role": "user", "content": [{"type": "text", "text": "Current goal: " + goal  + " . The screenshot represents the current state of the screen. What is the next step based on the screenshot? Do not generate more than 1 python code block for this step." }, {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_string}"}}]})
+                    
+        system_log[1]["content"][1]["image_url"]["url"] = f"data:image/jpeg;base64,{base64_string}" 
+        global last_input, previous_steps
       #  print(last_input)
+        chat_log = []
         base_log = [] 
         new_base = []
         total_tokens = 0
@@ -3501,11 +3702,11 @@ User: Download a youtube video and scrape the transcript
                 for chunk in response.iter_content(chunk_size=1024):
                     total += chunk.decode('utf-8')
                     thread_signals.update.emit(chunk.decode('utf-8'))
-
+                print(total)
                 chat_log.append({"role": "assistant", "content": total})
                 total_steps = len(previous_steps.split('end step'))
                 previous_steps += "[step f{total_steps}]"  + total + "[end step]"
-                
+                thread_signals.notifications.emit("Accomplished!", total, "icon.png", None, "No")
 #                for step in total.split("[start"):
                 
  #                   thread_signals.progress.emit("Running Code: [start " + step)
@@ -3677,11 +3878,12 @@ User: Download a youtube video and scrape the transcript
         graph.BottomToolbar.consoleOutput.setText(title + ": " + input_text)
     def send_message(self, input_text=None):
 
-        global last_message, chat_log, last_state, desktop_guidelines, user_key, total_errors
+        global last_message, chat_log, last_state, desktop_guidelines, user_key, total_errors, previous_steps
         text = self.entry_field.text()
         #slowly animate enlarging the window to 700 height in 2 seconds
         self.chat_display.show()
-
+        print("SENDING MESSAGE")
+        print(input_text)
       #  self.resize(self.width(), 700)
      #   self.move(self.x(), self.y() - 100)
         
@@ -3763,7 +3965,8 @@ User: Download a youtube video and scrape the transcript
                 log = [{"role": "system", "content": auto_prompt + out_guidelines}]
      #           chat_log.append({"role": "user", "content": text})
              #   graph.chatInstance.showMinimized()
-
+                print(log)
+                print("system log")
                 def encode_image(image_path):
                   with open(image_path, "rb") as image_file:
                     return base64.b64encode(image_file.read()).decode('utf-8')
@@ -3817,8 +4020,10 @@ User: Download a youtube video and scrape the transcript
                     base64_string = base64_image.decode('utf-8')
                     mode_gpt = "website2"
                     #print("SCRNEENSHOT MODE")
-
-                    chat_log.append({"role": "user", "content": [{"type": "text", "text": text + "Do not generate more than 1 python code block for this step." }, {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_string}"}}]})
+                    goal = text
+                    if "accomplish this original goal:" in text:
+                        goal = text.split("accomplish this original goal:")[1]
+                    log.append({"role": "user", "content": [{"type": "text", "text": "Current goal: " + goal  + " . The screenshot represents the current state of the screen. What is the next step based on the screenshot? Do not generate more than 1 python code block for this step. Here are the previously executed steps:" + previous_steps }, {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_string}"}}]})
                     #print("screenshot")
            
            #     graph.chatInstance.toggle_chat_display()
@@ -3853,8 +4058,11 @@ User: Download a youtube video and scrape the transcript
                 #print(log_process)
                 print("SENT MESSAGE")
               #  print(log_process)
+                window2.hide()
                 x = threading.Thread(target=self.sendRequest, args=[msg, thread_signals, log_process]).start()
-                #self.sendRequest(msg, thread_signals)
+                graph.auto_layout_nodes()
+                graph.fit_to_selection()
+  #              self.sendRequest(msg, thread_signals, log_process)
 
 
             else:
@@ -3862,7 +4070,7 @@ User: Download a youtube video and scrape the transcript
                 out_guidelines = self.find_guidelines(text, guidelines)
 
                 log = [{"role": "system", "content": out_guidelines + desktop_guidelines}]
-     #           chat_log.append({"role": "user", "content": text})
+                chat_log.append({"role": "user", "content": text})
                 def keep_last_user_message(chat_log):
                        # Find all the indices where there's an image
                     image_indices = [
@@ -3933,7 +4141,11 @@ User: Download a youtube video and scrape the transcript
                     mode_gpt = "website2"
                     #print("SCRNEENSHOT MODE")
 
-                    chat_log.append({"role": "user", "content": [{"type": "text", "text": text + "Do not generate more than 1 python code block for this step, and make sure to always use [start python] and [end python] around python code rather than quotations." }, {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_string}"}}]})
+                    goal = text
+                    if "accomplish this original goal:" in text:
+                        goal = text.split("accomplish this original goal:")[1]
+                    log.append({"role": "user", "content": [{"type": "text", "text": "Current goal: " + goal  + " . The screenshot represents the current state of the screen. What is the next step based on the screenshot? Do not generate more than 1 python code block for this step." }, {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_string}"}}]})
+                    #print("screenshot")
                     #print("screenshot")
            
              #   graph.chatInstance.toggle_chat_display()
@@ -3957,7 +4169,12 @@ User: Download a youtube video and scrape the transcript
                 #print(log_process)
                 print("SENT MESSAGE")
       #          print(log_process)
+                window2.hide()
                 x = threading.Thread(target=self.sendRequest, args=[msg, thread_signals, log_process]).start()
+                graph.auto_layout_nodes()
+                graph.fit_to_selection()
+               
+  #              self.sendRequest(msg, thread_signals, log_process)
 
                 
                 
@@ -4742,7 +4959,7 @@ class WelcomeWindow(QMainWindow):
                             nodes[len(nodes)-1].create_property('code',node["script"], widget_type=NODE_PROP_QLINEEDIT)
                             nodes[len(nodes)-1].create_property('URL',node["url"], widget_type=NODE_PROP_QLINEEDIT)
                             nodes[len(nodes)-1].create_property('key',user_key, widget_type=NODE_PROP_QLINEEDIT)
-                            nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+                            nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
     
                             connectToLastNode(nodes[len(nodes)-1])
                             graph_nodes = graph.serialize_session()
@@ -4977,7 +5194,7 @@ class WelcomeWindow(QMainWindow):
                                         nodes[len(nodes)-1].create_property('code',node["script"], widget_type=NODE_PROP_QLINEEDIT)
                                         nodes[len(nodes)-1].create_property('URL',node["url"], widget_type=NODE_PROP_QLINEEDIT)
                                         nodes[len(nodes)-1].create_property('key',user_key, widget_type=NODE_PROP_QLINEEDIT)
-                                        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+                                        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
                 
                                         connectToLastNode(nodes[len(nodes)-1])
                                         graph_nodes = graph.serialize_session()
@@ -5362,7 +5579,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Bounding Box X2', ref_point[1][0], widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Bounding Box Y2', ref_point[1][1], widget_type=NODE_PROP_QLINEEDIT)
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         this_path = os.path.dirname(os.path.abspath(__file__))
         icon = os.path.join(this_path, 'examples', 'OCRScraper.png')
    
@@ -5425,7 +5642,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Bounding Box X2', ref_point[1][0], widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Bounding Box Y2', ref_point[1][1], widget_type=NODE_PROP_QLINEEDIT)
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         this_path = os.path.dirname(os.path.abspath(__file__))
         icon = os.path.join(this_path, 'examples', 'OCRScraper.png')
    
@@ -5496,7 +5713,7 @@ if __name__ == '__main__':
         for i in range(0,10):
             graph.global_variables["Scrape_" + str(i) + "_" + str(len(graph.global_variables))] = ""
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
               
@@ -5531,7 +5748,7 @@ if __name__ == '__main__':
        # cv2.waitKey(1)
        #draw a red rectangle around the region of interest using draw 
         draw = ImageDraw.Draw(raw_image)
-        draw.rectangle([x-100, y-50, x+100, y+50], outline ="red", width=10)
+        draw.rectangle([x-100, y-20, x+100, y+20], outline ="red", width=10)
       
        # cropped = load_demo_image(image_size=image_size, device=device, input = cut_image) "Loop Total Runs","Loop Node Runs"
         raw_image.save(resource_path("crop.png"))
@@ -5581,6 +5798,7 @@ if __name__ == '__main__':
         time.sleep(3)
         x = {"type":"Left Mouse Click", "semanticTarget":caption, "x":x, "y":y}
         nodes.append(graph.create_node('nodes.widget.ImageNode',     name="CLICK " + str(len(nodes)), data=x))
+        nodes[len(nodes)-1].create_property('Automation Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
 
         nodes[len(nodes)-1].create_property('X',x["x"],  widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Y',x["y"],  widget_type=NODE_PROP_QLINEEDIT)
@@ -5590,7 +5808,7 @@ if __name__ == '__main__':
 
         nodes[len(nodes)-1].create_property('semanticTarget', caption, widget_type=NODE_PROP_QLINEEDIT)
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         this_path = os.path.dirname(os.path.abspath(__file__))
         icon = os.path.join(this_path, 'examples', 'OCRScraper.png')
       #  global_variables["CLICK_" + str(len(global_variables))]
@@ -5672,11 +5890,13 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Target In English', caption, widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Automation Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
 
-        nodes[len(nodes)-1].create_property('Scrape Links',"False",items=["True","False"],  widget_type=NODE_PROP_QCOMBO)
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Scrape Browser',"",items=["Links","Images", "Text", "Headings", "Audios", "Videos", "Textareas", "Tables", "Divs", "Spans", "Headings",  "Buttons" ],  widget_type=NODE_PROP_QCOMBO)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
-        graph.global_variables["Description" + str(len(nodes) -1)] = "the state of the screen"
+        graph.global_variables["Magic Scraper Output" + str(len(nodes) -1)] = "the state of the screen"
+        graph.global_variables["Magic Scraper All Outputs"] = "The full screen"
+
         graph.auto_layout_nodes()
         graph.fit_to_selection()
     def addCustomCode():
@@ -5687,7 +5907,7 @@ if __name__ == '__main__':
         nodes.append(graph.create_node('nodes.basic.BasicNodeA',     name="Python Code " + str(len(nodes)), data=x))
 
         nodes[len(nodes)-1].create_property('code', "alert('hello world');", widget_type=NODE_PROP_QTEXTEDIT)
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
               
@@ -5722,7 +5942,7 @@ if __name__ == '__main__':
 
         nodes[len(nodes)-1].create_property('body', "none", widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Body variable',"",items=list(graph.global_variables.keys())  + ["","Loop Total Runs","Loop Node Runs"],  widget_type=NODE_PROP_QCOMBO)
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
               
@@ -5736,7 +5956,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('URL', "none", widget_type=NODE_PROP_QLINEEDIT)
         graph.global_variables["Files" + str(len(graph.global_variables))] = ""
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
               
@@ -5756,7 +5976,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Input 4', "",items=list(global_variables.keys()) ,  widget_type=NODE_PROP_QCOMBO)
         nodes[len(nodes)-1].create_property('Input 5', "",items=list(global_variables.keys()) ,  widget_type=NODE_PROP_QCOMBO)
         
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
               
@@ -5771,7 +5991,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('value', "none", widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('input',"",items=list(global_variables.keys()) ,  widget_type=NODE_PROP_QCOMBO)
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
               
@@ -5798,7 +6018,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Row 10',"",items=list(graph.global_variables.keys()) ,  widget_type=NODE_PROP_QCOMBO)
 
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
               
@@ -5809,12 +6029,12 @@ if __name__ == '__main__':
         # x = {"type":"Move Mouse", "data":"variables""x":500,"y":500}
         x = {"type":"Open"}
         nodes.append(graph.create_node('nodes.basic.BasicNodeA',     name="Open Program " + str(len(nodes)), data=x))
-        nodes[len(nodes)-1].create_property('program', "none", widget_type=NODE_PROP_QLINEEDIT)
-        nodes[len(nodes)-1].create_property('arguments', "none", widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('program', "", widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('arguments', "", widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Automated Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
         nodes[len(nodes)-1].create_property('Automated Lists',"",items=list(graph.global_variables.keys()) ,  widget_type=NODE_PROP_QCOMBO)
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
               
@@ -5827,7 +6047,7 @@ if __name__ == '__main__':
         nodes.append(graph.create_node('nodes.basic.BasicNodeA',     name="Delay " + str(len(nodes)), data=x))
         nodes[len(nodes)-1].create_property('seconds', "5", widget_type=NODE_PROP_QLINEEDIT)
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
               
@@ -5847,7 +6067,7 @@ if __name__ == '__main__':
 
         graph.global_variables["GPT4" + str(len(graph.global_variables))] = ""
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
      
@@ -5868,7 +6088,7 @@ if __name__ == '__main__':
 
         graph.global_variables["webcam" + str(len(graph.global_variables))] = ""
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
      
@@ -5880,15 +6100,16 @@ if __name__ == '__main__':
         x = {"type":"GPT4"}
         graph.global_variables["GPT4" + str(len(nodes))] = ""
 
-        nodes.append(graph.create_node('nodes.widget.TextInputNode',     name="GPT4 " + str(len(nodes)), data=x))
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA',     name="GPT4 " + str(len(nodes)), data=x))
         nodes[len(nodes)-1].create_property('Automation Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
+        nodes[len(nodes)-1].create_property('input', "none", widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Webhook Input', "none", widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Tracking Tag',"None",items=["None", "324" + user_key[:5] ],  widget_type=NODE_PROP_QCOMBO)
         nodes[len(nodes)-1].create_property('type output',"false",items=["false", "true" ],  widget_type=NODE_PROP_QCOMBO)
 
         graph.global_variables["GPT4" + str(len(graph.global_variables))] = ""
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
      
@@ -5908,7 +6129,7 @@ if __name__ == '__main__':
 
         graph.global_variables["ElevenLabs" + str(len(graph.global_variables))] = ""
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
      
@@ -5929,7 +6150,7 @@ if __name__ == '__main__':
 
         graph.global_variables["Synthesia" + str(len(graph.global_variables))] = ""
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
      
@@ -5948,7 +6169,7 @@ if __name__ == '__main__':
 
         graph.global_variables["getRecording" + str(len(graph.global_variables))] = ""
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
 
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
@@ -5972,7 +6193,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('frames',"",items= ["25_frames_with_svd_xt","14_frames_with_svd"],  widget_type=NODE_PROP_QCOMBO)
         nodes[len(nodes)-1].create_property('resolution',"",items=["maintain_aspect_ratio","crop_to_16_9", "use_image_dimensions"],  widget_type=NODE_PROP_QCOMBO)
     
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
               
@@ -5990,7 +6211,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Automation Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
 
         nodes[len(nodes)-1].create_property('prompt', "none", widget_type=NODE_PROP_QLINEEDIT)
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
               
@@ -6016,7 +6237,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('action', "", widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Google Sheet Output', "none", widget_type=NODE_PROP_QLINEEDIT)
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
 
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
@@ -6037,7 +6258,7 @@ if __name__ == '__main__':
 
         nodes[len(nodes)-1].create_property('selector', x["selector"], widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('value', x["value"], widget_type=NODE_PROP_QLINEEDIT)
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
 
@@ -6053,7 +6274,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Cookies', "", widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Headers', "", widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Type', "getData", widget_type=NODE_PROP_QLINEEDIT)
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
 
@@ -6070,7 +6291,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('URL', x["download_location"],
             widget_type=NODE_PROP_QLINEEDIT)
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
 
@@ -6085,7 +6306,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Download Location', "",
             widget_type=NODE_PROP_QLINEEDIT)
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
 
@@ -6098,7 +6319,7 @@ if __name__ == '__main__':
         nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Scroll " + str(len(nodes)), data=x))#, color= "#FFFFFF"
         nodes[len(nodes)-1].create_property('Distance',100, widget_type=NODE_PROP_QLINEEDIT)
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
 
@@ -6126,7 +6347,7 @@ if __name__ == '__main__':
 
         nodes[len(nodes)-1].create_property('Request', "", widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('URL', "https://cheatlayer.com/triggers/extension", widget_type=NODE_PROP_QLINEEDIT)
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
 
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
@@ -6140,7 +6361,7 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('Variables',"",items=list(graph.global_variables.keys()) + ["", "Total Run","Current Time", "Current Date", "Total Scraped"],  widget_type=NODE_PROP_QCOMBO)
         nodes[len(nodes)-1].create_property('operator',"includes",items=["includes","equals","greater than","less than","regex match"],  widget_type=NODE_PROP_QCOMBO)
         nodes[len(nodes)-1].create_property('condition', "none", widget_type=NODE_PROP_QLINEEDIT)
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
 
@@ -6154,20 +6375,35 @@ if __name__ == '__main__':
         nodes[len(nodes)-1].create_property('String',"test", widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('Saved Values', "None",items=list(["None", "Current Directory"]) ,  widget_type=NODE_PROP_QCOMBO)
         nodes[len(nodes)-1].create_property('GPT-4 Mode', "False",items=list(["False", "True"]) ,  widget_type=NODE_PROP_QCOMBO)
+        nodes[len(nodes)-1].create_property('Automation Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
 
         graph.auto_layout_nodes()
         graph.fit_to_selection()
+    
+    
+    def addGeneral():
+        global nodes
+        x = {"type":"general"}
+        nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Generalized Agent " + str(len(nodes)), data=x))#, color= "#FFFFFF"
+        nodes[len(nodes)-1].create_property('prompt',"Search Google for dogs.", widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
+        if len(nodes) > 0:
+            connectToLastNode(nodes[-1])
+
+        graph.auto_layout_nodes()
+        graph.fit_to_selection()
+
     def runOnCheatLayer():
         global nodes
         x = {"type":"cheatlayer"}
         nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Cheat Layer Extension " + str(len(nodes)), data=x))#, color= "#FFFFFF"
         nodes[len(nodes)-1].create_property('code',"alert('test')", widget_type=NODE_PROP_QLINEEDIT)
         nodes[len(nodes)-1].create_property('URL',"https://cheatlayer.com", widget_type=NODE_PROP_QLINEEDIT)
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
 
@@ -6178,7 +6414,7 @@ if __name__ == '__main__':
         x = {"type":"print"}
         nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Print " + str(len(nodes)), data=x))#, color= "#FFFFFF"
         nodes[len(nodes)-1].create_property('Variables',"",items=list(global_variables.keys()) ,  widget_type=NODE_PROP_QCOMBO)
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
 
@@ -6312,7 +6548,10 @@ if __name__ == '__main__':
                 graph.auto_layout_nodes()
             else:
                 x = json.loads(node["custom"]["Data"])
-                nodes.append(graph.create_node(node["type_"], name=node["name"], data=x))#, color= "#FFFFFF"
+                if "IfElse" in x["type"]:
+                    nodes.append(graph.create_node('nodes.basic.BasicNodeB', name=node["name"], data=x))
+                else:
+                    nodes.append(graph.create_node(node["type_"], name=node["name"], data=x))#, color= "#FFFFFF"
                 this_path = os.path.dirname(os.path.abspath(__file__))
                 icon = os.path.join(this_path, 'examples', 'Move.png')
                 if "Move" in x["type"]:
@@ -6408,7 +6647,7 @@ if __name__ == '__main__':
                     nodes[len(nodes)-1].create_property('URL', "https://cheatlayer.com/triggers/extension", widget_type=NODE_PROP_QLINEEDIT)
                 if "print" in x["type"]:
                     nodes[len(nodes)-1].create_property('Variables',node["custom"]["Variables"],items=list(global_variables.keys()) ,  widget_type=NODE_PROP_QCOMBO)
-                    nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+                    nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
                 if "OCR" in x["type"]:
                     nodes[len(nodes)-1].create_property('Bounding Box X1', node["custom"]["Bounding Box X1"], widget_type=NODE_PROP_QLINEEDIT)
                     nodes[len(nodes)-1].create_property('Bounding Box Y1', node["custom"]["Bounding Box Y1"], widget_type=NODE_PROP_QLINEEDIT)
@@ -6446,7 +6685,7 @@ if __name__ == '__main__':
                 #nodes[len(nodes)-1].model.set_property("id",key)
                 nodes[len(nodes)-1].set_pos(node["pos"][0],node["pos"][1] )
 
-                nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+                nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
             node_dict[key] = nodes[len(nodes)-1]
             ##print(key)
             nodes[len(nodes)-1].set_icon(icon)
@@ -6486,6 +6725,7 @@ if __name__ == '__main__':
         #print(file2)
         #print("OPEN")
         graph.fit_to_selection()
+        graph.last_cheat = file2
         if file2 == None or type(file2) == bool:
             f,_ = QFileDialog.getOpenFileName(graph.QMainWindow, 'Open file', 'c:\\',"Cheat Files (*.cheat)")
         else:
@@ -6506,7 +6746,10 @@ if __name__ == '__main__':
                 graph.auto_layout_nodes()
             else:
                 x = json.loads(node["custom"]["Data"])
-                nodes.append(graph.create_node(node["type_"], name=node["name"], data=x))#, color= "#FFFFFF"
+                if "IfElse" in x["type"]:
+                    nodes.append(graph.create_node('nodes.basic.BasicNodeB', name=node["name"], data=x))
+                else:
+                    nodes.append(graph.create_node(node["type_"], name=node["name"], data=x))#, color= "#FFFFFF"
                 this_path = os.path.dirname(os.path.abspath(__file__))
                 icon = os.path.join(this_path, 'examples', 'Move.png')
                 if "Move" in x["type"]:
@@ -6532,7 +6775,8 @@ if __name__ == '__main__':
                     nodes[len(nodes)-1].create_property('Row 10',node["custom"]["Row 10"],items=list(graph.global_variables.keys()) ,  widget_type=NODE_PROP_QCOMBO)
                 if "Email" in x["type"]:
                     nodes[len(nodes)-1].create_property('file', node["custom"]["file"] , widget_type=NODE_PROP_QLINEEDIT)
-                    nodes[len(nodes)-1].create_property('Body variable',node["custom"]["Body variable"] ,items=list(graph.global_variables.keys())  + ["Loop Total Runs","Loop Node Runs"],  widget_type=NODE_PROP_QCOMBO)
+                    if "Body variable" in node["custom"]:
+                        nodes[len(nodes)-1].create_property('Body variable',node["custom"]["Body variable"] ,items=list(graph.global_variables.keys())  + ["Loop Total Runs","Loop Node Runs"],  widget_type=NODE_PROP_QCOMBO)
                     nodes[len(nodes)-1].create_property('to', node["custom"]["to"], widget_type=NODE_PROP_QLINEEDIT)
                     nodes[len(nodes)-1].create_property('subject', node["custom"]["subject"], widget_type=NODE_PROP_QLINEEDIT)
                     nodes[len(nodes)-1].create_property('body', node["custom"]["body"], widget_type=NODE_PROP_QLINEEDIT)
@@ -6541,7 +6785,9 @@ if __name__ == '__main__':
                     nodes[len(nodes)-1].create_property('Semantic Description', node["custom"]["Semantic Description"], widget_type=NODE_PROP_QLINEEDIT)
                     #nodes[len(nodes)-1].create_property('Mode',node["custom"]["Mode"],items=["First","All","Last"],  widget_type=NODE_PROP_QCOMBO)
                     nodes[len(nodes)-1].create_property('Mode',node["custom"]["Mode"],items=["First","All","Last", "Loop Total Runs","Loop Node Runs"],  widget_type=NODE_PROP_QCOMBO)
-                    nodes[len(nodes)-1].create_property('Target',node["custom"]["Target"],items=["span","link text","link destination", "article", "Twitter posts"],  widget_type=NODE_PROP_QCOMBO)
+                    if "Target" in node["custom"]:
+                        nodes[len(nodes)-1].create_property('Target',node["custom"]["Target"],items=["span","link text","link destination", "article", "Twitter posts"],  widget_type=NODE_PROP_QCOMBO)
+#                    nodes[len(nodes)-1].create_property('Target',node["custom"]["Target"],items=["span","link text","link destination", "article", "Twitter posts"],  widget_type=NODE_PROP_QCOMBO)
 
                     nodes[len(nodes)-1].create_property('X', node["custom"]["X"], widget_type=NODE_PROP_QLINEEDIT)
                     nodes[len(nodes)-1].create_property('Y', node["custom"]["Y"], widget_type=NODE_PROP_QLINEEDIT)
@@ -6558,10 +6804,22 @@ if __name__ == '__main__':
                     if "Target In English" in node["custom"]:
                         nodes[len(nodes)-1].create_property('Target In English', node["custom"]["Target In English"], widget_type=NODE_PROP_QLINEEDIT)
                     # find the screen dimensions and use that 
+                    if "Scrape Browser" in node["custom"]:
+                        nodes[len(nodes)-1].create_property('Scrape Browser', node["custom"]["Scrape Browser"], items=["Links","Images", "Text", "Headings", "Audios", "Videos", "Textareas", "Tables", "Divs", "Spans", "Headings",  "Buttons" ],  widget_type=NODE_PROP_QCOMBO)
+                    if "Scrape Links" in node["custom"]:
+                        nodes[len(nodes)-1].create_property('Scrape Links', node["custom"]["Scrape Links"],items=["True","False"],  widget_type=NODE_PROP_QCOMBO)
+                    if "Automation Input" in node["custom"]:
+                        nodes[len(nodes)-1].create_property('Automation Input', node["custom"]["Automation Input"],items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
                     screen_width = pyautogui.size()[0]
                     screen_height = pyautogui.size()[1]
                    
-                    graph.global_variables["Description" + str(len(nodes) -1)] = "The full screen"
+                    graph.global_variables["Magic Scraper Output" + str(len(nodes) -1)] = "The full screen"
+                    graph.global_variables["Magic Scraper All Outputs"] = "The full screen"
+                    
+                    graph.global_variables["Links"  + str(len(nodes) -1)] = []
+                    graph.global_variables["Link Texts"  + str(len(nodes) -1)] = []
+
+
                 if "Delay" in x["type"]:
                     nodes[len(nodes)-1].create_property('seconds', node["custom"]["seconds"], widget_type=NODE_PROP_QLINEEDIT)
 
@@ -6599,9 +6857,14 @@ if __name__ == '__main__':
     
                 if "Click" in x["type"]:
                     icon = os.path.join(this_path, 'examples', 'Click.png')
+                    if "Click Type" in node["custom"]:
+                        nodes[len(nodes)-1].create_property('Click Type', node["custom"]["Click Type"],items=["Single Left Click", "Single Right Click","Double Click", "Drag"],  widget_type=NODE_PROP_QCOMBO)
+ #                   nodes[len(nodes)-1].create_property('Click Type', node["custom"]["Click Type"],items=["Single Left Click", "Single Right Click","Double Click", "Drag"],  widget_type=NODE_PROP_QCOMBO)
                     nodes[len(nodes)-1].create_property('X', node["custom"]["X"], widget_type=NODE_PROP_QLINEEDIT)
                     nodes[len(nodes)-1].create_property('Y',  node["custom"]["Y"], widget_type=NODE_PROP_QLINEEDIT)
                     nodes[len(nodes)-1].create_property('semanticTarget',  node["custom"]["semanticTarget"], widget_type=NODE_PROP_QLINEEDIT)
+                    if "Mode" in node["custom"]:
+                        nodes[len(nodes)-1].create_property('Mode',node["custom"]["Mode"],items=["First","Last", "Loop Total Runs","Loop Node Runs"],  widget_type=NODE_PROP_QCOMBO)
 
                     nodes[len(nodes)-1].create_property('Type', "Click", widget_type=NODE_PROP_QLINEEDIT)
                 if "Open" in x["type"]:        
@@ -6645,25 +6908,14 @@ if __name__ == '__main__':
                     nodes[len(nodes)-1].create_property('mode',node["custom"]["mode"],items=["Text To Image"],  widget_type=NODE_PROP_QCOMBO)
             
                     nodes[len(nodes)-1].create_property('prompt', node["custom"]["prompt"], widget_type=NODE_PROP_QLINEEDIT)
-            
-                    nodes[len(nodes)-1].create_property('turbo',node["custom"]["turbo"],items=["False","True"],  widget_type=NODE_PROP_QCOMBO)
-                    nodes[len(nodes)-1].create_property('ddim_steps', node["custom"]["ddim_steps"], widget_type=NODE_PROP_QLINEEDIT)
-                    nodes[len(nodes)-1].create_property('seed', node["custom"]["seed"], widget_type=NODE_PROP_QLINEEDIT)
-                    nodes[len(nodes)-1].create_property('tile', 256, widget_type=NODE_PROP_QLINEEDIT)
+                    if "turbo" in node["custom"]:
+                        nodes[len(nodes)-1].create_property('turbo',node["custom"]["turbo"],items=["False","True"],  widget_type=NODE_PROP_QCOMBO)
 
                     nodes[len(nodes)-1].create_property('variable',node["custom"]["variable"],items=list(global_variables.keys())  + ["Loop Total Runs","Loop Node Runs"],  widget_type=NODE_PROP_QCOMBO)
             
                     nodes[len(nodes)-1].create_property('input image',node["custom"]["input image"],items=["Loop Total Runs","Loop Node Runs"],  widget_type=NODE_PROP_QCOMBO)
             
-                    nodes[len(nodes)-1].create_property('height_value', node["custom"]["height_value"], widget_type=NODE_PROP_QLINEEDIT)
-                    nodes[len(nodes)-1].create_property('width_value', node["custom"]["width_value"], widget_type=NODE_PROP_QLINEEDIT)
-                    nodes[len(nodes)-1].create_property('scale', node["custom"]["scale"], widget_type=NODE_PROP_QLINEEDIT)
-                    nodes[len(nodes)-1].create_property('sampler',node["custom"]["sampler"],items=["ddim","ddim_a","euler","euler_a","plms"],  widget_type=NODE_PROP_QCOMBO)
-                    nodes[len(nodes)-1].create_property('precision',node["custom"]["precision"],items=["full","autocast"],  widget_type=NODE_PROP_QCOMBO)
-                    nodes[len(nodes)-1].create_property('iterations', node["custom"]["iterations"], widget_type=NODE_PROP_QLINEEDIT)
-                    nodes[len(nodes)-1].create_property('samples', node["custom"]["samples"], widget_type=NODE_PROP_QLINEEDIT)
 
-                    nodes[len(nodes)-1].create_property('device',node["custom"]["device"],items=["cuda","cpu"],  widget_type=NODE_PROP_QCOMBO)
                 if "IfElse" in x["type"]:
                     icon = os.path.join(this_path, 'examples', 'Click.png')
                     nodes[len(nodes)-1].create_property('Variables',node["custom"]["Variables"],items=list(global_variables.keys())  + [node["custom"]["Variables"], "Total Run","Current Time", "Current Date", "Total Scraped"],  widget_type=NODE_PROP_QCOMBO)
@@ -6684,13 +6936,14 @@ if __name__ == '__main__':
                     
                     nodes[len(nodes)-1].create_property('Body Key 5', node["custom"]["Body Key 5"], widget_type=NODE_PROP_QLINEEDIT)
                     nodes[len(nodes)-1].create_property('Body Value 5', node["custom"]["Body Value 5"], widget_type=NODE_PROP_QLINEEDIT)
-
-
+                    if "Headers" in node["custom"]:
+                        nodes[len(nodes)-1].create_property('Headers', node["custom"]["Headers"], widget_type=NODE_PROP_QLINEEDIT)
+                 
                     nodes[len(nodes)-1].create_property('Request', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
                     nodes[len(nodes)-1].create_property('URL', node["custom"]["URL"], widget_type=NODE_PROP_QLINEEDIT)
                 if "print" in x["type"]:
                     nodes[len(nodes)-1].create_property('Variables',node["custom"]["Variables"],items=list(global_variables.keys()) ,  widget_type=NODE_PROP_QCOMBO)
-                    nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+                    nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
                 if "OCR" in x["type"]:
                     nodes[len(nodes)-1].create_property('Bounding Box X1', node["custom"]["Bounding Box X1"], widget_type=NODE_PROP_QLINEEDIT)
                     nodes[len(nodes)-1].create_property('Bounding Box Y1', node["custom"]["Bounding Box Y1"], widget_type=NODE_PROP_QLINEEDIT)
@@ -6730,15 +6983,16 @@ if __name__ == '__main__':
                 #nodes[len(nodes)-1].model.set_property("id",key)
                 nodes[len(nodes)-1].set_pos(node["pos"][0],node["pos"][1] )
 
-                nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+                nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
             node_dict[key] = nodes[len(nodes)-1]
             ##print(key)
             nodes[len(nodes)-1].set_icon(icon)
             #graph.auto_layout_nodes()
             graph.clear_selection()
-         
-            if len(nodes) > 1:
-                nodes[-1].input(0).connect_to(nodes[-2].output(0))
+
+                        
+            #if len(nodes) > 1:
+            #    nodes[-1].input(0).connect_to(nodes[-2].output(0))
             # crate a backdrop node and wrap it around
             # "custom port node" and "group node".
             # fit node selection to the viewer.
@@ -6765,7 +7019,7 @@ if __name__ == '__main__':
         nodes.append(graph.create_node('nodes.basic.BasicNodeA', name="Scroll " + str(len(nodes)), data=x))#, color= "#FFFFFF"
         nodes[len(nodes)-1].create_property('Distance',100, widget_type=NODE_PROP_QLINEEDIT)
 
-        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+        nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder))
         if len(nodes) > 0:
             connectToLastNode(nodes[-1])
 
@@ -6839,6 +7093,27 @@ if __name__ == '__main__':
 
                 compound_keypress_icon = os.path.join(this_path, 'examples', 'Keypress.png')
                 compound_keypress_node.create_property('GPT-4 Mode', "False",items=list(["False", "True"]) ,  widget_type=NODE_PROP_QCOMBO)
+
+                for keypress in keypress_sequence:
+                    if 'KEY_INSERT' in keypress['key']:
+                        nodes.append(graph.create_node('nodes.basic.BasicNodeA',     name="Magic Scraper " + str(len(nodes)), data=x))
+                        # Use the in-memory bytes to call `blip_caption` directly
+                        caption = "the state of the screen"
+                        nodes[len(nodes)-1].create_property('Target In English', caption, widget_type=NODE_PROP_QLINEEDIT)
+                        nodes[len(nodes)-1].create_property('Automation Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
+                        nodes[len(nodes)-1].create_property('Scrape Links',"False",items=["True","False"],  widget_type=NODE_PROP_QCOMBO)
+                        graph.global_variables["Magic Scraper Output"  +  str(len(nodes)-1)] = ""
+                        graph.global_variables["Magic Scraper All Outputs"] = "The full screen"
+
+                        graph.global_variables["Links"  + str(len(nodes) -1)] = []
+                        graph.global_variables["Link Texts"  + str(len(nodes) -1)] = []
+                        test = {"type":"SemanticDescribe", "semanticTarget":"caption"}
+                        nodes[len(nodes)-1].create_property('Data', json.dumps(test, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+
+                        if len(nodes) > 0:
+                            nodes[-1].input(0).connect_to(nodes[-2].output(0))
+                        break
+                compound_keypress_node.create_property('Automation Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
 
                 compound_keypress_node.create_property('String', "", widget_type=NODE_PROP_QLINEEDIT)
                 compound_keypress_node.create_property('Type', "keypress", widget_type=NODE_PROP_QLINEEDIT)
@@ -6980,12 +7255,20 @@ if __name__ == '__main__':
                     nodes[len(nodes)-1].create_property('Target In English', caption, widget_type=NODE_PROP_QLINEEDIT)
                     nodes[len(nodes)-1].create_property('Automation Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
                     nodes[len(nodes)-1].create_property('Scrape Links',"False",items=["True","False"],  widget_type=NODE_PROP_QCOMBO)
-                    nodes[len(nodes)-1].create_property('Data', json.dumps(x, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
+                        
+                    graph.global_variables["Magic Scraper Output"  +  str(len(nodes)-1)] = ""
+                    graph.global_variables["Magic Scraper All Outputs"] = "The full screen"
+
+                    graph.global_variables["Links"  + str(len(nodes) -1)] = []
+                    graph.global_variables["Link Texts"  + str(len(nodes) -1)] = []
+                    test = {"type":"SemanticDescribe", "semanticTarget":"caption"}
+                    nodes[len(nodes)-1].create_property('Data', json.dumps(test, cls=NumpyEncoder), widget_type=NODE_PROP_QLINEEDIT)
                     if len(nodes) > 0:
                         nodes[-1].input(0).connect_to(nodes[-2].output(0))
                     break
             compound_keypress_node.create_property('String', "", widget_type=NODE_PROP_QLINEEDIT)
             compound_keypress_node.create_property('GPT-4 Mode', "False",items=list(["False", "True"]) ,  widget_type=NODE_PROP_QCOMBO)
+            compound_keypress_node.create_property('Automation Input',"",items=list(graph.global_variables.keys()),  widget_type=NODE_PROP_QCOMBO)
 
             compound_keypress_node.create_property('Type', "Keypress", widget_type=NODE_PROP_QLINEEDIT)
             compound_keypress_node.set_icon(icon)
@@ -7052,8 +7335,8 @@ if __name__ == '__main__':
             print(workflow)
             #graph.global_variables[
     key = 'None'
-    if os.path.isfile(get_path('config_cheatlayer.txt')):
-        with open(get_path('config_cheatlayer.txt'), 'r') as file:
+    if os.path.isfile(get_path(resource_path('config_cheatlayer.txt'))):
+        with open(get_path(resource_path('config_cheatlayer.txt')), 'r') as file:
             key = file.read().replace('\n', '')
     #print("USER KEY -1")
     #print(user_key)
@@ -7183,8 +7466,7 @@ if __name__ == '__main__':
         if ngrok_key == "":
             ngrok_key, entered = QtWidgets.QInputDialog.getText(graph.QMainWindow, 'Cheat Layer Key', '(Optional) Please sign up at ngrok and enter your free auth token to host a GPT-4 phone server and local services. You can re-enter this key if you want to later:')  
             #save the key 
-            with open(get_path('config_ngrok.txt'), 'w') as file:
-                file.write(ngrok_key)
+    
 
 
         sanitized_key = ngrok_key.replace('\r', '').replace('\n', '')
@@ -7206,10 +7488,6 @@ if __name__ == '__main__':
         }
         
         # Write the configuration to a file
-        with open('ngrok.yml', 'w') as ngrok_config_file:
-            yaml.dump(ngrok_config, ngrok_config_file, default_flow_style=False)
-        subprocess.Popen(['ngrok', 'config', 'add-authtoken', ngrok_key.replace('\r', '').replace('\n', '')])
-        subprocess.Popen(['ngrok','start','--all','--config','./ngrok.yml'])
         #ngrok start --all --config ./ngrok.yml
         #p = subprocess.Popen(['ssh','-R', '80:localhost:5000','serveo.net'], stdin=subprocess.PIPE)
 
@@ -7230,11 +7508,7 @@ if __name__ == '__main__':
     ngrok_key = ""
     RoboflowKey = "Y0kBgAMpHpaJPgyhHB1i"
     #load the ngrok key and roboflow key from a config file
-    
-    if os.path.isfile(get_path('config_ngrok.txt')):
-        with open(get_path('config_ngrok.txt'), 'r') as file:
-            ngrok_key = file.read().replace('\n', '')
-    #print("USER KEY -2")
+        #print("USER KEY -2")
     #print(ngrok_key)
     #print("USER KEY -3")
     #print(RoboflowKey)
@@ -7243,7 +7517,7 @@ if __name__ == '__main__':
     #start the server with the ngrok key
 
     
-    graph = NodeGraph( addWebcam, addElevenLabs, addSynthesia, addLlama, getRecording, AddStableVideo, RoboflowKey, workflows, addScrape, scheduled_jobs, atlas, user_key, drawHistory, verified, addOCR, addPrint, addScroll, addSendData, addIfElse, addKeypress, addMove, addClick,getData,getScreenshot,download_file, openCheat, scheduleCheat, addAIDetector, runOnCheatLayer, trainModels, launchAtlas, AddStableDiffusion, addCustomCode,addEmail,addRiku,addMath,addGsheets,addOpen,addDelay, newCheat, addGetFiles, openAtlas, ChatApp.addResponse, window2, blip_decoder, addDescribe, addOCRSemantic, openaikey, user_plan, thread_signals, addGPT4)
+    graph = NodeGraph( addGeneral,addWebcam, addElevenLabs, addSynthesia, addLlama, getRecording, AddStableVideo, RoboflowKey, workflows, addScrape, scheduled_jobs, atlas, user_key, drawHistory, verified, addOCR, addPrint, addScroll, addSendData, addIfElse, addKeypress, addMove, addClick,getData,getScreenshot,download_file, openCheat, scheduleCheat, addAIDetector, runOnCheatLayer, trainModels, launchAtlas, AddStableDiffusion, addCustomCode,addEmail,addRiku,addMath,addGsheets,addOpen,addDelay, newCheat, addGetFiles, openAtlas, ChatApp.addResponse, window2, blip_decoder, addDescribe, addOCRSemantic, openaikey, user_plan, thread_signals, addGPT4)
     graph.set_acyclic(False)
     QApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
     
@@ -7256,7 +7530,7 @@ if __name__ == '__main__':
 
     #print("USER KEY -5")
     #print(ngrok_key)
-   # start_ngrok(ngrok_key)
+    #start_ngrok(ngrok_key)
 
 
     # registered example nodes.
@@ -7365,6 +7639,10 @@ if __name__ == '__main__':
     check_timer.timeout.connect(is_key_available)
     check_timer.start(1000)  # Check every second
 
+    #if os.path.isfile(get_path(resource_path('config_cheatlayer.txt'))):
+    with open(get_path(resource_path('config_cheatlayer.txt')), 'r') as file:
+        user_key = file.read().replace('\n', '')
+
     while user_key == "None" or user_key == "":
         #print(user_key)
         time.sleep(2)
@@ -7459,7 +7737,7 @@ if __name__ == '__main__':
 
 
                    #if os.path.isfile(get_path('config_cheatlayer.txt')):
-                    with open(get_path('config_cheatlayer.txt'), 'w') as f:
+                    with open(get_path(resource_path('config_cheatlayer.txt')), 'w') as f:
                         f.write(key)
                     # create a nodes tree widget.
                     nodes_tree = NodesTreeWidget(node_graph=graph)
@@ -7572,7 +7850,7 @@ if __name__ == '__main__':
                     # ...
 
                 #if os.path.isfile(get_path('config_cheatlayer.txt')):
-                with open(get_path('config_cheatlayer.txt'), 'w') as f:
+                with open(get_path(resource_path('config_cheatlayer.txt')), 'w') as f:
                     f.write(key)
 
 
@@ -7619,6 +7897,7 @@ if __name__ == '__main__':
                 graph.updateSchedule(workflows)
                 graph.cheat_scheduler.start()
    #             schedule_test()
+           #     graph.QMainWindow.scheduler.redraw()
                 graph.QMainWindow.scheduler.hide()
     #            atlas = WelcomeWindow(base_questions, custom_questions, sites, prompts)
     #            atlas.setWindowIcon(QIcon(os.path.join(this_path, 'examples', 'favicon.ico')))
@@ -7646,7 +7925,7 @@ if __name__ == '__main__':
                 palette.setColor(QPalette.HighlightedText, Qt.white)
                 app.setPalette(palette)
                 recorder = ScreenRecorder()
-              #  window2.show()
+                #window2.show()
               #  webbrowser.open('https://cheatlayer.com/dashboard', new=2)
 
                 USER_CONFIG_PATH = 'config_user.txt'  # Adjust this path as necessary
@@ -7681,5 +7960,12 @@ if __name__ == '__main__':
                 # Add the menu to the tray
                 tray.setContextMenu(menu)
                 graph.QMainWindow.showMaximized()
-      
+                #onboarding_window.setWindowFlags(onboarding_window.windowFlags() | Qt.WindowStaysOnTopHint)
+                #if ngrok_key == "":
+
+#                    onboarding_window.show()
+  #              window_web = WebWindow()
+  #              window_web.show()
+## [{'genera    ted_text': 'two birds are standing next to each other '}]
+          #      window.hide()
                 app.exec_()
