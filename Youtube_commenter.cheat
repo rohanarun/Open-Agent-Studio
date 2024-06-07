@@ -1,0 +1,353 @@
+{
+  "graph":{
+    "acyclic":false,
+    "pipe_collision":false
+  },
+  "nodes":{
+    "0x2b7133f23b0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Start Node 0",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -22.21019553072631,
+        -329.52590782122905
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Initial Program":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://www.youtube.com/@CheatLayer/videos",
+        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe https://www.youtube.com/@CheatLayer/videos\"}"
+      }
+    },
+    "0x2b71344c2e0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Click.png",
+      "name":"CLICK 1",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -282.2101955307263,
+        -187.12590782122905
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "X":569,
+        "Y":897,
+        "semanticTarget":"A title for a video with the video above it",
+        "Type":"Click",
+        "Data":"{\"type\": \"Left Mouse Click\", \"semanticTarget\": \"Caption: a white background with blue dots on it\", \"x\": 569, \"y\": 897}"
+      }
+    },
+    "0x2b71344c700":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Scroll 2",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -22.21019553072631,
+        -187.12590782122905
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Distance":"-500",
+        "Data":"{\"type\": \"scroll\"}"
+      }
+    },
+    "0x2b71344cac0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Click.png",
+      "name":"CLICK 6",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -282.2101955307263,
+        -44.72590782122904
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "X":198,
+        "Y":796,
+        "semanticTarget":"Caption: a screen shot of a web page with two comments",
+        "Type":"Click",
+        "Data":"{\"type\": \"Left Mouse Click\", \"semanticTarget\": \"Caption: a screen shot of a web page with two comments\", \"x\": 198, \"y\": 796}"
+      }
+    },
+    "0x2b71344ce80":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Semantic Scrape 6",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -22.21019553072631,
+        -44.72590782122904
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Semantic Description":"A title for a video with the video above it",
+        "Mode":"All",
+        "X":347,
+        "Y":530,
+        "Data":"{\"type\": \"semanticScrape\"}"
+      }
+    },
+    "0x2b71344d1e0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"GPT4 7",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -282.2101955307263,
+        97.67409217877099
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "input":"Generate a comment based on the title of this youtube video: ",
+        "Automation Input":"Scrape6",
+        "Data":"{\"type\": \"GPT4\"}"
+      }
+    },
+    "0x2b7194289d0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"C:\\Users\\Public\\cheatlayer\\7_click.png",
+      "name":"CLICK 2",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":true,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -22.21019553072631,
+        97.67409217877099
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Bounding Box X1":1195,
+        "Bounding Box Y1":738,
+        "Bounding Box X2":1395,
+        "Bounding Box Y2":938,
+        "X":1295,
+        "Y":838,
+        "Mode":"All",
+        "semanticTarget":"A blue button with white text that says Comment",
+        "Data":"{\"type\": \"Left Mouse Click\", \"semanticTarget\": \"Caption: a screenshot of a computer screen with a keyboard and mouse\", \"x\": 1295, \"y\": 838}"
+      }
+    }
+  },
+  "connections":[
+    {
+      "out":[
+        "0x2b7133f23b0",
+        "out A"
+      ],
+      "in":[
+        "0x2b71344c2e0",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x2b71344c2e0",
+        "out A"
+      ],
+      "in":[
+        "0x2b71344c700",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x2b71344c700",
+        "out A"
+      ],
+      "in":[
+        "0x2b71344cac0",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x2b71344cac0",
+        "out A"
+      ],
+      "in":[
+        "0x2b71344ce80",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x2b71344ce80",
+        "out A"
+      ],
+      "in":[
+        "0x2b71344d1e0",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x2b71344d1e0",
+        "out A"
+      ],
+      "in":[
+        "0x2b7194289d0",
+        "in A"
+      ]
+    }
+  ]
+}

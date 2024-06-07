@@ -1,0 +1,149 @@
+{
+  "graph":{
+    "acyclic":false,
+    "pipe_collision":false
+  },
+  "nodes":{
+    "0x19265cda620":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Start Node 0",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        0.0,
+        0.0
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Initial Program":"",
+        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"\"}"
+      }
+    },
+    "0x1926d82c370":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Python Code 1",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":true,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -83.1395348837209,
+        146.27751937984505
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "code":"import os\n\n\ndef main():\n    final_story_filename = os.path.join(folder, 'final_story.mp4')\n    genSyntheticVideo({{prompt}}, file_name=final_story_filename)\n\nif __name__ == \"__main__\":\n    main()",
+        "Data":"{\"type\": \"python\"}"
+      }
+    },
+    "0x1926d82c6a0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Gmail 2",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        176.8604651162791,
+        143.2542635658915
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "file":"final_story.mp4",
+        "Body variable":"",
+        "to":"{{user}}",
+        "subject":"Video Generated From Desktop Cloud Agent ",
+        "body":"Please find attached the video about {{prompt}}",
+        "key":"655661703861be3664ca7e5b",
+        "Data":"{\"type\": \"Email\"}"
+      }
+    }
+  },
+  "connections":[
+    {
+      "out":[
+        "0x19265cda620",
+        "out A"
+      ],
+      "in":[
+        "0x1926d82c370",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x1926d82c370",
+        "out A"
+      ],
+      "in":[
+        "0x1926d82c6a0",
+        "in A"
+      ]
+    }
+  ]
+}

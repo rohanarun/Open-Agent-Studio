@@ -1,0 +1,318 @@
+{
+  "graph":{
+    "acyclic":false,
+    "pipe_collision":false
+  },
+  "nodes":{
+    "0x19c8182f970":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Start Node 0",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -94.4389623601221,
+        -287.5978382502543
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Initial Program":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://www.zillow.com/seattle-wa/?searchQueryState=%7B%22pagination%22%3A%7B%7D%2C%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22west%22%3A-122.41740790551758%2C%22east%22%3A-122.21656409448242%2C%22south%22%3A47.653960070653675%2C%22north%22%3A47.74753819683763%7D%2C%22regionSelection%22%3A%5B%7B%22regionId%22%3A16037%2C%22regionType%22%3A6%7D%5D%2C%22filterState%22%3A%7B%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%7D%2C%22isListVisible%22%3Atrue%2C%22mapZoom%22%3A13%7D",
+        "Copy This To Intial Program To Open Chrome":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://cheatlayer.com",
+        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe https://cheatlayer.com\"}"
+      }
+    },
+    "0x19c81a87e50":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Magic Scraper 3",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -354.4389623601221,
+        -145.1978382502543
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Target In English":"only the links to homes with addreses. do not include any links that don't have an address ",
+        "Automation Input":"",
+        "Scrape Links":"True",
+        "Data":"{\"type\": \"SemanticDescribe\", \"semanticTarget\": \"caption\"}"
+      }
+    },
+    "0x19c81b80520":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Open Program 5",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -489.2568667344864,
+        46.50124618514751
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "program":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        "arguments":"none",
+        "Automated Input":"",
+        "Automated Lists":"Links3",
+        "Data":"{\"type\": \"Open\"}"
+      }
+    },
+    "0x19c81b82620":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Delay 6",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -28.036113936927798,
+        -158.27718718209562
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "seconds":"5",
+        "Data":"{\"type\": \"Delay\"}"
+      }
+    },
+    "0x19c81b821a0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Magic Scraper 7",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -603.5274669379452,
+        329.2164038657172
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Target In English":"get the address, price, number of beds, and number of baths",
+        "Automation Input":"",
+        "Scrape Links":"False",
+        "Data":"{\"type\": \"SemanticDescribe\", \"semanticTarget\": \"caption\"}"
+      }
+    },
+    "0x19c81a87af0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Google Sheets 8",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        83.21617497456765,
+        269.38954730417095
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "URL":"https://docs.google.com/spreadsheets/d/12QA6kNx4YEcqjGbPFBOogMiwRJFH2-7dVKw5-xFAyeU/edit#gid=0",
+        "key":"663ebed667d969267bbd7b5f",
+        "sheet name":"Sheet1",
+        "Row 1":"Description7",
+        "Row 2":"",
+        "Row 3":"",
+        "Row 4":"",
+        "Row 5":"",
+        "Row 6":"",
+        "Row 7":"",
+        "Row 8":"",
+        "Row 9":"",
+        "Row 10":"",
+        "Data":"{\"type\": \"Gsheets\"}"
+      }
+    }
+  },
+  "connections":[
+    {
+      "out":[
+        "0x19c8182f970",
+        "out A"
+      ],
+      "in":[
+        "0x19c81a87e50",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x19c81a87e50",
+        "out A"
+      ],
+      "in":[
+        "0x19c81b82620",
+        "in A"
+      ]
+    },
+    {
+      "in":[
+        "0x19c81b80520",
+        "in A"
+      ],
+      "out":[
+        "0x19c81b82620",
+        "out A"
+      ]
+    },
+    {
+      "out":[
+        "0x19c81b80520",
+        "out A"
+      ],
+      "in":[
+        "0x19c81b821a0",
+        "in A"
+      ]
+    },
+    {
+      "in":[
+        "0x19c81b82620",
+        "in B"
+      ],
+      "out":[
+        "0x19c81a87af0",
+        "out A"
+      ]
+    },
+    {
+      "out":[
+        "0x19c81b821a0",
+        "out A"
+      ],
+      "in":[
+        "0x19c81a87af0",
+        "in A"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "graph":{
+    "acyclic":false,
+    "pipe_collision":false
+  },
+  "nodes":{
+    "0x157329455d0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Start Node 0",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        0.0,
+        0.0
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Initial Program":"",
+        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"\"}"
+      }
+    },
+    "0x15732944100":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Python Code 1",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":true,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -83.1395348837209,
+        146.27751937984505
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "prompt":"{{prompt}}",
+        "code":"import os\nimport threading\nfrom moviepy.editor import VideoFileClip, concatenate_videoclips, AudioFileClip\n\ndef process_sentence(index, sentence, folder, video_clips):\n    video_filename = f'{folder}/synthetic_{index}.mp4'\n    voiceover_filename = f'{folder}/voiceover_{index}.mp3'\n    \n    # Generate synthetic video\n    genSyntheticVideo(sentence, file_name=video_filename)\n    \n    # Generate voiceover\n    genVoice(sentence, voiceover_filename)\n    \n    # Load the synthetic video and voiceover\n    video_clip = VideoFileClip(video_filename)\n    voiceover_clip = AudioFileClip(voiceover_filename)\n    \n    # Extend or cut the video clip to match the length of the voiceover\n    if video_clip.duration < voiceover_clip.duration:\n        video_clip = video_clip.set_duration(voiceover_clip.duration)\n    else:\n        voiceover_clip = voiceover_clip.set_duration(video_clip.duration)\n    \n    # Set the audio of the video clip to the voiceover\n    video_clip = video_clip.set_audio(voiceover_clip)\n    \n    # Save the video clip with the voiceover\n    final_video_filename = f'{folder}/final_{index}.mp4'\n    video_clip.write_videofile(final_video_filename, codec='libx264', audio_codec='aac')\n    \n    # Append the clip to the list of video clips\n    with threading.Lock():\n        video_clips.append(VideoFileClip(final_video_filename))\n\ndef main():\n    # Generate short story sentences (your GPT-3 prompt is assumed to be defined elsewhere)\n    story_sentences = gpt3Prompt(\"generate only 5 short sentences that narrate a movie trailer with the given theme for don't generate anything violent or explicit that may violate content policies. Separate them by semicolons only and do not number them.\", {{prompt}}).split(\";\")\n    \n    # Define the folder where the files will be saved\n\n    # Create a video_clips list to store the final clips\n    video_clips = []\n\n    # Create a list to store all threads\n    threads = []\n\n    # Launch a thread for each sentence\n    for i, sentence in enumerate(story_sentences):\n        thread = threading.Thread(target=process_sentence, args=(i, sentence, folder, video_clips))\n        threads.append(thread)\n        thread.start()\n\n    # Wait for all threads to complete\n    for thread in threads:\n        thread.join()\n\n    # Combine all the video clips into one video\n    if video_clips:\n        final_story_filename = os.path.join(folder, 'final_story.mp4')\n        final_video = concatenate_videoclips(video_clips)\n        final_video.write_videofile(final_story_filename, codec='libx264', audio_codec='aac')\n\nif __name__ == \"__main__\":\n    main()",
+        "Data":"{\"type\": \"python\"}"
+      }
+    },
+    "0x15732945d50":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Gmail 2",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        176.8604651162791,
+        143.2542635658915
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "file":"final_story.mp4",
+        "Body variable":"",
+        "to":"{{user}}",
+        "subject":"Synthetic Movie Trailer From Desktop Cloud Agent ",
+        "body":"Please find attached the synthetic video generator about {{prompt}}",
+        "key":"6625c3d3ab748d304e2122e3",
+        "Data":"{\"type\": \"Email\"}"
+      }
+    }
+  },
+  "connections":[
+    {
+      "out":[
+        "0x157329455d0",
+        "out A"
+      ],
+      "in":[
+        "0x15732944100",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x15732944100",
+        "out A"
+      ],
+      "in":[
+        "0x15732945d50",
+        "in A"
+      ]
+    }
+  ]
+}

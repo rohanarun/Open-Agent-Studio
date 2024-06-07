@@ -1,0 +1,162 @@
+{
+  "graph":{
+    "acyclic":false,
+    "pipe_collision":false
+  },
+  "nodes":{
+    "0x21e0a9cdc60":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Start Node 0",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        0.0,
+        -45.49999999999994
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Initial Program":"",
+        "Copy This To Intial Program To Open Chrome":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe cheatlayer.com",
+        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe cheatlayer.com\"}"
+      }
+    },
+    "0x21e0a9cfe20":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Semantic Describe1",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        0.0,
+        -106.79999999999995
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Description":"Summarize the text of the ebook on the screen in 3 short sentences. Do not say ebook in the output",
+        "X Coordinate":0,
+        "Y Coordinate":0,
+        "Width":1920,
+        "Height":1080,
+        "Data":"{\"type\": \"SemanticDescribe\", \"semanticTarget\": \"caption\"}"
+      }
+    },
+    "0x21e0abfce20":{
+      "type_":"nodes.widget.ImageNode",
+      "icon":null,
+      "name":"Dalle 3 2",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":true,
+      "visible":true,
+      "width":220.0,
+      "height":173.05,
+      "pos":[
+        253.98974653435613,
+        -228.97265263995433
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "my_input":"text",
+        "mode":"Text To Image",
+        "Automation Input":"Description1",
+        "prompt":"Generate an image that looks like this scene ",
+        "Data":"{\"type\": \"StableDiffusion\"}"
+      }
+    }
+  },
+  "connections":[
+    {
+      "in":[
+        "0x21e0a9cdc60",
+        "in A"
+      ],
+      "out":[
+        "0x21e0abfce20",
+        "out"
+      ]
+    },
+    {
+      "out":[
+        "0x21e0a9cdc60",
+        "out A"
+      ],
+      "in":[
+        "0x21e0a9cfe20",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x21e0a9cfe20",
+        "out A"
+      ],
+      "in":[
+        "0x21e0abfce20",
+        "in"
+      ]
+    }
+  ]
+}

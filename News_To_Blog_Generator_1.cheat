@@ -1,0 +1,150 @@
+{
+  "graph":{
+    "acyclic":false,
+    "pipe_collision":false
+  },
+  "nodes":{
+    "0x1d864e868c0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Start Node 0",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        0.0,
+        0.0
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Initial Program":"",
+        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"\"}"
+      }
+    },
+    "0x1d864e87a30":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Python Code 1",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":true,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -139.06976744186045,
+        146.12403100775197
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "prompt":"{{prompt}}",
+        "code":"import requests\nimport xml.etree.ElementTree as ET\n\n# Function to fetch latest news on GPT-4 from Google News RSS feed\n\ndef fetch_latest_gpt4_news(topic):\n    # Encode the topic to be URL-friendly\n    encoded_topic = requests.utils.quote(topic)\n    # Google News RSS feed URL for the given search query\n    rss_url = f\"https://news.google.com/rss/search?q={encoded_topic}&hl=en-US&gl=US&ceid=US:en\"\n\n    # Send a GET request to the RSS feed URL\n    response = requests.get(rss_url)\n\n    # Check if the request was successful\n    if response.status_code == 200:\n        # Parse the RSS feed content\n        root = ET.fromstring(response.content)\n\n        # Find all 'item' elements in the feed\n        items = root.findall('.//item')\n\n        # Extract the title and link for each news item\n        news_items = [{'title': item.find('title').text, 'link': item.find('link').text, 'description': item.find('description').text} for item in items]\n\n        return news_items\n    else:\n        raise Exception(f\"Failed to fetch the RSS feed: {response.status_code}\")\n\n# Function definition for gpt3Prompt (assuming it's predefined)\n# This is just a placeholder for the actual function you should have already defined.\n# It should interact with an AI model to generate content based on the prompt.\n\n\n# Main script execution\nif __name__ == '__main__':\n    try:\n        # Fetch the latest GPT-4 news\n        latest_news = fetch_latest_gpt4_news({{prompt}})\n        print(latest_news)\n        # Concatenate news titles and descriptions to form a prompt for GPT-3\n        news_descriptions = '\\n'.join([f\"{item['title']}\\n{item['description']}\" for item in latest_news])\n\n        # Use the gpt3Prompt function to generate a blog post\n        gpt4_blog_post = gpt3Prompt('Generate a long blog post based on this topic and the information provided', news_descriptions)\n\n        # Save the blog post to a text file\n        with open(folder + '/gpt4_blog_post.txt', 'w', encoding='utf-8') as file:\n            file.write(gpt4_blog_post)\n            \n        print('Blog post generated and saved to gpt4_blog_post.txt')\n\n    except Exception as e:\n        print(f\"An error occurred: {e}\")",
+        "Data":"{\"type\": \"python\"}"
+      }
+    },
+    "0x1d864eeab30":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Gmail 2",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        109.84496124031007,
+        223.02015503875978
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "file":"gpt4_blog_post.txt",
+        "Body variable":"",
+        "to":"{{user}}",
+        "subject":"News To Blog Generator Agent",
+        "body":"Please find attached the blog post generated from news on {{topic}}",
+        "key":"655661703861be3664ca7e5b",
+        "Data":"{\"type\": \"Email\"}"
+      }
+    }
+  },
+  "connections":[
+    {
+      "out":[
+        "0x1d864e868c0",
+        "out A"
+      ],
+      "in":[
+        "0x1d864e87a30",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x1d864e87a30",
+        "out A"
+      ],
+      "in":[
+        "0x1d864eeab30",
+        "in A"
+      ]
+    }
+  ]
+}

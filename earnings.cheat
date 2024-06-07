@@ -1,0 +1,149 @@
+{
+  "graph":{
+    "acyclic":false,
+    "pipe_collision":false
+  },
+  "nodes":{
+    "0x1a3bee54130":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Start Node 0",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -76.96693794506609,
+        -104.78779247202439
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Initial Program":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://finance.yahoo.com/calendar/earnings/",
+        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe https://finance.yahoo.com/calendar/earnings/\"}"
+      }
+    },
+    "0x1a3bee54490":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Magic Scraper 1",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -76.96693794506609,
+        37.61220752797561
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Target In English":"tech companies wtih earnings reports after market close. Only inlcude known technology companies in the list and output only their ticker symbols. Do not include any pharma companies",
+        "Scrape Browser":"Tables",
+        "Data":"{\"type\": \"SemanticDescribe\", \"semanticTarget\": \"caption\"}"
+      }
+    },
+    "0x1a3bee54b50":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Gmail 2",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":true,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -76.96693794506609,
+        180.01220752797565
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "to":"{{user}}",
+        "subject":"test",
+        "file":"none",
+        "body":"test",
+        "Body variable":"Magic Scraper Output1",
+        "Data":"{\"type\": \"Email\"}"
+      }
+    }
+  },
+  "connections":[
+    {
+      "out":[
+        "0x1a3bee54130",
+        "out A"
+      ],
+      "in":[
+        "0x1a3bee54490",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x1a3bee54490",
+        "out A"
+      ],
+      "in":[
+        "0x1a3bee54b50",
+        "in A"
+      ]
+    }
+  ]
+}

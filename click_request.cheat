@@ -1,0 +1,102 @@
+{
+  "graph":{
+    "acyclic":false,
+    "pipe_collision":false
+  },
+  "nodes":{
+    "0x20bf5147c10":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Start Node 0",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        0.0,
+        61.299999999999955
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Initial Program":"",
+        "Copy This To Intial Program To Open Chrome":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://cheatlayer.com",
+        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe https://cheatlayer.com\"}"
+      }
+    },
+    "0x20bf5981ba0":{
+      "type_":"nodes.widget.ImageNode",
+      "icon":"Click.png",
+      "name":"CLICK 1",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":true,
+      "visible":true,
+      "width":219.0,
+      "height":173.05,
+      "pos":[
+        0.0,
+        0.0
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "my_input":"text",
+        "X":976,
+        "Y":214,
+        "Click Type":"Single Left Click",
+        "Mode":"All",
+        "semanticTarget":"{{prompt}}",
+        "Data":"{\"type\": \"Left Mouse Click\", \"semanticTarget\": \"Red play button on video player.\", \"x\": 976, \"y\": 214}"
+      }
+    }
+  },
+  "connections":[
+    {
+      "out":[
+        "0x20bf5147c10",
+        "out A"
+      ],
+      "in":[
+        "0x20bf5981ba0",
+        "in"
+      ]
+    }
+  ]
+}

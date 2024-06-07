@@ -1,0 +1,346 @@
+{
+  "graph":{
+    "acyclic":false,
+    "pipe_collision":false
+  },
+  "nodes":{
+    "0x22590156860":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Start Node 0",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        0.0,
+        0.0
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Initial Program":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://www.tiktok.com/upload?lang=en",
+        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe https://www.tiktok.com/upload?lang=en\"}"
+      }
+    },
+    "0x225965c57e0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Bash Commands 1",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        862.592907635407,
+        -344.497736815806
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "code":" \npip3 install opencv-python-headless\npip3 install numpy\npip3 install requests\npip3 install pyttsx3\npip3 install moviepy\n\n\n",
+        "Data":"{\"type\": \"bash\", \"code\": \" \\npip3 install --upgrade --force-reinstall \\\"git+https://github.com/yt-dlp/yt-dlp.git\\\"\\n\\n\\n\"}"
+      }
+    },
+    "0x225965c6590":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Python Code 2",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":true,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        1165.4016450938143,
+        -298.85647154256054
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "prompt":"{{prompt}}",
+        "voiceover":"{{voiceover}}",
+        "code":"import cv2\nimport numpy as np\nimport requests\nimport pyttsx3\nfrom PIL import ImageFont, ImageDraw, Image\nfrom moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip\n\ndef download_file(url, filename):\n    response = requests.get(url)\n    with open(filename, 'wb') as f:\n        f.write(response.content)\n\n# Generate synthetic video\nsynthetic_video_url = genSyntheticVideo({{prompt}})\nsynthetic_video_filename = 'synthetic.mp4'\ndownload_file(synthetic_video_url, synthetic_video_filename)\n\n# Generate voiceover text using GPT-3\nvoiceover_text = gpt3Prompt(\"generate a voiceover for a video with the given description. Do not describe the music or direction and only generate the voiceover text directly as the person would say without any explanations\", {{voiceover}}) \n\n\n\n# Generate voice from the text\nvoiceover_filename = 'voiceover.mp3'\ngenVoice(voiceover_text, voiceover_filename)\n\n# Load synthetic video and voiceover\nvideo_clip = VideoFileClip(synthetic_video_filename).loop(duration=AudioFileClip(voiceover_filename).duration)\naudio_clip = AudioFileClip(voiceover_filename)\n\n# Composite video and audio\nfinal_clip = CompositeVideoClip([video_clip.set_audio(audio_clip)])\nfinal_clip.write_videofile( '_.mp4', codec='libx264', audio_codec='aac')\n\n\n\n\n",
+        "Data":"{\"type\": \"python\", \"code\": \" \\ngenSyntheticVideo(\\\"AI automation\\\")\\n\"}"
+      }
+    },
+    "0x225965c6aa0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Keypress.png",
+      "name":"Keypress 4",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -150.10453000546624,
+        -69.95928441629007
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "String":"_.mp4",
+        "Saved Values":"None",
+        "Type":"Keypress",
+        "Data":"{\"type\": \"keypress_manual\"}"
+      }
+    },
+    "0x225965c6d10":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Keypress.png",
+      "name":"Keypress 5",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        283.05096426943555,
+        26.692260681795705
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "String":"return",
+        "Saved Values":"None",
+        "Type":"Keypress",
+        "Data":"{\"type\": \"keypress_manual\"}"
+      }
+    },
+    "0x225965c7070":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Delay 19",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        396.26160709283346,
+        -336.4126033182756
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "seconds":"10",
+        "Data":"{\"type\": \"Delay\"}"
+      }
+    },
+    "0x225965c7430":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Click.png",
+      "name":"CLICK 20",
+      "color":[
+        13,
+        18,
+        23,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        255,
+        255,
+        255,
+        180
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        630.597065589791,
+        -331.1831156212735
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "X":1114,
+        "Y":733,
+        "semanticTarget":"Red button with \"Select file\" text.",
+        "Mode":"All",
+        "Type":"Click",
+        "Data":"{\"type\": \"Left Mouse Click\", \"semanticTarget\": \"Red button with \\\"Select file\\\" text.\", \"x\": 1114, \"y\": 733}"
+      }
+    }
+  },
+  "connections":[
+    {
+      "out":[
+        "0x22590156860",
+        "out A"
+      ],
+      "in":[
+        "0x225965c7070",
+        "in A"
+      ]
+    },
+    {
+      "in":[
+        "0x225965c57e0",
+        "in A"
+      ],
+      "out":[
+        "0x225965c7430",
+        "out A"
+      ]
+    },
+    {
+      "out":[
+        "0x225965c57e0",
+        "out A"
+      ],
+      "in":[
+        "0x225965c6590",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x225965c6590",
+        "out A"
+      ],
+      "in":[
+        "0x225965c6aa0",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x225965c6aa0",
+        "out A"
+      ],
+      "in":[
+        "0x225965c6d10",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x225965c7070",
+        "out A"
+      ],
+      "in":[
+        "0x225965c7430",
+        "in A"
+      ]
+    }
+  ]
+}

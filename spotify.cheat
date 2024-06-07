@@ -1,0 +1,155 @@
+{
+  "graph":{
+    "acyclic":false,
+    "pipe_collision":false
+  },
+  "nodes":{
+    "0x1d269a2e830":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Start Node 0",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        82.35829086047877,
+        -201.41544342395252
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Initial Program":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://open.spotify.com/search/{{search}}",
+        "Copy This To Intial Program To Open Chrome":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://cheatlayer.com",
+        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe https://cheatlayer.com\"}"
+      }
+    },
+    "0x1d269bfb610":{
+      "type_":"nodes.widget.ImageNode",
+      "icon":"Click.png",
+      "name":"CLICK 1",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":219.0,
+      "height":173.05,
+      "pos":[
+        82.35829086047877,
+        -262.7154434239525
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "my_input":"text",
+        "X":898,
+        "Y":294,
+        "Click Type":"Single Left Click",
+        "Mode":"All",
+        "semanticTarget":"the top result on the search",
+        "Data":"{\"type\": \"Left Mouse Click\", \"semanticTarget\": \"Spotify song selection \\\"Frequencies Peace 2 > 3 (Chicago - 03.07.15)\\\"\", \"x\": 898, \"y\": 294}"
+      }
+    },
+    "0x1d269a2c6d0":{
+      "type_":"nodes.widget.ImageNode",
+      "icon":"Click.png",
+      "name":"CLICK 2",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":true,
+      "visible":true,
+      "width":219.0,
+      "height":173.05,
+      "pos":[
+        82.35829086047877,
+        490.78455657604763
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "my_input":"text",
+        "X":488,
+        "Y":554,
+        "Click Type":"Single Left Click",
+        "Mode":"All",
+        "semanticTarget":"Big Green Play button",
+        "Data":"{\"type\": \"Left Mouse Click\", \"semanticTarget\": \"Audio playback control buttons.\", \"x\": 488, \"y\": 554}"
+      }
+    }
+  },
+  "connections":[
+    {
+      "out":[
+        "0x1d269a2e830",
+        "out A"
+      ],
+      "in":[
+        "0x1d269bfb610",
+        "in"
+      ]
+    },
+    {
+      "out":[
+        "0x1d269bfb610",
+        "out"
+      ],
+      "in":[
+        "0x1d269a2c6d0",
+        "in"
+      ]
+    }
+  ]
+}

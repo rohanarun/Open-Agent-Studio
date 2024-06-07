@@ -1,0 +1,362 @@
+{
+  "graph":{
+    "acyclic":false,
+    "pipe_collision":false
+  },
+  "nodes":{
+    "0x207dc16e8c0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Start Node 0",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -44.98667980671411,
+        -401.7868006103764
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Initial Program":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://www.linkedin.com/search/results/people/?network=%5B%22F%22%5D&origin=FACETED_SEARCH&sid=m*x&titleFreeText=CEO",
+        "Copy This To Intial Program To Open Chrome":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://cheatlayer.com",
+        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe https://cheatlayer.com\"}"
+      }
+    },
+    "0x207df919090":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Magic Scraper 1",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -304.9866798067141,
+        -259.3868006103765
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Target In English":"the top 3 links of CEO profiles",
+        "Automation Input":"",
+        "Scrape Browser":"Links",
+        "Data":"{\"type\": \"SemanticDescribe\", \"semanticTarget\": \"caption\"}"
+      }
+    },
+    "0x207df91aad0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Open Program 2",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -44.98667980671411,
+        -259.38680061037644
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "program":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe ",
+        "arguments":"",
+        "Automated Input":"",
+        "Automated Lists":"Links1",
+        "Data":"{\"type\": \"Open\"}"
+      }
+    },
+    "0x207df91baf0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Scroll 3",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -304.9866798067141,
+        -116.9868006103764
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Distance":"-500",
+        "Data":"{\"type\": \"scroll\"}"
+      }
+    },
+    "0x207dbf06b30":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Magic Scraper 5",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -44.98667980671411,
+        -116.9868006103764
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Target In English":"The highlights in the highlights section of the linkedin profile",
+        "Automation Input":"",
+        "Scrape Browser":"",
+        "Data":"{\"type\": \"SemanticDescribe\", \"semanticTarget\": \"caption\"}"
+      }
+    },
+    "0x207dc119000":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Google Sheets 6",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -304.9866798067141,
+        25.413199389623628
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "URL":"https://docs.google.com/spreadsheets/d/11TfCzQllwA3pd91c7XVB0ZGtgbD0EyI9IimDrjUEAsk/edit#gid=0",
+        "key":"662e48ea91cf12506c348eab",
+        "sheet name":"Sheet1",
+        "Row 1":"Magic Scraper Output5",
+        "Row 2":"",
+        "Row 3":"",
+        "Row 4":"",
+        "Row 5":"",
+        "Row 6":"",
+        "Row 7":"",
+        "Row 8":"",
+        "Row 9":"",
+        "Row 10":"",
+        "Data":"{\"type\": \"Gsheets\"}"
+      }
+    },
+    "0x207dc16c5e0":{
+      "type_":"nodes.widget.ImageNode",
+      "icon":"Click.png",
+      "name":"CLICK 8",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":219.0,
+      "height":173.05,
+      "pos":[
+        14.013320193285892,
+        25.413199389623628
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "my_input":"text",
+        "Automation Input":"",
+        "X":62,
+        "Y":657,
+        "Click Type":"Single Left Click",
+        "Mode":"All",
+        "semanticTarget":"Link with text that says \"see more\" in the about section at the end on the right. ",
+        "Data":"{\"type\": \"Left Mouse Click\", \"semanticTarget\": \"Empty beige sidebar on the left.\", \"x\": 62, \"y\": 657}"
+      }
+    }
+  },
+  "connections":[
+    {
+      "out":[
+        "0x207dc16e8c0",
+        "out A"
+      ],
+      "in":[
+        "0x207df919090",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x207df919090",
+        "out A"
+      ],
+      "in":[
+        "0x207df91aad0",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x207df91aad0",
+        "out A"
+      ],
+      "in":[
+        "0x207df91baf0",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x207df91baf0",
+        "out A"
+      ],
+      "in":[
+        "0x207dbf06b30",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x207dbf06b30",
+        "out A"
+      ],
+      "in":[
+        "0x207dc119000",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x207dc119000",
+        "out A"
+      ],
+      "in":[
+        "0x207dc16c5e0",
+        "in"
+      ]
+    }
+  ]
+}

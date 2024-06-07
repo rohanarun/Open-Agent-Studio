@@ -1,0 +1,205 @@
+{
+  "graph":{
+    "acyclic":false,
+    "pipe_collision":false
+  },
+  "nodes":{
+    "0x26d4d9e65c0":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
+      "name":"Start Node 0",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -37.336215666327575,
+        -355.46070701932854
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Initial Program":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://x.com/sama/status/1776083954786836979",
+        "Copy This To Intial Program To Open Chrome":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://x.com/sama/status/1776083954786836979",
+        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe https://cheatlayer.com\"}"
+      }
+    },
+    "0x26d5130df30":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"Magic Scraper 1",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":true,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -297.3362156663276,
+        -212.0546032553407
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Target In English":"The text of the top tweet on the page",
+        "Automation Input":"",
+        "Scrape Browser":"",
+        "Data":"{\"type\": \"SemanticDescribe\", \"semanticTarget\": \"caption\"}"
+      }
+    },
+    "0x26d5130ff70":{
+      "type_":"nodes.widget.ImageNode",
+      "icon":"Click.png",
+      "name":"CLICK 2",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":219.0,
+      "height":173.05,
+      "pos":[
+        21.663784333672425,
+        -213.06070701932853
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "my_input":"text",
+        "Automation Input":"",
+        "X":728,
+        "Y":454,
+        "Click Type":"Single Left Click",
+        "Mode":"All",
+        "semanticTarget":"Text input that says post your reply",
+        "Data":"{\"type\": \"Left Mouse Click\", \"semanticTarget\": \"\\\"Post your reply\\\" text box.\", \"x\": 728, \"y\": 454}"
+      }
+    },
+    "0x26d5130ed40":{
+      "type_":"nodes.basic.BasicNodeA",
+      "icon":null,
+      "name":"GPT4 3",
+      "color":[
+        240,
+        240,
+        240,
+        255
+      ],
+      "border_color":[
+        74,
+        84,
+        85,
+        255
+      ],
+      "text_color":[
+        0,
+        0,
+        0,
+        255
+      ],
+      "disabled":false,
+      "selected":false,
+      "visible":true,
+      "width":160,
+      "height":71.2,
+      "pos":[
+        -264.1347914547305,
+        5.7311546286877615
+      ],
+      "port_deletion_allowed":false,
+      "subgraph_session":{},
+      "custom":{
+        "Automation Input":"Magic Scraper Output1",
+        "input":"generate a funny reply to the tweet",
+        "Webhook Input":"none",
+        "Tracking Tag":"None",
+        "type output":"true",
+        "Data":"{\"type\": \"GPT4\"}"
+      }
+    }
+  },
+  "connections":[
+    {
+      "out":[
+        "0x26d4d9e65c0",
+        "out A"
+      ],
+      "in":[
+        "0x26d5130df30",
+        "in A"
+      ]
+    },
+    {
+      "out":[
+        "0x26d5130df30",
+        "out A"
+      ],
+      "in":[
+        "0x26d5130ff70",
+        "in"
+      ]
+    },
+    {
+      "out":[
+        "0x26d5130ff70",
+        "out"
+      ],
+      "in":[
+        "0x26d5130ed40",
+        "in A"
+      ]
+    }
+  ]
+}
