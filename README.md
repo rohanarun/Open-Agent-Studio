@@ -64,50 +64,6 @@ Then select the option "Run anyway"
 
 Then, follow this quick start guide to dive deeper into Cheat Layer Desktop:
 
+Update:
+Epic breakthrough! We just cracked unlimited agents and executions!
 
-### Minimum Requirements
-Windows 11
-
-i5 Intel CPU (llama.cpp does not support ARM cpus currently, but you may be able to compile the dll yourself for Surface laptops)
-
-8 GB RAM
-
-Python 3.10
-
-OSX 
-
-Mac M1 CPU
-
-Mac Intel CPU
-
-8 GB RAM
-
-Python 3.10
-
-Chrome Extension Installed Locally in new Chrome Profile
-
-100% Display Scale
-
-Cheat Layer Desktop requires users to keep the display scaling set to 100%. 
-
-### Single Monitors and Resolution
-We currently only support single monitor agents, but in the future we can train multi-monitor agents. Please ensure you use one monitor and the same resolution the agent creator uses for publishes agents. 
-## Mac Instructions
-[![Mac Install Instructions](https://img.youtube.com/vi/fnAvP2s_2rk/0.jpg)](https://www.youtube.com/watch?v=fnAvP2s_2rk)
-
-Go to System Preferences > Security & Privacy.
-
-Click the Privacy tab.
-
-Scroll through the list on the left to find Full Disk Access or Files and Folders. 
-
-Click the lock icon at the bottom left to make changes (you may need to enter your administrator password).
-
-Check if terminal and cheatlayeror a related process is listed and has a checkmark next to it. If not, you can add it by clicking the plus sign (+) and navigating to the application in your Applications folder.
-
-Add "terminal" to the "accessibility" and "screen recording" lists.
-
-Then click the "General" tab, and click run apps from the App Store and approved developers. 
-
-## Citations
-We forked the https://github.com/jchanvfx/NodeGraphQt framework for the UI. 
