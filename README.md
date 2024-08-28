@@ -72,7 +72,7 @@ Epic breakthrough! We just cracked unlimited agents and executions!
 
 Currently we still need to open source the backend and Chrome Extension to be able to run everything locally, but if you are interested in contributing please email me at rohan@cheatlayer.com and I can get you set up with free access while we work on publishing everything. 
 
-We need help with evals for generalized stretch goals to push the limits of the state machine and Loom video to agents, and to improve the testing loop. We strongly believe the testing loop to be the path to the 'holy grail'. 
+We need help with evals for generalized stretch goals to push the limits of the state machine and Loom video to agents, and to improve the testing loop. We strongly believe the testing loop to be the path to the 'holy grail' for open-ended generalized tasks. 
 
 Road Map:
 1) Open agent cloud
