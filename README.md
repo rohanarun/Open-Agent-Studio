@@ -14,6 +14,9 @@ In a future where the AI in your pocket can generate custom, secure, and free ve
 
 This is an older public version of our internal private repo which will be updated in the coming days with the latest updates to Open Agent Studio 7.0.0 whch can be downloaded at openagent.studio now. 
 
+[![Bootcamp Season 4 Class 1](https://img.youtube.com/vi/vyfxtovnB7Q/0.jpg)](https://www.youtube.com/watch?v=vyfxtovnB7Q)
+
+
 ## Agentic Process Automation
 ![Generalized Agents framework](https://storage.googleapis.com/cheatlayer/agent.png)
 
