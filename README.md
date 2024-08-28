@@ -67,3 +67,11 @@ Then, follow this quick start guide to dive deeper into Cheat Layer Desktop:
 Update:
 Epic breakthrough! We just cracked unlimited agents and executions!
 
+
+### Contributions:
+
+Currently we still need to open source the backend and Chrome Extension to be able to run everything locally, but if you are interested in contributing please email me at rohan@cheatlayer.com and I can get you set up with free access while we work on publishing everything. 
+
+We need help with Evals for generalized stretch goals to push the limits of the state machine and Loom video to agents, and to improve the testing loop. We strongly believe the testing loop to be the path to the 'holy grail'. 
+
+Thansk!
