@@ -18,6 +18,7 @@ This is an older public version of our internal private repo which will be updat
 
 ## Agentic Process Automation
 ![Generalized Agents framework](https://storage.googleapis.com/cheatlayer/agent.png)
+![image](https://github.com/user-attachments/assets/ff792176-c3cc-41df-bbaf-8728e7520540)
 
 
 ### Semantic Targets
