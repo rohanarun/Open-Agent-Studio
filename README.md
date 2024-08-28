@@ -78,6 +78,6 @@ Road Map:
 1) Open agent cloud
 2) Loom video to agent in Open Agent Cloud
 3) Evals for generalized agents
-4) Improve testing loop to reach general AI with this same scaffolding on the shoulders of the next generations of models.
+4) Improve testing loop to reach generalized agents with this same scaffolding on the shoulders of the next generations of models.
 
 Thansk!
