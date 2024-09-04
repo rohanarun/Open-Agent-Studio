@@ -84,14 +84,3 @@ Road Map:
 4) Improve testing loop to reach generalized agents with this same scaffolding on the shoulders of the next generations of models.
 
 Thansk!
-Bootcamp Season 4 Class 1:
-
-[![Bootcamp Season 4 Class 1](https://img.youtube.com/vi/vyfxtovnB7Q/0.jpg)](https://www.youtube.com/watch?v=vyfxtovnB7Q)
-
-Bootcamp Season 4 Class 2:
-
-[![Bootcamp Season 4 Class 1](https://img.youtube.com/vi/hs1syZNCEjM/0.jpg)](https://www.youtube.com/watch?v=hs1syZNCEjM)
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=rohanarun/Open-Agent-Studio&type=Date)](https://star-history.com/#rohanarun/Open-Agent-Studio&Date)
