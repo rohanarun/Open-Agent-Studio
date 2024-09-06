@@ -84,3 +84,6 @@ Road Map:
 4) Improve testing loop to reach generalized agents with this same scaffolding on the shoulders of the next generations of models.
 
 Thansk!
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=rohanarun/Open-Agent-Studio&type=Date)](https://star-history.com/#rohanarun/Open-Agent-Studio&Date)
