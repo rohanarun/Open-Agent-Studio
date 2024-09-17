@@ -1,4 +1,4 @@
-# Open Agent Studio
+# Open Agent Studio - Open Source UIPath RPA Alternative Using Modern Semantic Targets
 
 Open Agent Studio is the first cross platform desktop application built to enable Agentic Process Automation as an open-source alternative and replacement for UIpath and all other RPA tools today. 
 
