@@ -232,10 +232,7 @@ Best Practices
 By following this documentation, you can create sophisticated automated agents capable of handling a wide range of tasks across multiple platforms and services. The Agents API provides a flexible and powerful framework for defining complex sequences of actions, data processing, and integrations.
 
 
----
-title: 'No-Code Actions'
-description: 'Open Agent Studio No-Code Actions'
----
+## No-Code Actions
 
 This documentation details Open Agent Studio's no-code actions, designed to build powerful desktop automations without writing code. Each action is described along with its input parameters and an example use case.
 
