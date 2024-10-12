@@ -34,10 +34,7 @@ Semantic targets can be dynamic or robust based on how strict the language is.
 ### Reasoning Based Targets
 ![Reasoning Based Targets](https://storage.googleapis.com/cheatlayer/reasoning.png)  
 
----
-title: 'Agents API'
-description: 'Trigger agents from other services using a simple JSON API that returns results'
----
+## Agents API
 The Agents API now runs on every Open Agent Studio instance. An easy way to test this is to run Ngrok locally, or use Open Agent Studio which publishes a public IP address you can use as your personal Agents API. 
 ![Agents API](https://storage.googleapis.com/cheatlayer/agents_api.png)
 It even returns all the saved agent data during the automation, plus the verification testing loop steps we use to verify each action. 
