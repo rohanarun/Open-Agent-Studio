@@ -1,346 +1,374 @@
-{
-  "graph":{
-    "acyclic":false,
-    "pipe_collision":false
-  },
-  "nodes":{
-    "0x22590156860":{
-      "type_":"nodes.basic.BasicNodeA",
-      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
-      "name":"Start Node 0",
-      "color":[
-        13,
-        18,
-        23,
-        255
-      ],
-      "border_color":[
-        74,
-        84,
-        85,
-        255
-      ],
-      "text_color":[
-        255,
-        255,
-        255,
-        180
-      ],
-      "disabled":false,
-      "selected":false,
-      "visible":true,
-      "width":160,
-      "height":71.2,
-      "pos":[
-        0.0,
-        0.0
-      ],
-      "port_deletion_allowed":false,
-      "subgraph_session":{},
-      "custom":{
-        "Initial Program":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe https://www.tiktok.com/upload?lang=en",
-        "Data":"{\"type\": \"Start Node\", \"x\": 0, \"y\": 0, \"Application\": \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe https://www.tiktok.com/upload?lang=en\"}"
-      }
-    },
-    "0x225965c57e0":{
-      "type_":"nodes.basic.BasicNodeA",
-      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
-      "name":"Bash Commands 1",
-      "color":[
-        13,
-        18,
-        23,
-        255
-      ],
-      "border_color":[
-        74,
-        84,
-        85,
-        255
-      ],
-      "text_color":[
-        255,
-        255,
-        255,
-        180
-      ],
-      "disabled":false,
-      "selected":false,
-      "visible":true,
-      "width":160,
-      "height":71.2,
-      "pos":[
-        862.592907635407,
-        -344.497736815806
-      ],
-      "port_deletion_allowed":false,
-      "subgraph_session":{},
-      "custom":{
-        "code":" \npip3 install opencv-python-headless\npip3 install numpy\npip3 install requests\npip3 install pyttsx3\npip3 install moviepy\n\n\n",
-        "Data":"{\"type\": \"bash\", \"code\": \" \\npip3 install --upgrade --force-reinstall \\\"git+https://github.com/yt-dlp/yt-dlp.git\\\"\\n\\n\\n\"}"
-      }
-    },
-    "0x225965c6590":{
-      "type_":"nodes.basic.BasicNodeA",
-      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
-      "name":"Python Code 2",
-      "color":[
-        13,
-        18,
-        23,
-        255
-      ],
-      "border_color":[
-        74,
-        84,
-        85,
-        255
-      ],
-      "text_color":[
-        255,
-        255,
-        255,
-        180
-      ],
-      "disabled":false,
-      "selected":true,
-      "visible":true,
-      "width":160,
-      "height":71.2,
-      "pos":[
-        1165.4016450938143,
-        -298.85647154256054
-      ],
-      "port_deletion_allowed":false,
-      "subgraph_session":{},
-      "custom":{
-        "prompt":"{{prompt}}",
-        "voiceover":"{{voiceover}}",
-        "code":"import cv2\nimport numpy as np\nimport requests\nimport pyttsx3\nfrom PIL import ImageFont, ImageDraw, Image\nfrom moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip\n\ndef download_file(url, filename):\n    response = requests.get(url)\n    with open(filename, 'wb') as f:\n        f.write(response.content)\n\n# Generate synthetic video\nsynthetic_video_url = genSyntheticVideo({{prompt}})\nsynthetic_video_filename = 'synthetic.mp4'\ndownload_file(synthetic_video_url, synthetic_video_filename)\n\n# Generate voiceover text using GPT-3\nvoiceover_text = gpt3Prompt(\"generate a voiceover for a video with the given description. Do not describe the music or direction and only generate the voiceover text directly as the person would say without any explanations\", {{voiceover}}) \n\n\n\n# Generate voice from the text\nvoiceover_filename = 'voiceover.mp3'\ngenVoice(voiceover_text, voiceover_filename)\n\n# Load synthetic video and voiceover\nvideo_clip = VideoFileClip(synthetic_video_filename).loop(duration=AudioFileClip(voiceover_filename).duration)\naudio_clip = AudioFileClip(voiceover_filename)\n\n# Composite video and audio\nfinal_clip = CompositeVideoClip([video_clip.set_audio(audio_clip)])\nfinal_clip.write_videofile( '_.mp4', codec='libx264', audio_codec='aac')\n\n\n\n\n",
-        "Data":"{\"type\": \"python\", \"code\": \" \\ngenSyntheticVideo(\\\"AI automation\\\")\\n\"}"
-      }
-    },
-    "0x225965c6aa0":{
-      "type_":"nodes.basic.BasicNodeA",
-      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Keypress.png",
-      "name":"Keypress 4",
-      "color":[
-        13,
-        18,
-        23,
-        255
-      ],
-      "border_color":[
-        74,
-        84,
-        85,
-        255
-      ],
-      "text_color":[
-        255,
-        255,
-        255,
-        180
-      ],
-      "disabled":false,
-      "selected":false,
-      "visible":true,
-      "width":160,
-      "height":71.2,
-      "pos":[
-        -150.10453000546624,
-        -69.95928441629007
-      ],
-      "port_deletion_allowed":false,
-      "subgraph_session":{},
-      "custom":{
-        "String":"_.mp4",
-        "Saved Values":"None",
-        "Type":"Keypress",
-        "Data":"{\"type\": \"keypress_manual\"}"
-      }
-    },
-    "0x225965c6d10":{
-      "type_":"nodes.basic.BasicNodeA",
-      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Keypress.png",
-      "name":"Keypress 5",
-      "color":[
-        13,
-        18,
-        23,
-        255
-      ],
-      "border_color":[
-        74,
-        84,
-        85,
-        255
-      ],
-      "text_color":[
-        255,
-        255,
-        255,
-        180
-      ],
-      "disabled":false,
-      "selected":false,
-      "visible":true,
-      "width":160,
-      "height":71.2,
-      "pos":[
-        283.05096426943555,
-        26.692260681795705
-      ],
-      "port_deletion_allowed":false,
-      "subgraph_session":{},
-      "custom":{
-        "String":"return",
-        "Saved Values":"None",
-        "Type":"Keypress",
-        "Data":"{\"type\": \"keypress_manual\"}"
-      }
-    },
-    "0x225965c7070":{
-      "type_":"nodes.basic.BasicNodeA",
-      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Move.png",
-      "name":"Delay 19",
-      "color":[
-        13,
-        18,
-        23,
-        255
-      ],
-      "border_color":[
-        74,
-        84,
-        85,
-        255
-      ],
-      "text_color":[
-        255,
-        255,
-        255,
-        180
-      ],
-      "disabled":false,
-      "selected":false,
-      "visible":true,
-      "width":160,
-      "height":71.2,
-      "pos":[
-        396.26160709283346,
-        -336.4126033182756
-      ],
-      "port_deletion_allowed":false,
-      "subgraph_session":{},
-      "custom":{
-        "seconds":"10",
-        "Data":"{\"type\": \"Delay\"}"
-      }
-    },
-    "0x225965c7430":{
-      "type_":"nodes.basic.BasicNodeA",
-      "icon":"c:\\Users\\Public\\cheatlayer\\examples\\Click.png",
-      "name":"CLICK 20",
-      "color":[
-        13,
-        18,
-        23,
-        255
-      ],
-      "border_color":[
-        74,
-        84,
-        85,
-        255
-      ],
-      "text_color":[
-        255,
-        255,
-        255,
-        180
-      ],
-      "disabled":false,
-      "selected":false,
-      "visible":true,
-      "width":160,
-      "height":71.2,
-      "pos":[
-        630.597065589791,
-        -331.1831156212735
-      ],
-      "port_deletion_allowed":false,
-      "subgraph_session":{},
-      "custom":{
-        "X":1114,
-        "Y":733,
-        "semanticTarget":"Red button with \"Select file\" text.",
-        "Mode":"All",
-        "Type":"Click",
-        "Data":"{\"type\": \"Left Mouse Click\", \"semanticTarget\": \"Red button with \\\"Select file\\\" text.\", \"x\": 1114, \"y\": 733}"
-      }
-    }
-  },
-  "connections":[
-    {
-      "out":[
-        "0x22590156860",
-        "out A"
-      ],
-      "in":[
-        "0x225965c7070",
-        "in A"
-      ]
-    },
-    {
-      "in":[
-        "0x225965c57e0",
-        "in A"
-      ],
-      "out":[
-        "0x225965c7430",
-        "out A"
-      ]
-    },
-    {
-      "out":[
-        "0x225965c57e0",
-        "out A"
-      ],
-      "in":[
-        "0x225965c6590",
-        "in A"
-      ]
-    },
-    {
-      "out":[
-        "0x225965c6590",
-        "out A"
-      ],
-      "in":[
-        "0x225965c6aa0",
-        "in A"
-      ]
-    },
-    {
-      "out":[
-        "0x225965c6aa0",
-        "out A"
-      ],
-      "in":[
-        "0x225965c6d10",
-        "in A"
-      ]
-    },
-    {
-      "out":[
-        "0x225965c7070",
-        "out A"
-      ],
-      "in":[
-        "0x225965c7430",
-        "in A"
-      ]
-    }
-  ]
-}
+import yt_dlp
+import os
+import subprocess
+from gtts import gTTS
+from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_audioclips, CompositeAudioClip, concatenate_videoclips
+from PySide2.QtWidgets import QProgressDialog, QApplication
+from PySide2.QtCore import Qt
+import random
+import time
+import urllib.request
+from tiktok_uploader.upload import upload_video
+from youtubesearchpython import VideosSearch
+import sys
+import math
+import speech_recognition as sr
+
+os.environ["IMAGEMAGICK_BINARY"] = "magick"
+
+def download_tiktok_video(url, save_path="tiktok_video.mp4"):
+    try:
+        ydl_opts = {
+            'outtmpl': save_path,
+            'overwrites': True,
+            'verbose': True,
+            'format': 'best',
+            'cookiesfrombrowser': ('chrome',),
+            'extract_flat': False,
+            'cachedir': False,
+            'cookiefile': 'youtube.txt',
+            'geo_bypass': True,
+            'noplaylist': True,
+            'extractor_args': {
+              'youtube': {
+                'player_client': ['web']
+              }
+            },
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0',
+            },
+            'socket_timeout': 15,
+            'retries': 3,
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+        print(f"Video saved as {save_path}")
+    except Exception as e:
+        print(f"Error downloading video: {str(e)}")
+        raise
+
+def extract_audio_to_text(video_path):
+    try:
+        wav_path = "temp_audio.wav"
+        command = [
+            "ffmpeg",
+            "-i", video_path,
+            "-vn",
+            "-acodec", "pcm_s16le",
+            "-ar", "16000",
+            "-ac", "1",
+            wav_path,
+            '-y'
+        ]
+        subprocess.run(command, check=True)
+
+        recognizer = sr.Recognizer()
+        with sr.AudioFile(wav_path) as source:
+            # Adjust recognition settings
+            recognizer.energy_threshold = 300
+            recognizer.dynamic_energy_threshold = True
+            recognizer.adjust_for_ambient_noise(source)
+            audio = recognizer.record(source)
+            
+        # Try multiple recognition services
+        text = ""
+        try:
+            text = recognizer.recognize_google(audio)
+        except:
+            try:
+                text = recognizer.recognize_sphinx(audio)
+            except:
+                print("Failed to recognize speech")
+        
+        os.remove(wav_path)
+        print(f"Extracted text: {text}")
+        return text
+    except Exception as e:
+        print(f"Error in speech recognition: {str(e)}")
+        return ""
+
+def generate_voiceover(text, audio_path="voiceover.mp3"):
+    try:
+        if not text or not text.strip():
+            raise ValueError("Empty text provided for voiceover")
+
+        print(f"Generating voiceover at: {audio_path}")
+        tts = gTTS(text=text, lang='en')
+        tts.save(audio_path)
+
+        if not os.path.exists(audio_path):
+            raise FileNotFoundError(f"Failed to create voiceover file at {audio_path}")
+
+        audio = AudioFileClip(audio_path)
+        duration = audio.duration
+        audio.close()
+
+        print(f"Voiceover generated successfully, duration: {duration}")
+        return duration
+
+    except Exception as e:
+        print(f"Error generating voiceover: {str(e)}")
+        raise
+
+def create_subtitle_file(text, start_time, duration, subtitle_path="subtitles.srt", original_subtitles=""):
+    try:
+        sentences = text.split(". ")
+        time_per_sentence = duration / len(sentences) if sentences else duration
+        
+        subtitle_content = ""
+        counter = 1
+
+        # Add original video subtitles first (if any)
+        if original_subtitles:
+            orig_sentences = original_subtitles.split(". ")
+            orig_time_per_sentence = min(30, duration) / len(orig_sentences) if orig_sentences else 30
+            
+            for i, sentence in enumerate(orig_sentences):
+                if not sentence.strip():
+                    continue
+                    
+                sentence_start = i * orig_time_per_sentence
+                sentence_end = (i + 1) * orig_time_per_sentence
+                
+                if sentence_end > 30:  # Limit original subtitles to first 30 seconds
+                    break
+                
+                start_str = f"{int(sentence_start//3600):02d}:{int((sentence_start%3600)//60):02d}:{int(sentence_start%60):02d},{int((sentence_start*1000)%1000):03d}"
+                end_str = f"{int(sentence_end//3600):02d}:{int((sentence_end%3600)//60):02d}:{int(sentence_end%60):02d},{int((sentence_end*1000)%1000):03d}"
+                
+                subtitle_content += f"{counter}\n{start_str} --> {end_str}\n{sentence.strip()}\n\n"
+                counter += 1
+
+        # Add voiceover subtitles
+        for i, sentence in enumerate(sentences):
+            if not sentence.strip():
+                continue
+                
+            sentence_start = start_time + (i * time_per_sentence)
+            sentence_end = start_time + ((i + 1) * time_per_sentence)
+            
+            start_str = f"{int(sentence_start//3600):02d}:{int((sentence_start%3600)//60):02d}:{int(sentence_start%60):02d},{int((sentence_start*1000)%1000):03d}"
+            end_str = f"{int(sentence_end//3600):02d}:{int((sentence_end%3600)//60):02d}:{int(sentence_end%60):02d},{int((sentence_end*1000)%1000):03d}"
+            
+            subtitle_content += f"{counter}\n{start_str} --> {end_str}\n{sentence.strip()}\n\n"
+            counter += 1
+        
+        with open(subtitle_path, "w", encoding='utf-8') as f:
+            f.write(subtitle_content)
+            
+        print(f"Subtitles created successfully at {subtitle_path}")
+    except Exception as e:
+        print(f"Error creating subtitles: {str(e)}")
+        raise
+
+def combine_video_audio_subtitles(video_path, audio_path, subtitle_path, output_path="_.mp4"):
+    try:
+        print(f"Checking files before processing:")
+        print(f"Video path exists: {os.path.exists(video_path)}")
+        print(f"Audio path exists: {os.path.exists(audio_path)}")
+        print(f"Subtitle path exists: {os.path.exists(subtitle_path)}")
+        
+        if not all(os.path.exists(p) for p in [video_path, audio_path, subtitle_path]):
+            raise FileNotFoundError("One or more required files not found")
+
+        video = VideoFileClip(video_path)
+        total_duration = video.duration
+        
+        if total_duration < 30:
+            raise Exception("Video is shorter than 30 seconds")
+            
+        max_start = total_duration - 30
+        start_time = random.uniform(0, max_start)
+        end_time = start_time + 30
+        
+        video_segment = video.subclip(start_time, end_time)
+        video_segment.write_videofile("temp_segment.mp4", codec="libx264")
+        
+        command_extract = [
+            "ffmpeg",
+            "-i", "temp_segment.mp4",
+            "-vn",
+            "-acodec", "aac",
+            "-b:a", "192k",
+            "original_audio.aac",
+            '-y'
+        ]
+        subprocess.run(command_extract, check=True)
+        
+        audio = AudioFileClip(audio_path)
+        original_audio = AudioFileClip("original_audio.aac")
+        
+        first_part = original_audio.subclip(0, min(30, original_audio.duration))
+        original_audio_lowered = original_audio.volumex(0.3)
+        
+        if original_audio_lowered.duration < audio.duration:
+            num_loops = math.ceil(audio.duration / original_audio_lowered.duration)
+            original_audio_lowered = original_audio_lowered.loop(n=num_loops)
+        
+        original_audio_lowered = original_audio_lowered.subclip(0, audio.duration)
+        
+        second_part = CompositeAudioClip([audio, original_audio_lowered])
+        final_audio = concatenate_audioclips([first_part, second_part])
+        final_duration = final_audio.duration
+        
+        final_audio.write_audiofile("combined_audio.mp3")
+        
+        audio.close()
+        original_audio.close()
+        original_audio_lowered.close()
+        final_audio.close()
+        
+        num_loops = math.ceil(final_duration / 30)
+        looped_clips = [video_segment] * num_loops
+        looped_video = concatenate_videoclips(looped_clips)
+        looped_video = looped_video.subclip(0, final_duration)
+        
+        temp_video_path = "temp_video.mp4"
+        looped_video.write_videofile(temp_video_path, codec="libx264")
+        
+        video.close()
+        video_segment.close()
+        looped_video.close()
+
+        # Updated filter_complex with centered subtitles and outline
+        filter_complex = (
+            f"subtitles={subtitle_path}"
+            ":force_style='"
+            "FontSize=24,"
+            "Alignment=10,"  # Center alignment
+            "PrimaryColour=&HFFFFFF,"  # White text
+            "OutlineColour=&H000000,"  # Black outline
+            "BorderStyle=3,"  # Outline border style
+            "Outline=2,"  # Outline width
+            "Shadow=0,"  # No shadow
+            "MarginV=10"  # Vertical margin from bottom
+            "'"
+        )
+        
+        command = [
+            "ffmpeg",
+            "-i", temp_video_path,
+            "-i", "combined_audio.mp3",
+            "-vf", filter_complex,
+            "-c:v", "libx264",
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-strict", "-2",
+            "-shortest",
+            output_path,
+            '-y'
+        ]
+        subprocess.run(command, check=True)
+        
+        # Cleanup
+        for file in ["temp_video.mp4", "temp_segment.mp4", "original_audio.aac", "combined_audio.mp3"]:
+            if os.path.exists(file):
+                os.remove(file)
+                
+    except Exception as e:
+        print(f"Error in combine_video_audio_subtitles: {str(e)}")
+        raise
+
+def remove_non_bmp_characters(text):
+    return ''.join(c for c in text if ord(c) <= 0xFFFF)
+
+def process_with_progress(video_url, text, caption):
+    progress = QProgressDialog("Processing Video...", "Cancel", 0, 100)
+    progress.setWindowModality(Qt.WindowModal)
+    progress.setWindowTitle("Video Processing")
+    progress.setMinimumDuration(0)
+    progress.setAutoClose(True)
+    progress.setAutoReset(False)
+    progress.show()
+
+    try:
+        progress.setLabelText("Downloading video...")
+        progress.setValue(0)
+        download_tiktok_video(video_url, "repurpose.mp4")
+        progress.setValue(15)
+
+        if progress.wasCanceled():
+            return
+
+        progress.setLabelText("Extracting original audio...")
+        original_text = extract_audio_to_text("repurpose.mp4")
+        progress.setValue(30)
+
+        if progress.wasCanceled():
+            return
+
+        progress.setLabelText("Generating voiceover...")
+        voiceover_path = os.path.abspath("voiceover.mp3")
+        print(f"Generating voiceover at: {voiceover_path}")
+        
+        audio_duration = generate_voiceover(text, voiceover_path)
+        
+        if not os.path.exists(voiceover_path):
+            raise FileNotFoundError(f"Voiceover file not found at {voiceover_path}")
+            
+        progress.setValue(50)
+
+        if progress.wasCanceled():
+            return
+
+        progress.setLabelText("Creating subtitles...")
+        subtitle_path = "subtitles.srt"
+        create_subtitle_file(text, 30, audio_duration, subtitle_path, original_text)
+        progress.setValue(70)
+
+        if progress.wasCanceled():
+            return
+
+        progress.setLabelText("Combining video, audio, and subtitles...")
+        combine_video_audio_subtitles("repurpose.mp4", voiceover_path, subtitle_path, "_.mp4")
+        progress.setValue(85)
+
+        if progress.wasCanceled():
+            return
+
+        progress.setLabelText("Waiting before upload...")
+        sleep_time = random.uniform(300, 920)
+        
+        steps = int(sleep_time)
+        for i in range(steps):
+            current_progress = 85 + (i * 15 // steps)
+            progress.setValue(current_progress)
+            progress.setLabelText(f"Waiting before upload... {int((sleep_time-i)/60)} minutes remaining")
+            time.sleep(1)
+            if progress.wasCanceled():
+                return
+
+        progress.setLabelText("Uploading video...")
+        upload_video("_.mp4", description=caption, cookies="/path/to/your/cookies.txt")
+        progress.setValue(100)
+
+    except Exception as e:
+        print(f"Error in process_with_progress: {str(e)}")
+        progress.cancel()
+        raise e
+    finally:
+        for file in [voiceover_path, subtitle_path, "repurpose.mp4", "_.mp4"]:
+            try:
+                if os.path.exists(file):
+                    os.remove(file)
+            except Exception as e:
+                print(f"Error cleaning up {file}: {str(e)}")
+
+def main(agent_memory):
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication([])
+
+    videos_search = VideosSearch(agent_memory["GPT47"][:20], limit=100)
+    result = videos_search.result()
+    video_urls = [video['link'] for video in result['result']]
+
+    if video_urls:
+        video_url = random.choice(video_urls)
+        caption = remove_non_bmp_characters(agent_memory["GPT415"])
+        process_with_progress(video_url, agent_memory["GPT47"], caption)
+    else:
+        print("No videos found.")
+
+if __name__ == "__main__":
+    main(agent_memory)
