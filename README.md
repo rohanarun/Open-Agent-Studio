@@ -25,7 +25,7 @@ This is an older public version of our internal private repo which will be updat
 
 ### Semantic Targets
 
-We were the first startup to invent the idea of "semantic targets" using LLMs before ChatGPT was launched and many agent startups that claim to invent this idea. Semantic targets and agentic process automation was a concept we introduced to replace brittle code selectors in 2022. You can see the code for semantic targets in this repo starting  2 years ago, and were approved by openAI to sell GPT-3 for autoamtion as the first startup in 2021. 
+We were the first startup to invent the idea of "semantic targets" using LLMs before ChatGPT was launched. Semantic targets and agentic process automation was a concept we introduced to replace brittle code selectors and computer vision in 2022. You can see the code for semantic targets in this repo starting  2 years ago, and were approved by openAI to sell GPT-3 for autoamtion as the first startup in 2021. 
 
 Semantic targets distils the underlying intent of a target to english, so they still work even if services completely change their designs. This enables building robust, future-proof, agents. 
 
