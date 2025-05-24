@@ -2290,7 +2290,7 @@ def UImodel(image_path):
     import requests
     # Run inference on an image
     url = "https://api.ultralytics.com/v1/predict/kVhczpBn9wqjExiUOYBU"
-    headers = {"x-api-key": "8bbb078acd811a4e092adeca938400db04f2e9b062"}
+    headers = {"x-api-key": "ULTRALYTICSKEY"}
     data = {"size": 640, "confidence": 0.01, "iou": 0.2}
     results_out = []
     with open(image_path, "rb") as f:
