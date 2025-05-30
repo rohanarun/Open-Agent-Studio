@@ -12,7 +12,9 @@ Businesses today are threatening to fire employees and replace them with AI. We 
 
 In a future where the AI in your pocket can generate custom, secure, and free versions of all the most expensive business software, we believe there'll be a level playing field that removes the barrier to build these businesses. More small businesses will build competitive brands through personal relationships, better quality service, and network effects through unique data. We invite you to join us in building this future together faster.
 
-Windows Install instructions:
+## Windows Install instructions:
+
+
 [![Windows Install Instructions!](https://img.youtube.com/vi/gsU5033ms5k/0.jpg)](https://www.youtube.com/watch?v=8xhFKkD4H-0)
 
 
