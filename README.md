@@ -2,11 +2,12 @@
 
 Open Agent Studio is the first cross platform desktop application built to enable Agentic Process Automation as an open-source alternative and replacement for UIpath and all other RPA tools today. 
 
-Download for Windows and Mac at https://cheatlayer.com .
+Exectuable for linux: https://toy.new/main.zip
+Built executable for Windows: https://toy.new/cheatlayer.zip
 
 We founded Cheat Layer during the pandemic to help people who had lost their jobs and businesses rebuild online using GPT-3. We personally helped hundreds pro bono before turning to AI for help.
 
-In August 2021, we were the first startup to get approved by openAI to sell GPT-3 for automation. 
+In August 2021, we were the first startup to get approved by openAI to sell GPT-3 for automation. We invtented the "Semantic targets" algorithm years before the chatGPT launch to solve brittle code selectors and computer vision targets using our own multimodal model Atlas-2. Today, modern models are cheaper and faster and we no longer need this, but before GPT-4 we had to train it first since none other existed. We reached SOTA 97% accuracy with our targeting algorithm for clicks in our UI element dataset that includes synthetic and real data across PC and mobile phones. 
 
 Businesses today are threatening to fire employees and replace them with AI. We believe within 2 years, the AI necessary to generate most of those businesses will be a commodity.
 
