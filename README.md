@@ -7,7 +7,7 @@ Built executable for Windows: https://toy.new/cheatlayer.zip
 
 We founded Cheat Layer during the pandemic to help people who had lost their jobs and businesses rebuild online using GPT-3. We personally helped hundreds pro bono before turning to AI for help.
 
-In August 2021, we were the first startup to get approved by openAI to sell GPT-3 for automation. We invtented the "Semantic targets" algorithm years before the chatGPT launch to solve brittle code selectors and computer vision targets using our own multimodal model Atlas-2. Today, modern models are cheaper and faster and we no longer need this, but before GPT-4 we had to train it first since none other existed. We reached SOTA 97% accuracy with our targeting algorithm for clicks in our UI element dataset that includes synthetic and real data across PC and mobile phones. 
+In August 2021, we were the first startup to get approved by openAI to sell GPT-3 for automation. We invtented the "Semantic targets" algorithm to solve brittle code selectors and computer vision targets using our own multimodal model Atlas-2. Today, modern models are cheaper and faster and we no longer need this, but before GPT-4 we had to train it first since none other existed. We reached SOTA 97% accuracy with our targeting algorithm for clicks in our UI element dataset that includes synthetic and real data across PC and mobile phones. 
 
 Businesses today are threatening to fire employees and replace them with AI. We believe within 2 years, the AI necessary to generate most of those businesses will be a commodity.
 
@@ -31,8 +31,6 @@ https://www.youtube.com/watch?v=8xhFKkD4H-0
 
 
 ### Semantic Targets
-
-We were the first startup to invent the idea of "semantic targets" using LLMs before ChatGPT was launched. Semantic targets and agentic process automation was a concept we introduced to replace brittle code selectors and computer vision in 2022. You can see the code for semantic targets in this repo starting  2 years ago, and were approved by openAI to sell GPT-3 for autoamtion as the first startup in 2021. 
 
 Semantic targets distils the underlying intent of a target to english, so they still work even if services completely change their designs. This enables building robust, future-proof, agents. 
 
