@@ -53,6 +53,143 @@ def load_data(file_path):
         raise KeyError(f"Missing key in JSON data: {e}")
 
     return marketing_data, cookies, email
+import os
+import json
+import base64
+from openai import OpenAI
+
+# Global variable to store the API key
+OPENROUTER_API_KEY = None
+
+def get_api_key():
+    """Get OpenRouter API key from user or storage"""
+    global OPENROUTER_API_KEY
+    
+    # Try to load from file first
+    try:
+        with open('openrouter_key.txt', 'r') as f:
+            stored_key = f.read().strip()
+            if stored_key:
+                OPENROUTER_API_KEY = stored_key
+                print("Loaded API key from storage.")
+                return stored_key
+    except FileNotFoundError:
+        pass
+    
+    # If no stored key, ask user for it
+    if not OPENROUTER_API_KEY:
+        print("OpenRouter API key not found.")
+        api_key = input("Please enter your OpenRouter API key: ").strip()
+        if api_key:
+            OPENROUTER_API_KEY = api_key
+            # Save to file for future use
+            try:
+                with open('openrouter_key.txt', 'w') as f:
+                    f.write(api_key)
+                print("API key saved for future use.")
+            except Exception as e:
+                print(f"Warning: Could not save API key: {e}")
+            return api_key
+        else:
+            raise ValueError("API key is required to use this service.")
+    
+    return OPENROUTER_API_KEY
+
+def blip_caption_new(data, caption, user_key, user_plan, data2):
+    total = ""
+    print(user_key)
+    print(user_plan)
+    
+    try:
+        # Get API key
+        api_key = get_api_key()
+        
+        # Initialize OpenAI client with OpenRouter
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key,
+        )
+        
+        # Prepare messages in the same format as original
+        log = [{"role": "system", "content": "You are provided two images of a screen with UI elements. In the first image, determine the locations of all the possible target UI elements that might possibly match the description given by the user. In the 2nd image, there are red indices inside each UI element with a red bounding box around the element. The red indices are in the middle or right hand side of each cooresponding element. Select all possible similar elements to this description and return a list of all possible elements that might possibly match the description. Use these indices to communicate which elements on the screenshot matches the description by returning an array of the indices that closely match the description.  If the description asks to exclude anything, make sure to never select that index. Output an array of elements like [2,3,42] that cloest match the description. If there are multiple similar elements, include them all. You return the numbers of the UI elements which matches the description exactly. Choose the numbers that is closest to the elements in pixels that you want. Use these numbers to refer to the element and return only the numbers if the target element exists in the image. If the user provides a location, pay attention to this when matching the description and eliminate any elements which don't appear in this location. If the description does not exist in the image at all, always only return the number -1. Return only a single array of numbers and do not explain or return text in the output. Ignore the notifications in the top right hand corner of the screen, since they will repeat the current step and will often include the words of the current step. Try to return at least 2 indices if possible. Never select a notification in the top right hand corner of the screen."}]
+        
+        log.append({"role": "user", "content": [{"type": "text", "text": "First, find all the target elements in this image that might posissbly match the description. Ignore the notifications in the top right hand corner of the screen, since they will repeat the current step and will often include the words of the current step. Never select a notification in the top right hand corner of the screen.  If there are multiple similar elements, generate the full list of indices in the array, for example [21,412,1].  Here is the target description:" + caption}, {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{data2}"}}]})
+
+        log.append({"role": "user", "content": [{"type": "text", "text": "Next, use this image with bounding boxes and indices to return the indices of the elements which might match the provided description. The red indices are in the middle or right hand side of each cooresponding element. Select all possible similar elements to this description from the previous image and this description:" + caption + ".  Output an array of elements like [2,3,42] that cloest match the description. If the description asks to exclude anything, make sure to never select that index.  Ignore the size of the numbers and the size has no importance. Instead, find the indices of the elements, text or images, which closely match this description best.  Ignore the notifications in the top right hand corner of the screen, since they will repeat the current step and will often include the words of the current step. Output an array of elements like [2,3,42] that closest match the description.  If the description asks to exclude anything, make sure to never select that index. If there are multiple similar elements, include them all.  Never select a notification in the top right hand corner of the screen. The red numbers are inside the cooresponding elements red bounding box. Return only a single array of indices and do not explain or return text in the output. Use the clean image to determine which elements to target based on my description, and the image with red numbers to determine the number of the element. The numbers will always be INSIDE the red bounding box of the coorsponding element, so find the closest bounding box first, then determine the number inside that bounding box.  Turn only either -1 if you can't find the elements or the number of the elements that matches exactly this description exactly. Choose the targets that might possibly matches this description exactly:" + caption}, {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{data}"}}]})
+        
+        print("sending request blip caption new")
+        
+        # Make API call using OpenRouter
+        completion = client.chat.completions.create(
+            extra_headers={
+                "HTTP-Referer": "https://your-app.com",  # Optional. Replace with your site URL
+                "X-Title": "Open Agent Studio",   # Optional. Replace with your app name
+            },
+            extra_body={},
+            model="qwen/qwen2.5-vl-72b-instruct:free",
+            messages=log,
+            max_tokens=5000,
+            temperature=0.1
+        )
+        
+        # Get the response content
+        total = completion.choices[0].message.content.strip()
+        print("atlas-2")
+        print(total)
+        
+        if total == "":
+            print('server error')
+            return [0]
+            
+    except Exception as error:
+        print(f"Error in blip_caption_new: {error}")
+        # Retry logic - call the function again
+        try:
+            return blip_caption_new(data, caption, user_key, user_plan, data2)
+        except:
+            return [0]
+    
+    print(total)
+    
+    # Parse the response
+    if len(total) > 1:
+        try:
+            # Try to parse as JSON array
+            return json.loads(total)
+        except json.JSONDecodeError:
+            try:
+                # If it's not valid JSON, try to extract array from text
+                # Look for patterns like [1,2,3] in the response
+                import re
+                matches = re.findall(r'\[[\d,\s-]+\]', total)
+                if matches:
+                    return json.loads(matches[0])
+                else:
+                    # If no array found, check if it's just a single number or -1
+                    if total.strip() == "-1":
+                        return [-1]
+                    else:
+                        return [0]
+            except:
+                return [0]
+    else:
+        return [0]
+
+def update_api_key():
+    """Function to update the stored API key"""
+    global OPENROUTER_API_KEY
+    
+    new_key = input("Enter your new OpenRouter API key: ").strip()
+    if new_key:
+        OPENROUTER_API_KEY = new_key
+        try:
+            with open('openrouter_key.txt', 'w') as f:
+                f.write(new_key)
+            print("API key updated and saved.")
+        except Exception as e:
+            print(f"Warning: Could not save API key: {e}")
+    else:
+        print("No key provided, keeping existing key.")
 
 def normalize_url(url: str) -> str:
     """
@@ -754,7 +891,7 @@ class ScreenshotTaker(threading.Thread):
         print(data)
         
         # Call local server instead of remote API
-        response = requests.post("http://localhost:8000/v1/chat/completions", 
+        response = requests.post("http://localhost:8080/v1/chat/completions", 
                                 headers=headers, 
                                 data=json.dumps(data), 
                                 stream=True)
@@ -788,7 +925,7 @@ class ScreenshotTaker(threading.Thread):
             # If streaming didn't work or total is empty, try non-streaming
             if not total:
                 data["stream"] = False
-                response = requests.post("http://localhost:8000/v1/chat/completions", 
+                response = requests.post("http://localhost:8080/v1/chat/completions", 
                                         headers=headers, 
                                         data=json.dumps(data))
                 if response.status_code == 200:
@@ -809,7 +946,7 @@ class ScreenshotTaker(threading.Thread):
     def gpt3Prompt(self, system_prompt, description):
     # Setup local llama.cpp server if it's not running
         if not hasattr(self, 'llama_server_process') or self.llama_server_process is None:
-            self.setup_local_llama_server()
+            self.setup_local_llama_server_smolvlm_vision()
 
         log = [{"role": "system", "content": system_prompt}]
         log.append({"role": "user", "content": description})
@@ -826,7 +963,7 @@ class ScreenshotTaker(threading.Thread):
         }
 
         # Call local server instead of remote API
-        response = requests.post("http://localhost:8000/v1/chat/completions", 
+        response = requests.post("http://localhost:8080/v1/chat/completions", 
                                  headers=headers, 
                                  data=json.dumps(data))
 
@@ -838,6 +975,39 @@ class ScreenshotTaker(threading.Thread):
         else:
             print(f"Error response from llama.cpp server: {response.status_code} {response.text}")
             return "Error communicating with local LLM server"
+    
+    def setup_local_llama_server_smolvlm_vision(self):
+        """
+        Download the SmolVLM-Instruct model and start a local llama.cpp server with vision capabilities.
+        """
+        print("Setting up local llama.cpp server with SmolVLM-Instruct model...")
+    
+        # 
+        global llama_server_process 
+        llama_server_process = subprocess.Popen([
+           "./llama-server", "-hf", "ggml-org/SmolVLM-500M-Instruct-GGUF" # Set to >0 if you have CUDA or Metal/ROCM and llama.cpp was built with GPU support
+        ])
+        llama_server_process = subprocess.Popen([
+           "./llama-server", "-hf", "bartowski/Phi-3-medium-128k-instruct-GGUF" # Set to >0 if you have CUDA or Metal/ROCM and llama.cpp was built with GPU support
+        ])
+        # Give server time to start up and verify it's running ./llama-server   -hf bartowski/Phi-3-medium-128k-instruct-GGUF  --host 0.0.0.0   --port 8080   --threads $(nproc --all)   --ctx-size 4096   --n-gpu-layers 0
+
+        print("Waiting for server to start...")
+        for i in range(30): # Wait up to 60 seconds
+            try:
+                response = requests.get("http://localhost:8080/v1/models", timeout=2)
+                if response.status_code == 200:
+                    print("Local llama.cpp server is running with SmolVLM-Instruct!")
+                    return
+            except requests.exceptions.ConnectionError:
+                pass
+            except Exception as e:
+                print(f"Error checking server readiness: {e}")
+                pass
+            time.sleep(2)
+    
+        print("Warning: Server may not have started properly or is taking a long time. Check the process manually.")
+        print(f"Attempted to start server with model: {model_path} and projector: {projector_path}")
 
     def setup_local_llama_server(self):
         """
@@ -872,12 +1042,12 @@ class ScreenshotTaker(threading.Thread):
             print("Downloading multimodal projector (this may take a while)...")
             subprocess.run([
                 "wget", "-O", projector_path,
-                "https://huggingface.co/bartowski/google_gemma-3-4b-it-GGUF/resolve/main/mmproj-gemma-3-4b-it-f16.gguf"
+                "https://huggingface.co/bartowski/google_gemma-3-4b-it-GGUF/resolve/main/mmproj-google_gemma-3-4b-it-f16.gguf"
             ], check=True)
 
         # Check if server is already running
         try:
-            response = requests.get("http://localhost:8000/v1/models")
+            response = requests.get("http://localhost:8080/v1/models")
             if response.status_code == 200:
                 print("Local llama.cpp server is already running")
                 return
@@ -892,12 +1062,12 @@ class ScreenshotTaker(threading.Thread):
         if cpu_threads > 4:
             cpu_threads = cpu_threads - 2  # Leave some CPU for other tasks
 
-        self.llama_server_process = subprocess.Popen([
+        llama_server_process = subprocess.Popen([
             "llama.cpp/server",
             "-m", model_path,
             "--mmproj", projector_path,
             "--host", "0.0.0.0",
-            "--port", "8000",
+            "--port", "8080",
             "-t", str(cpu_threads),
             "-c", "4096",
             "--temperature", "0.7"
@@ -1326,7 +1496,7 @@ class Server:
                         print(data)
 
                         # Call local server instead of remote API
-                        response = requests.post("http://localhost:8000/v1/chat/completions", 
+                        response = requests.post("http://localhost:8080/v1/chat/completions", 
                                                 headers=headers, 
                                                 data=json.dumps(data), 
                                                 stream=True)
@@ -1360,7 +1530,7 @@ class Server:
                             # If streaming didn't work or total is empty, try non-streaming
                             if not total:
                                 data["stream"] = False
-                                response = requests.post("http://localhost:8000/v1/chat/completions", 
+                                response = requests.post("http://0.0.0.0:8000/v1/chat/completions", 
                                                         headers=headers, 
                                                         data=json.dumps(data))
                                 if response.status_code == 200:
@@ -1780,6 +1950,173 @@ import io
 full = io.StringIO()
 
 
+def get_element_description(encoded_image, description, user_key, user_plan, element_index=None):
+    """
+    Get a description of what's in the UI element
+    """
+
+    try:
+        # Add a unique identifier to prevent caching
+        import hashlib
+        image_hash = hashlib.md5(encoded_image.encode()).hexdigest()[:8]
+        
+        log = [{
+            "role": "system", 
+            "content": """You are a UI element describer. Describe what you see in the image concisely.
+Include:
+- Type of element (button, text, input field, image, icon, etc.)
+- Any visible text content (quote it exactly)
+- Color or visual style if notable
+- What the element appears to do or represent
+
+Keep descriptions under 20 words. Be specific and factual.
+Examples:
+- "Blue button with text 'Submit'"
+- "Text input field with placeholder 'Enter email'"
+- "Red error message saying 'Invalid password'"
+- "Navigation menu icon (three horizontal lines)"
+- "Product image showing a laptop"
+"""
+        }]
+        
+        # Add unique context to prevent caching
+        unique_prompt = f"Describe this UI element (Element #{element_index if element_index else 'unknown'}, Hash: {image_hash}):"
+        
+        log.append({
+            "role": "user", 
+            "content": [
+                {
+                    "type": "image_url", 
+                    "image_url": {
+                        "url": f"data:image/png;base64,{encoded_image}"
+                    }
+                },
+                {
+                    "type": "text", 
+                    "text": " Describe this screenshot of a UI element. Include any text, color, and size."
+                }
+            ]
+        })
+        
+        # Debug: Save the image being sent
+        if element_index is not None:
+            import base64
+            image_data = base64.b64decode(encoded_image)
+            with open(resource_path(f"debug_element_{element_index}_sent.jpg"), "wb") as f:
+                f.write(image_data)
+            print(f"  Debug: Saved image for element {element_index} (hash: {image_hash})")
+        
+        converted_log = [convert_message_for_llama(msg) for msg in log]
+        
+        # Add timestamp to prevent caching
+        import time
+        data = {
+            "model": "gemma-3-4b-it",
+            "messages": log,
+            "temperature": 0.7,  # Increased from 0.3 for more variation
+            "max_tokens": 50,
+            "stream": False
+        }
+        
+        response = requests.post("http://localhost:8080/v1/chat/completions", 
+                    headers=headers, 
+                    data=json.dumps(data),
+                    timeout=30)
+        
+        response.raise_for_status()
+        
+        if response.status_code == 200:
+            result = response.json()
+            description = result["choices"][0]["message"]["content"].strip()
+            
+            # Remove any hash or element number from the description if it leaked through
+            description = description.replace(f"Hash: {image_hash}", "").strip()
+            description = description.replace(f"Element #{element_index}", "").strip()
+            
+            return description
+        else:
+            return f"Error: Could not describe element {element_index}"
+            
+    except Exception as e:
+        print(f"Error getting element description: {e}")
+        return f"Error: Could not describe element {element_index}"
+
+    
+def find_best_description_match(element_descriptions, target_description, user_key, user_plan):
+    """
+    Find which element descriptions best match the target description
+    """
+
+    try:
+        import json
+
+        # Build the descriptions list
+        descriptions_text = ""
+        for i, elem_desc in enumerate(element_descriptions):
+            descriptions_text += f"{i}: {elem_desc['description']}\n"
+        
+        log = [{
+            "role": "system", 
+            "content": """Determine the index of the row and UI element that closest matches {target_description}. Output the index number only in a single element array"""
+        }]
+        
+        log.append({
+            "role": "user", 
+            "content": f"""Target UI element description: "{target_description}"
+Find the closest matching UI element to this target in this list: 
+Element descriptions:
+{descriptions_text}
+
+Which single element matches the target closest? Output only a single element index in an 1 element array containing the index number:"""
+        })
+        
+        converted_log = [convert_message_for_llama(msg) for msg in log]
+        data = {
+            "messages": log,
+            "temperature": 0.1,
+            "max_tokens": 50,
+            "stream": False
+        }
+        
+        response = requests.post("http://0.0.0.0:8000/v1/chat/completions", 
+                    headers=headers, 
+                    data=json.dumps(data),
+                    timeout=300)
+        
+        response.raise_for_status()
+        
+        if response.status_code == 200:
+            result = response.json()
+            content = result["choices"][0]["message"]["content"].strip()
+            
+            try:
+                # Parse JSON array
+                indices = json.loads(content)
+                
+                # Validate indices
+                valid_indices = []
+                for idx in indices:
+                    if isinstance(idx, int) and 0 <= idx < len(element_descriptions):
+                        valid_indices.append(idx)
+                
+                return valid_indices if valid_indices else []
+                
+            except:
+                # Try to extract numbers from the response
+                import re
+                numbers = re.findall(r'-?\d+', content)
+                indices = []
+                for num in numbers:
+                    idx = int(num)
+                    if idx >= 0 and idx < len(element_descriptions):
+                        indices.append(idx)
+                return indices
+        else:
+            return []
+            
+    except Exception as e:
+        print(f"Error finding best match: {e}")
+        return []
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -1879,7 +2216,7 @@ def blip_caption_check(data, caption,user_key, user_plan):
         print(data)
 
         # Call local server instead of remote API
-        response = requests.post("http://localhost:8000/v1/chat/completions", 
+        response = requests.post("http://localhost:8080/v1/chat/completions", 
                                 headers=headers, 
                                 data=json.dumps(data), 
                                 stream=True)
@@ -1913,7 +2250,7 @@ def blip_caption_check(data, caption,user_key, user_plan):
             # If streaming didn't work or total is empty, try non-streaming
             if not total:
                 data["stream"] = False
-                response = requests.post("http://localhost:8000/v1/chat/completions", 
+                response = requests.post("http://localhost:8080/v1/chat/completions", 
                                         headers=headers, 
                                         data=json.dumps(data))
                 if response.status_code == 200:
@@ -1970,188 +2307,86 @@ def convert_message_for_llama(message):
     
 llama_server_process = None
 
+def setup_local_llama_server_smolvlm_vision():
+    """
+    Download the SmolVLM-Instruct model and start a local llama.cpp server with vision capabilities.
+    """
+    print("Setting up local llama.cpp server with SmolVLM-Instruct model...")
 
-def setup_local_llama_server(self):
-    """
-    Download the Gemma-3 model if needed and start a local llama.cpp server with vision capabilities
-    """
-    print("Setting up local llama.cpp server with Gemma-3 4B-IT model...")
-    global llama_server_process
-    # Clone llama.cpp repository
-    if not os.path.exists("llama.cpp"):
-        subprocess.run(["git", "clone", "https://github.com/ggerganov/llama.cpp.git"], check=True)
-    # Build llama.cpp with vision support
-    if not os.path.exists("llama.cpp/server"):
-        os.chdir("llama.cpp")
-        subprocess.run(["make", "server", "LLAMA_BLAS=ON", "LLAMA_BLAS_VENDOR=OpenBLAS", f"-j{os.cpu_count()}"], check=True)
-        os.chdir("..")
-    # Create models directory if it doesn't exist
-    os.makedirs("models/gemma3", exist_ok=True)
-    # Check if model and projector exist, download if needed
-    model_path = "models/gemma3/gemma-3-4b-it-q4_k_xl.gguf"
-    if not os.path.exists(model_path):
-        print("Downloading Gemma-3 4B-IT model (this may take a while)...")
-        subprocess.run([
-            "wget", "-O", model_path,
-            "https://huggingface.co/bartowski/google_gemma-3-4b-it-GGUF/resolve/main/gemma-3-4b-it-Q4_K_XL.gguf"
-        ], check=True)
-    projector_path = "models/gemma3/mmproj-gemma-3-4b-it-f16.gguf"
-    if not os.path.exists(projector_path):
-        print("Downloading multimodal projector (this may take a while)...")
-        subprocess.run([
-            "wget", "-O", projector_path,
-            "https://huggingface.co/bartowski/google_gemma-3-4b-it-GGUF/resolve/main/mmproj-gemma-3-4b-it-f16.gguf"
-        ], check=True)
-    # Check if server is already running
-    try:
-        response = requests.get("http://localhost:8000/v1/models")
-        if response.status_code == 200:
-            print("Local llama.cpp server is already running")
-            return
-    except:
-        pass  # Server not running, we'll start it
-    
-    # Start the server
-    print("Starting llama.cpp server with Gemma-3 4B-IT model...")
-    # Determine number of CPU threads
-    cpu_threads = os.cpu_count()
-    if cpu_threads > 4:
-        cpu_threads = cpu_threads - 2  # Leave some CPU for other tasks
+    # 
+    global llama_server_process 
     llama_server_process = subprocess.Popen([
-        "llama.cpp/server",
-        "-m", model_path,
-        "--mmproj", projector_path,
-        "--host", "0.0.0.0",
-        "--port", "8000",
-        "-t", str(cpu_threads),
-        "-c", "4096"
+       "./llama-server", "-hf", "ggml-org/SmolVLM-500M-Instruct-GGUF" # Set to >0 if you have CUDA or Metal/ROCM and llama.cpp was built with GPU support
     ])
-    # Give server time to start up
-    time.sleep(5)
-    print("Local llama.cpp server is running with Gemma-3 4B-IT!")
-def blip_caption_describe(data, caption,user_key, user_plan):
+
+    llama_server_process = subprocess.Popen([
+       "./llama-server", "-hf", "bartowski/Phi-3-medium-128k-instruct-GGUF" # Set to >0 if you have CUDA or Metal/ROCM and llama.cpp was built with GPU support
+    ])
+    # Give server time to start up and verify it's running
+    print("Waiting for server to start...")
+    for i in range(30): # Wait up to 60 seconds
+        try:
+            response = requests.get("http://localhost:8080/v1/models", timeout=2)
+            if response.status_code == 200:
+                print("Local llama.cpp server is running with SmolVLM-Instruct!")
+                return
+        except requests.exceptions.ConnectionError:
+            pass
+        except Exception as e:
+            print(f"Error checking server readiness: {e}")
+            pass
+        time.sleep(2)
+
+    print("Warning: Server may not have started properly or is taking a long time. Check the process manually.")
+    print(f"Attempted to start server with model: {model_path} and projector: {projector_path}")
+
+def blip_caption_describe(data, caption, user_key, user_plan):
     total = ""
-    global error_total, llama_server_process
     print(user_key)
     print(user_plan)
     
-    if llama_server_process is None:
-        setup_local_llama_server()
-    
     try:
-        log = [{"role": "system", "content": "You take the current screenshot of the screen, and return a detailed description of exactly the part the user wants to target. For example, if the user asks to desribe an email, return only the text you can see from the email. If the user asks to describe a social post, return only the text from that social post. Do not describe your output and only output exactly what the user wants. Do prefix the output text with any description, and do not mention what the target is. ."}]
-
-        #log = [{"role": "system", "content": "You return the number of the element which matches the target description from the image. The provided image will have boxes with numbers inside them surrounding potential targets that may match the description with a red number to the left of the top left corner of the corresponding element. If none match the description exactly, return exactly -1. Be as precise as possible when determining if a matching element exists or not. Make sure the color, text and any other information in the description exactly matches the element, and consider all the elements in the list. The numbers will all be inside the element box and in the top left of the box."}]
-     #           chat_log.append({"role": "user", "content": text})
-        headers = {
-            "Content-Type": "application/json",
-        }
-        def encode_image(image_path):
-          with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('utf-8')
-        mode_gpt = "32k"
-        #if text includes the keyword 'screenshot', take a screenshot with pyauto-gui and reformat chat_log to use the following format to support images and text. 
-        #"messages": [ { "role": "user", "content": [ { "type": "text", "text": "What’s in this image?" }, { "type": "image_url", "image_url": { "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg" } } ] } ],
-        #base64_image = encode_image("screenshot.png")
-        mode_gpt = "website2"
-        ##print("SCRNEENSHOT MODE"
-        log.append({"role": "user", "content": [{"type": "text", "text":  caption}, {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{data}"}}]})
-        ##print("screenshot")
+        # Get API key
+        api_key = get_api_key()
         
-        # Convert OpenAI vision format to llama.cpp format
-        def convert_message_for_llama(message):
-            """Convert OpenAI vision API format to llama.cpp format"""
-            if isinstance(message.get('content'), list):
-                # Extract text and image from the content array
-                text_content = ""
-                image_data = None
-                for item in message['content']:
-                    if item['type'] == 'text':
-                        text_content += item['text']
-                    elif item['type'] == 'image_url':
-                        # Extract base64 data from data URL
-                        image_url = item['image_url']['url']
-                        if image_url.startswith('data:image/'):
-                            # Remove the data:image/jpeg;base64, prefix
-                            image_data = image_url.split(',', 1)[1]
-                return {
-                    "role": message['role'],
-                    "content": text_content,
-                    "images": [image_data] if image_data else []
-                }
-            else:
-                # Regular text message
-                return message
-        # Convert all messages to llama.cpp format
-        converted_log = [convert_message_for_llama(msg) for msg in log]
-        data = {
-            "model": "gemma-3-4b-it",  # This is what the llama.cpp server expects
-            "messages": converted_log,
-            "temperature": 0.7,
-            "max_tokens": 5000,
-            "stream": True  # Enable streaming to match original behavior
-        }
-
-        print(data)
-
-        # Call local server instead of remote API
-        response = requests.post("http://localhost:8000/v1/chat/completions", 
-                                headers=headers, 
-                                data=json.dumps(data), 
-                                stream=True)
-
-        import pyautogui
-        if response.status_code == 200:
-            items = []
-            total = ""
-            for chunk in response.iter_lines():
-                try:
-                    if chunk:
-                        # Parse SSE format from llama.cpp server
-                        chunk_str = chunk.decode('utf-8')
-                        if chunk_str.startswith('data: '):
-                            chunk_data = chunk_str[6:]  # Remove 'data: ' prefix
-                            if chunk_data.strip() == '[DONE]':
-                                break
-                            
-                            chunk_json = json.loads(chunk_data)
-                            if 'choices' in chunk_json and len(chunk_json['choices']) > 0:
-                                delta = chunk_json['choices'][0].get('delta', {})
-                                if 'content' in delta:
-                                    content = delta['content']
-                                    total += content
-                                    print(content, end='', flush=True)
-                except Exception as e:
-                    # If streaming fails, fall back to non-streaming
-                    print(f"Streaming error: {e}")
-                    break
-                
-            # If streaming didn't work or total is empty, try non-streaming
-            if not total:
-                data["stream"] = False
-                response = requests.post("http://localhost:8000/v1/chat/completions", 
-                                        headers=headers, 
-                                        data=json.dumps(data))
-                if response.status_code == 200:
-                    result = response.json()
-                    total = result["choices"][0]["message"]["content"]
-                    print(total)
-                else:
-                    print(f"Error response from llama.cpp server: {response.status_code} {response.text}")
-                    total = "Error communicating with local LLM server"
-
-            print()  # New line after streaming output
-            print(total)
-        else:
-            print(f"Error response from llama.cpp server: {response.status_code} {response.text}")
-            total = "Error communicating with local LLM server"
-
+        # Initialize OpenAI client with OpenRouter
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key,
+        )
+        
+        # Prepare messages in the same format as original
+        log = [{"role": "system", "content": "You take the current screenshot of the screen, and return a detailed description of exactly the part the user wants to target. For example, if the user asks to describe an email, return only the text you can see from the email. If the user asks to describe a social post, return only the text from that social post. Do not describe your output and only output exactly what the user wants. Do prefix the output text with any description, and do not mention what the target is."}]
+        
+        log.append({"role": "user", "content": [{"type": "text", "text": caption}, {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{data}"}}]})
+        
+        print("Sending request to OpenRouter API...")
+        
+        # Make API call using OpenRouter
+        completion = client.chat.completions.create(
+            extra_headers={
+                "HTTP-Referer": "https://your-app.com",  # Optional. Replace with your site URL
+                "X-Title": "Open Agent Studio",        # Optional. Replace with your app name
+            },
+            extra_body={},
+            model="qwen/qwen2.5-vl-72b-instruct:free",
+            messages=log,
+            max_tokens=5000,
+            temperature=0.1
+        )
+        
+        # Get the response content
+        total = completion.choices[0].message.content
+        print("atlas-2")
+        print(total)
         
     except Exception as error:
+        print(f"Error in blip_caption_describe: {error}")
         return "error"
-        response = "0"
+    
     print(total)
     return total
+
 def blip_caption(data, caption):
     try:
         response = call_replicate(data, caption)
@@ -2164,106 +2399,98 @@ def blip_caption(data, caption):
     print(response)
     return response
 
-def blip_caption_new(data, caption,user_key, user_plan , data2):
-    total = ""
-    print(user_key)
-    print(user_plan)
-    
+
+
+def get_element_match_percentage(encoded_image, description, user_key, user_plan):
+    """
+    Get percentage match for a single element
+    """
     if llama_server_process is None:
-        setup_local_llama_server()
+        setup_local_llama_server_smolvlm_vision()
     
     try:
+        log = [{
+            "role": "system", 
+            "content": 
+
+            """You are a precise UI element matcher. You will be shown multiple UI elements and must score how well EACH matches a description.
+
+SCORING RULES:
+- 0-20%: Element has NO relation to the description (wrong type, wrong text, wrong purpose)
+- 21-40%: Element is similar type but wrong content (e.g., a button but wrong text)
+- 41-60%: Element partially matches (some text matches, or right type but unclear)
+- 61-80%: Element mostly matches but has minor differences
+- 81-100%: Element exactly matches the description
+
+BE VERY STRICT! Most elements should score LOW unless they exactly match.
+Output ONLY a comma-separated list of percentages, one per element shown.
+Example output: 10,5,85,20,15"""
+        }]
         
-        log = [{"role": "system", "content": "You are provided two images of a screen with UI elements. In the first image, determine the locations of all the possible target UI elements that might possibly match the description given by the user. In the 2nd image, there are red indices inside each UI element with a red bounding box around the element. The red indices are in the middle or right hand side of each cooresponding element. Select all possible similar elements to this description and return a list of all possible elements that might possibly match the description. Use these indices to communicate which elements on the screenshot matches the description by returning an array of the indices that closely match the description.  If the description asks to exclude anything, make sure to never select that index. Output an array of elements like [2,3,42] that cloest match the description. If there are multiple similar elements, include them all. You return the numbers of the UI elements which matches the description exactly. Choose the numbers that is closest to the elements in pixels that you want. Use these numbers to refer to the element and return only the numbers if the target element exists in the image. If the user provides a location, pay attention to this when matching the description and eliminate any elements which don't appear in this location. If the description does not exist in the image at all, always only return the number -1. Return only a single array of numbers and do not explain or return text in the output. Ignore the notifications in the top right hand corner of the screen, since they will repeat the current step and will often include the words of the current step. Try to return at least 2 indices if possible. Never select a notification in the top right hand corner of the screen."}]
-
-        #log = [{"role": "system", "content": "You return the number of the element which matches the target description from the image. The provided image will have boxes with numbers inside them surrounding potential targets that may match the description with a red number to the left of the top left corner of the corresponding element. If none match the description exactly, return exactly -1. Be as precise as possible when determining if a matching element exists or not. Make sure the color, text and any other information in the description exactly matches the element, and consider all the elements in the list. The numbers will all be inside the element box and in the top left of the box."}]
-     #           chat_log.append({"role": "user", "content": text})
-
-        def encode_image(image_path):
-          with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('utf-8')
-        mode_gpt = "32k"
-        #if text includes the keyword 'screenshot', take a screenshot with pyauto-gui and reformat chat_log to use the following format to support images and text. 
-        #"messages": [ { "role": "user", "content": [ { "type": "text", "text": "What’s in this image?" }, { "type": "image_url", "image_url": { "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg" } } ] } ],
-        #base64_image = encode_image("screenshot.png")
-        mode_gpt = "click"
-        ##print("SCRNEENSHOT MODE"
-        log.append({"role": "user", "content": [{"type": "text", "text":  "First, find all the target elements in this image that might posissbly match the description. Ignore the notifications in the top right hand corner of the screen, since they will repeat the current step and will often include the words of the current step. Never select a notification in the top right hand corner of the screen.  If there are multiple similar elements, generate the full list of indices in the array, for example [21,412,1].  Here is the target description:" + caption}, {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{data2}"}}]})
-
-        log.append({"role": "user", "content": [{"type": "text", "text":  "Next, use this image with bounding boxes and indices to return the indices of the elements which might match the provided description. The red indices are in the middle or right hand side of each cooresponding element. Select all possible similar elements to this description from the previous image and this description:" + caption  + ".  Output an array of elements like [2,3,42] that cloest match the description. If the description asks to exclude anything, make sure to never select that index.  Ignore the size of the numbers and the size has no importance. Instead, find the indices of the elements, text or images, which closely match this description best.  Ignore the notifications in the top right hand corner of the screen, since they will repeat the current step and will often include the words of the current step. Output an array of elements like [2,3,42] that closest match the description.  If the description asks to exclude anything, make sure to never select that index. If there are multiple similar elements, include them all.  Never select a notification in the top right hand corner of the screen. The red numbers are inside the cooresponding elements red bounding box. Return only a single array of indices and do not explain or return text in the output. Use the clean image to determine which elements to target based on my description, and the image with red numbers to determine the number of the element. The numbers will always be INSIDE the red bounding box of the coorsponding element, so find the closest bounding box first, then determine the number inside that bounding box.  Turn only either -1 if you can't find the elements or the number of the elements that matches exactly this description exactly. Choose the targets that might possibly matches this description exactly:" + caption},  {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{data}"}}]})
-                ##print("screenshot")
-                
+        log.append({
+            "role": "user", 
+            "content": [
+                {
+                    "type": "text", 
+                    "text": f"How well does this UI element match the following description?  return ONLY a percentage (0-100). Be as accurate as possible. Take into account the subject, background, color, size, etc. Description: {description}"
+                }, 
+                {
+                    "type": "image_url", 
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{encoded_image}"
+                    }
+                }
+            ]
+        })
+        
         converted_log = [convert_message_for_llama(msg) for msg in log]
         data = {
-            "model": "gemma-3-4b-it",  # This is what the llama.cpp server expects
-            "messages": converted_log,
-            "temperature": 0.7,
-            "max_tokens": 5000,
-            "stream": True  # Enable streaming to match original behavior
+            "model": "gemma-3-4b-it",
+            "messages": log,
+            "temperature": 0.1,  # Low temperature for consistent scoring
+            "max_tokens": 10,
+            "stream": False  # Ensure we're not streaming
         }
+        print(description)
+
+        # Make synchronous request and wait for complete response
+        response = requests.post("http://localhost:8080/v1/chat/completions", 
+                    headers=headers, 
+                    data=json.dumps(data),
+                    timeout=30)  # Add timeout to ensure we wait
         
-        print(data)
+        # Wait for the response to complete
+        response.raise_for_status()  # Raise an exception for bad status codes
         
-        # Call local server instead of remote API
-        response = requests.post("http://localhost:8000/v1/chat/completions", 
-                                headers=headers, 
-                                data=json.dumps(data), 
-                                stream=True)
-        
-        import pyautogui
         if response.status_code == 200:
-            items = []
-            total = ""
-            for chunk in response.iter_lines():
-                try:
-                    if chunk:
-                        # Parse SSE format from llama.cpp server
-                        chunk_str = chunk.decode('utf-8')
-                        if chunk_str.startswith('data: '):
-                            chunk_data = chunk_str[6:]  # Remove 'data: ' prefix
-                            if chunk_data.strip() == '[DONE]':
-                                break
-                            
-                            chunk_json = json.loads(chunk_data)
-                            if 'choices' in chunk_json and len(chunk_json['choices']) > 0:
-                                delta = chunk_json['choices'][0].get('delta', {})
-                                if 'content' in delta:
-                                    content = delta['content']
-                                    total += content
-                                    print(content, end='', flush=True)
-                except Exception as e:
-                    # If streaming fails, fall back to non-streaming
-                    print(f"Streaming error: {e}")
-                    break
-                
-            # If streaming didn't work or total is empty, try non-streaming
-            if not total:
-                data["stream"] = False
-                response = requests.post("http://localhost:8000/v1/chat/completions", 
-                                        headers=headers, 
-                                        data=json.dumps(data))
-                if response.status_code == 200:
-                    result = response.json()
-                    total = result["choices"][0]["message"]["content"]
-                    print(total)
-                else:
-                    print(f"Error response from llama.cpp server: {response.status_code} {response.text}")
-                    total = "Error communicating with local LLM server"
+            result = response.json()
+            content = result["choices"][0]["message"]["content"].strip()
             
-            print()  # New line after streaming output
-            print(total)
+            # Extract percentage from response
+            try:
+                # Remove any non-numeric characters except decimal point
+                numeric_content = ''.join(c for c in content if c.isdigit() or c == '.')
+                percentage = float(numeric_content)
+                # Ensure it's within 0-100 range
+                percentage = max(0, min(100, percentage))
+                return percentage
+            except:
+                print(f"Could not parse percentage from: {content}")
+                return 0.0
         else:
-            print(f"Error response from llama.cpp server: {response.status_code} {response.text}")
-            total = "Error communicating with local LLM server"
-        
-    except Exception as error:
-        blip_caption_new(data, caption,user_key, user_plan, data2)
-        response = "0"
-    print(total)
-    if len(total) > 1:
-        return json.loads(total)
-    else:
-        return [0]
+            print(f"Error response from server: {response.status_code}")
+            return 0.0
+            
+    except requests.exceptions.Timeout:
+        print("Request timed out")
+        return 0.0
+    except requests.exceptions.RequestException as e:
+        print(f"Request error: {e}")
+        return 0.0
+    except Exception as e:
+        print(f"Error getting element match percentage: {e}")
+        return 0.0
+
 def blip_caption2(data, caption = ""):
     try:
         response = call_replicate2(data, caption)
@@ -2290,7 +2517,7 @@ def UImodel(image_path):
     import requests
     # Run inference on an image
     url = "https://api.ultralytics.com/v1/predict/kVhczpBn9wqjExiUOYBU"
-    headers = {"x-api-key": "ULTRALYTICSKEY"}
+    headers = {"x-api-key": "8bbb078acd811a4e092adeca938400db04f2e9b062"}
     data = {"size": 640, "confidence": 0.01, "iou": 0.2}
     results_out = []
     with open(image_path, "rb") as f:
@@ -2649,7 +2876,6 @@ class JobRunner:
 
         if "row" in self.graph.global_variables:
       # Replace 'your_api_key' with your actual Mailgun API key
-                api_key = 'MAILGUNKEY'
 
                 # Replace 'your_mailgun_domain' with your actual Mailgun domain
 
@@ -2863,7 +3089,6 @@ class BottomToolbar(QToolBar):
 #        print(browser_elements)
         print("fished loop")
         graph.data_graph = data_graph
-        graph.server.data_graph = data_graph
        # sys.stdout = Stream(newText=self.normalOutputWritten)
         #sys.stderr = Stream(newText=self.normalOutputWritten)
         
@@ -3518,11 +3743,12 @@ class NodeGraph(QtCore.QObject):
         browser_elements = self.sendMessageRTCAsync('semanticClick:' + target)
         print(browser_elements)
         print("fished loop sent")
+
     def semanticSearch(self, description, x = 0, y = 0):
 
         browser_max = 0
         if x > 10 and y > 10:
-            import subprocess, pyautogui
+            import subprocess   
             pyautogui.moveTo(float(x), float(y) + 100)
            # pyautogui.moveTo(float(x), float(y))
        # time.sleep(5)
@@ -3765,68 +3991,29 @@ class NodeGraph(QtCore.QObject):
                     data_index_big = base64.b64encode(io.BytesIO(byte_im_index_big).read()).decode('utf-8')
                     log.append({"role": "user", "content": [{"type": "text", "text": "Element description:" + description +  "This is a large image that shows the surrounding context for the element. Use this to diffferentiate between multiple similar elements based on their location and surrounding context. For example, for a grid of elements, choose the index that most closely exactly matches the cell. The index for this image is:" + str(indicex)}, {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{data_index_big}"}}]})
                 print(log)
+
                 data = {
-                    "model": "gemma-3-4b-it",  # This is what the llama.cpp server expects
-                    "messages": log,
-                    "temperature": 0.7,
+                    "input": log,  # Use the correct fallback value for client.exampleInput
                     "max_tokens": 5000,
-                    "stream": True  # Enable streaming to match original behavior
+                    "id": self.user_key,
+                    "key": "",
+                    "mode":"website2"
                 }
-
                 print(data)
-
-                # Call local server instead of remote API
-                response = requests.post("http://localhost:8000/v1/chat/completions", 
-                                        headers=headers, 
-                                        data=json.dumps(data), 
-                                        stream=True)
-
-                import pyautogui
+                print("sending request blip caption new")
+                headers = {
+                    "Content-Type": "application/json",
+                }
+                response = requests.post("https://streaming-16k.vercel.app/api/request", headers=headers, data=json.dumps(data), stream=True, verify=False)
+                #print(response)
                 if response.status_code == 200:
                     items = []
                     total = ""
-                    for chunk in response.iter_lines():
-                        try:
-                            if chunk:
-                                # Parse SSE format from llama.cpp server
-                                chunk_str = chunk.decode('utf-8')
-                                if chunk_str.startswith('data: '):
-                                    chunk_data = chunk_str[6:]  # Remove 'data: ' prefix
-                                    if chunk_data.strip() == '[DONE]':
-                                        break
-                                    
-                                    chunk_json = json.loads(chunk_data)
-                                    if 'choices' in chunk_json and len(chunk_json['choices']) > 0:
-                                        delta = chunk_json['choices'][0].get('delta', {})
-                                        if 'content' in delta:
-                                            content = delta['content']
-                                            total += content
-                                            print(content, end='', flush=True)
-                        except Exception as e:
-                            # If streaming fails, fall back to non-streaming
-                            print(f"Streaming error: {e}")
-                            break
-                        
-                    # If streaming didn't work or total is empty, try non-streaming
-                    if not total:
-                        data["stream"] = False
-                        response = requests.post("http://localhost:8000/v1/chat/completions", 
-                                                headers=headers, 
-                                                data=json.dumps(data))
-                        if response.status_code == 200:
-                            result = response.json()
-                            total = result["choices"][0]["message"]["content"]
-                            print(total)
-                        else:
-                            print(f"Error response from llama.cpp server: {response.status_code} {response.text}")
-                            total = "Error communicating with local LLM server"
-
-                    print()  # New line after streaming output
+                    #print("Analyzing semantic target...")
+                    for chunk in response.iter_content(chunk_size=1024):
+                        total += chunk.decode('utf-8')
+                    print("atlas-2")
                     print(total)
-                else:
-                    print(f"Error response from llama.cpp server: {response.status_code} {response.text}")
-                    total = "Error communicating with local LLM server"
-
                 if total == "":
                     total = itm_output[0]
                 print("COMPLETED SEMANTIC SEARCH2")
@@ -4288,7 +4475,7 @@ class NodeGraph(QtCore.QObject):
 
         # Check if model exists and verify it's valid, re-download if corrupted
         model_path = "llama.cpp/models/smolvlm/smolvlm-instruct-q4_k_m.gguf"
-
+        projector_path = "llama.cpp/models/smolvlm/smolvlm-instruct-mmproj-f16.gguf"
         def is_valid_gguf(filepath):
             """Check if GGUF file has valid magic header"""
             try:
@@ -4298,7 +4485,7 @@ class NodeGraph(QtCore.QObject):
             except:
                 return False
 
-        if not os.path.exists(model_path) or not is_valid_gguf(model_path):
+        if not os.path.exists(model_path) or not is_valid_gguf(model_path) or not os.path.exists(projector_path) or not is_valid_gguf(projector_path):
             if os.path.exists(model_path):
                 print("Model file appears corrupted, re-downloading...")
                 os.remove(model_path)
@@ -4314,18 +4501,15 @@ class NodeGraph(QtCore.QObject):
             if not is_valid_gguf(model_path):
                 raise Exception("Downloaded model file is corrupted")
 
-        # For now, let's skip the projector and use text-only mode
-        # projector_path = "llama.cpp/models/smolvlm/smolvlm-instruct-mmproj-f16.gguf"
-        # if not os.path.exists(projector_path):
-        #     print("Downloading SmolVLM multimodal projector (this may take a while)...")
-        #     subprocess.run([
-        #         "wget", "-O", projector_path,
-        #         "https://huggingface.co/ggml-org/SmolVLM-500M-Instruct-GGUF/resolve/main/smolvlm-instruct-mmproj-f16.gguf"
-        #     ], check=True)
-
-        # Check if server is already running
+            projector_path = "llama.cpp/models/smolvlm/smolvlm-instruct-mmproj-f16.gguf"
+            if not os.path.exists(projector_path):
+                print("Downloading SmolVLM multimodal projector (this may take a while)...")
+                subprocess.run([
+                    "wget", "-O", projector_path,
+                    "https://huggingface.co/ggml-org/SmolVLM-500M-Instruct-GGUF/resolve/main/smolvlm-instruct-mmproj-f16.gguf"
+                ], check=True)
         try:
-            response = requests.get("http://localhost:8000/v1/models", timeout=5)
+            response = requests.get("http://localhost:8080/v1/models", timeout=5)
             if response.status_code == 200:
                 print("Local llama.cpp server is already running")
                 return
@@ -4344,12 +4528,12 @@ class NodeGraph(QtCore.QObject):
         server_path = os.path.abspath("llama.cpp/build/bin/llama-server")
 
         # Start without multimodal projector for now (text-only mode)
-        self.llama_server_process = subprocess.Popen([
+        llama_server_process = subprocess.Popen([
             server_path,
             "--model", os.path.abspath(model_path),
-            # "--mmproj", os.path.abspath(projector_path),  # Commented out for now
+             "--mmproj", os.path.abspath(projector_path),  # Commented out for now
             "--host", "0.0.0.0",
-            "--port", "8000",
+            "--port", "8080",
             "--threads", str(cpu_threads),
             "--ctx-size", "2048",
             "--n-gpu-layers", "0"
@@ -4359,19 +4543,18 @@ class NodeGraph(QtCore.QObject):
         print("Waiting for server to start...")
         for i in range(30):
             try:
-                response = requests.get("http://localhost:8000/v1/models", timeout=2)
+                response = requests.get("http://localhost:8080/v1/models", timeout=2)
                 if response.status_code == 200:
                     print("Local llama.cpp server is running with Phi-3-mini!")
                     return
             except:
                 pass
-            time.sleep(2)
 
         print("Warning: Server may not have started properly. Check the process manually.")
     def gpt3Prompt(self, system_prompt, description):
     # Setup local llama.cpp server if it's not running
         if not hasattr(self, 'llama_server_process') or self.llama_server_process is None:
-            self.setup_local_llama_server()
+            self.setup_local_llama_server_smolvlm_vision()
     
         log = [{"role": "system", "content": system_prompt}]
         log.append({"role": "user", "content": description})
@@ -4388,7 +4571,7 @@ class NodeGraph(QtCore.QObject):
         }
         
         # Call local server instead of remote API
-        response = requests.post("http://localhost:8000/v1/chat/completions", 
+        response = requests.post("http://localhost:8080/v1/chat/completions", 
                                  headers=headers, 
                                  data=json.dumps(data))
     
@@ -4599,14 +4782,9 @@ class NodeGraph(QtCore.QObject):
           #  self.label.hide()
          #   self.label2.hide()
             print("winning click")
-            if new_max["browser"] == "false":
-                print("trying to click")
-                pyautogui.click(new_max['x'], new_max['y'])
-                
-
-            else:
-                self.sendMessageRTC("semanticClick:" + str(new_max['index']))
-                websocket_data = ""
+           
+            print("trying to click")
+            pyautogui.click(new_max['x'], new_max['y'])
             #pyautogui.click(new_max['x'], new_max['y'])
             #break
         else:
@@ -4829,7 +5007,9 @@ class NodeGraph(QtCore.QObject):
         creator_stats = ref.get()
         print(f"Retrieved creator stats for user_id: {user_id}")
         return creator_stats
-    
+    def startLlama(self):
+        setup_local_llama_server_smolvlm_vision()
+
     def runNode(self, graph, node_id, thread_signals, direct = True, manual = False, folder = "default"):
         #self.QMainWindow.showMinimized()
         global last_mouse_x, last_mouse_y, run_counter, agent_approval, python_process, total_errors, agent_memory, websocket_data, node_runs
@@ -5001,7 +5181,7 @@ class NodeGraph(QtCore.QObject):
                             print(data)
 
                             # Call local server instead of remote API
-                            response = requests.post("http://localhost:8000/v1/chat/completions", 
+                            response = requests.post("http://localhost:8080/v1/chat/completions", 
                                                     headers=headers, 
                                                     data=json.dumps(data), 
                                                     stream=True)
@@ -5035,7 +5215,7 @@ class NodeGraph(QtCore.QObject):
                                 # If streaming didn't work or total is empty, try non-streaming
                                 if not total:
                                     data["stream"] = False
-                                    response = requests.post("http://localhost:8000/v1/chat/completions", 
+                                    response = requests.post("http://localhost:8080/v1/chat/completions", 
                                                             headers=headers, 
                                                             data=json.dumps(data))
                                     if response.status_code == 200:
@@ -5886,7 +6066,7 @@ class NodeGraph(QtCore.QObject):
                                     print(data)
                                     
                                     # Call local server instead of remote API
-                                    response = requests.post("http://localhost:8000/v1/chat/completions", 
+                                    response = requests.post("http://localhost:8080/v1/chat/completions", 
                                                             headers=headers, 
                                                             data=json.dumps(data), 
                                                             stream=True)
@@ -5920,7 +6100,7 @@ class NodeGraph(QtCore.QObject):
                                         # If streaming didn't work or total is empty, try non-streaming
                                         if not total:
                                             data["stream"] = False
-                                            response = requests.post("http://localhost:8000/v1/chat/completions", 
+                                            response = requests.post("http://localhost:8080/v1/chat/completions", 
                                                                     headers=headers, 
                                                                     data=json.dumps(data))
                                             if response.status_code == 200:
@@ -5980,7 +6160,7 @@ class NodeGraph(QtCore.QObject):
                                     print(data)
 
                                     # Call local server instead of remote API
-                                    response = requests.post("http://localhost:8000/v1/chat/completions", 
+                                    response = requests.post("http://localhost:8080/v1/chat/completions", 
                                                             headers=headers, 
                                                             data=json.dumps(data), 
                                                             stream=True)
@@ -6014,7 +6194,7 @@ class NodeGraph(QtCore.QObject):
                                         # If streaming didn't work or total is empty, try non-streaming
                                         if not total:
                                             data["stream"] = False
-                                            response = requests.post("http://localhost:8000/v1/chat/completions", 
+                                            response = requests.post("http://localhost:8080/v1/chat/completions", 
                                                                     headers=headers, 
                                                                     data=json.dumps(data))
                                             if response.status_code == 200:
@@ -6444,9 +6624,7 @@ class NodeGraph(QtCore.QObject):
                     print(browser_elements)
                     print("sending to semantic search")
                     log.append({"role": "user", "content": "The intended target is " + description  + ". Generate a valid JSON only with double quotes for strings. Only return the json directly and don't add quotes or a prefix like ```json. The list of input elements is:" + json.dumps(browser_elements)[:100000]})
-                    if not hasattr(self, 'llama_server_process') or self.llama_server_process is None:
-                        self.setup_local_llama_server()
-    
+
                     # Convert OpenAI vision format to llama.cpp format
                     def convert_message_for_llama(message):
                         """Convert OpenAI vision API format to llama.cpp format"""
@@ -6479,16 +6657,16 @@ class NodeGraph(QtCore.QObject):
 
                     data = {
                         "model": "gemma-3-4b-it",  # This is what the llama.cpp server expects
-                        "messages": converted_log,
+                        "messages": log,
                         "temperature": 0.7,
                         "max_tokens": 5000,
-                        "stream": True  # Enable streaming to match original behavior
+                        "stream": False  # Enable streaming to match original behavior
                     }
 
                     print(data)
 
                     # Call local server instead of remote API
-                    response = requests.post("http://localhost:8000/v1/chat/completions", 
+                    response = requests.post("http://localhost:8080/v1/chat/completions", 
                                             headers=headers, 
                                             data=json.dumps(data), 
                                             stream=True)
@@ -6522,7 +6700,7 @@ class NodeGraph(QtCore.QObject):
                         # If streaming didn't work or total is empty, try non-streaming
                         if not total:
                             data["stream"] = False
-                            response = requests.post("http://localhost:8000/v1/chat/completions", 
+                            response = requests.post("http://localhost:8080/v1/chat/completions", 
                                                     headers=headers, 
                                                     data=json.dumps(data))
                             if response.status_code == 200:
@@ -6620,7 +6798,7 @@ class NodeGraph(QtCore.QObject):
                     print(data)
 
                     # Call local server instead of remote API
-                    response = requests.post("http://localhost:8000/v1/chat/completions", 
+                    response = requests.post("http://localhost:8080/v1/chat/completions", 
                                             headers=headers, 
                                             data=json.dumps(data), 
                                             stream=True)
@@ -6654,7 +6832,7 @@ class NodeGraph(QtCore.QObject):
                         # If streaming didn't work or total is empty, try non-streaming
                         if not total:
                             data["stream"] = False
-                            response = requests.post("http://localhost:8000/v1/chat/completions", 
+                            response = requests.post("http://localhost:8080/v1/chat/completions", 
                                                     headers=headers, 
                                                     data=json.dumps(data))
                             if response.status_code == 200:
@@ -6725,7 +6903,9 @@ class NodeGraph(QtCore.QObject):
                     buf = io.BytesIO()
                 
                     rgb_screenshot = screenshot.convert("RGB")
-                    rgb_screenshot.save(buf, format='JPEG')
+                    rgb_screenshot.save(buf, format='PNG')
+                    rgb_screenshot.save(r"rgb_screenshot.png")
+
                     byte_im = buf.getvalue()
                     import base64
                     encoded_jpeg = base64.b64encode(io.BytesIO(byte_im).read()).decode('utf-8')
@@ -7105,8 +7285,8 @@ class NodeGraph(QtCore.QObject):
                         #save the pixmap to disk
                         self.label.setFixedSize(new_max['width'], new_max['height'])
                         time.sleep(1)
-                        self.label.hide()
-                        self.label2.hide()
+                    self.label.hide()
+                    self.label2.hide()
 
        #                 self.label2.setFixedSize(960,48)
       #  cropped     = raw_image.crop((new_max['x'], new_max['y'], new_max['x'] + new_max['width'], new_max['y'] + new_max['height']))
@@ -7115,7 +7295,7 @@ class NodeGraph(QtCore.QObject):
                     print("winning click")
           #          self.chatInstance.showMinimized()
                     import pyautogui
-                    if new_max["browser"] == "false":
+                    if True:
                         if "Click Type" in graph["nodes"][node_id]["custom"]:
                             print("CUSTOM CLICK")
                             if "Double" in graph["nodes"][node_id]["custom"]["Click Type"]:
@@ -7235,7 +7415,7 @@ class NodeGraph(QtCore.QObject):
                         print(data)
                         
                         # Call local server instead of remote API
-                        response = requests.post("http://localhost:8000/v1/chat/completions", 
+                        response = requests.post("http://localhost:8080/v1/chat/completions", 
                                                 headers=headers, 
                                                 data=json.dumps(data), 
                                                 stream=True)
@@ -7269,7 +7449,7 @@ class NodeGraph(QtCore.QObject):
                             # If streaming didn't work or total is empty, try non-streaming
                             if not total:
                                 data["stream"] = False
-                                response = requests.post("http://localhost:8000/v1/chat/completions", 
+                                response = requests.post("http://localhost:8080/v1/chat/completions", 
                                                         headers=headers, 
                                                         data=json.dumps(data))
                                 if response.status_code == 200:
@@ -8414,10 +8594,14 @@ class NodeGraph(QtCore.QObject):
         self._viewer = (
             kwargs.get('viewer') or NodeViewer(undo_stack=self._undo_stack))
 
+        t0 = threading.Thread(target = self.startLlama)
+        t0.start()
         self._build_context_menu()
         self._register_builtin_nodes()
+        
         self._wire_signals()
-        self.restartServer()
+
+        #self.restartServer()
 
     def restartServer(self):
         self.server = Server(self.trigger, self.setkey, self.data_graph, self.runNode, self.thread_signals, self.sendMessageRTCAsync, self)
