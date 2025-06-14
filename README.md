@@ -2,7 +2,7 @@
 
 Open Agent Studio is the first cross platform desktop application built to enable Agentic Process Automation as an open-source alternative and replacement for UIpath and all other RPA tools today. 
 
-Download for Windows and Mac at https://openagent.studio.
+Download for Windows and Mac at https://cheatlayer.com .
 
 We founded Cheat Layer during the pandemic to help people who had lost their jobs and businesses rebuild online using GPT-3. We personally helped hundreds pro bono before turning to AI for help.
 
