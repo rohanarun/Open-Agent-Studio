@@ -20,7 +20,7 @@
 
 ## 🌟 What is Open Agent Studio?
 
-Open Agent Studio revolutionizes automation by enabling **Agentic Process Automation** through natural language. Instead of brittle selectors and complex code, describe what you want in plain English and let AI handle the rest.
+Open Agent Studio is an open-source alternative to UIPath and traditional RPA tools by enabling **Agentic Process Automation** through natural language. Instead of brittle selectors and complex code, describe what you want in plain English and let AI handle the rest.
 
 ### ✨ Key Features
 
