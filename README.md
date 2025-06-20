@@ -85,16 +85,6 @@ curl -X POST http://localhost:8080/agents \
 
 ---
 
-## 🧠 Key Concepts
-
-| Concept | Description |
-|---------|-------------|
-| **Nodes** | Individual actions an agent can perform |
-| **Variables** | Data passed between nodes |
-| **Verification** | Automatic checking of action success |
-| **Semantic Targets** | Natural language element descriptions |
-| **Agent API** | Built-in REST API for automation |
-
 ### 🎯 Semantic Targets
 Instead of fragile CSS selectors, use natural language:
 ```json
@@ -283,27 +273,16 @@ Creates and runs a new agent.
 **Response:**
 Returns execution results and verification data.
 
----
-
-## 🎯 Best Practices
-
-1. **Use descriptive semantic targets** instead of technical selectors
-2. **Add appropriate delays** for page loading
-3. **Handle errors gracefully** with verification
-4. **Use meaningful variable names**
-5. **Test with simple workflows first**
-6. **Leverage GPT-4 for complex logic**
-7. **Always verify critical actions**
 
 ---
 
 ## 🗺 Roadmap
 
-- [ ] **Open Agent Cloud** - Cloud-based execution
-- [ ] **Enhanced Video-to-Agent** - Improved conversion accuracy
+- [X] **Open Agent Cloud** - Cloud-based execution Done!
+- [X] **Enhanced Video-to-Agent** - Improved conversion accuracy Done!
 - [ ] **Advanced Evaluations** - Better testing for generalized agents
 - [ ] **Improved Testing Loop** - Self-healing automation
-- [ ] **Full Open Source Backend** - Complete local deployment
+- [X] **Full Open Source Backend** - Complete local deployment Done!
 
 ---
 
@@ -328,7 +307,6 @@ We welcome contributions! Here's how you can help:
 # Clone the repository
 git clone https://github.com/rohanarun/Open-Agent-Studio.git
 
-# Contact us for backend setup instructions
 # Email: rohan@cheatlayer.com
 ```
 
