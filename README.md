@@ -1,4 +1,4 @@
-# Open Agent Studio
+# Open Agent Studio - Build Unlimited Computer Use Agents Without Running Out Of Credits (Mac/Windows/Linux)
 
 <div align="center">
 
