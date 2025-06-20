@@ -20,7 +20,7 @@
 
 ## 🌟 What is Open Agent Studio?
 
-Open Agent Studio is an open-source alternative to UIPath and traditional RPA tools by enabling **Agentic Process Automation** through natural language. Instead of brittle selectors and complex code, describe what you want in plain English and let AI handle the rest.
+Open Agent Studio is an open-source alternative to UIPath and traditional RPA tools by enabling **Agentic Process Automation** through natural language. Instead of brittle selectors and complex code, describe what you want in plain English and let AI handle the rest. It uses unlimited free VLM models with state of the art object detection from our synthetic dataset to achieve state of the art computer use without credits across unlimited servers and agents. 
 
 ### ✨ Key Features
 
@@ -48,6 +48,9 @@ Open Agent Studio is an open-source alternative to UIPath and traditional RPA to
 ### 📺 Video Tutorials
 - [Windows Installation Guide](https://www.youtube.com/watch?v=8xhFKkD4H-0)
 - [Video-to-Agent Demo](https://www.youtube.com/watch?v=gsU5033ms5k)
+### ✨ Tools built using Open Agent Studio
+- Agentsbase.ai
+- Toy.new
 
 ---
 
