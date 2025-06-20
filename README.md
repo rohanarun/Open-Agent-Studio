@@ -49,9 +49,9 @@ Open Agent Studio is an open-source alternative to UIPath and traditional RPA to
 - [Windows Installation Guide](https://www.youtube.com/watch?v=8xhFKkD4H-0)
 - [Video-to-Agent Demo](https://www.youtube.com/watch?v=gsU5033ms5k)
 ### ✨ Tools built using Open Agent Studio
-- [![Agentsbase.ai](https://Agentsbase.ai)](#Agentsbase.ai)
+- [Agentsbase.ai](https://Agentsbase.ai)
 
-- [![Toy.new](https://Toy.new)](#Toy.new)
+- [Toy.new](https://Toy.new)
 
 ---
 
