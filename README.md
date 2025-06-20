@@ -5,7 +5,7 @@
 ![Open Agent Studio Logo](https://storage.googleapis.com/cheatlayer/agent.png)
 
 **The first cross-platform desktop application for Agentic Process Automation**  
-*An open-source alternative to UIPath and traditional RPA tools*
+*An open-source alternative to UIPath and traditional RPA tools using unlimited VLM models for semantic targets.*
 
 [![Downloads](https://img.shields.io/badge/Downloads-Available-green)](#-installation)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-blue)](#-installation)
