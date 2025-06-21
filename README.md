@@ -329,12 +329,6 @@ Founded during the pandemic to help people rebuild their businesses with AI, we 
 
 ---
 
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=rohanarun/Open-Agent-Studio&type=Date)](https://star-history.com/#rohanarun/Open-Agent-Studio&Date)
-
----
-
 <div align="center">
 
 **Made with ❤️ by the Cheat Layer Team**
